@@ -28,11 +28,17 @@ body{
   transition: height 300ms;
   
 }
-
+.btn{
+  padding:8px 20px !important;
+}
 .btn-blue{
   background-color:#0083e0 !important;
   color:white !important;
   padding:8px 20px !important;
+}
+.btn-sm{
+  padding:6px 20px !important ; 
+  font-size:13px !important;
 }
 .btn-blue:hover{
   background-color:#1690e5 !important;
@@ -49,3 +55,8 @@ body{
 
 }
 
+
+th.MuiTableCell-root{
+  @apply bg-[#f1f1f1]
+  py-2
+}

@@ -1,5 +1,5 @@
 import { Button } from "@mui/material";
-import React, { useState } from "react";
+import React, { useContext, useState } from "react";
 import Badge from "@mui/material/Badge";
 import { styled } from "@mui/material/styles";
 import IconButton from "@mui/material/IconButton";
@@ -14,6 +14,8 @@ import { FaUserAlt } from "react-icons/fa";
 import { IoLogOutSharp } from "react-icons/io5";
 
 import { RiMenu2Line } from "react-icons/ri";
+import { MyContext } from "../../App";
+
 
 
 const Header = () => {
@@ -35,16 +37,16 @@ const Header = () => {
   const handleCloseMyProfile = () => {
     setAnchorMyProfile(null);
   };
-
+ const context = useContext(MyContext)
   return (
-    <header className="w-full pr-7 shadow-md h-auto py-2 bg-[#fff]  pl-73 flex items-center justify-between">
+    <header
+    className={`w-full pr-7 shadow-md h-auto py-2 bg-[#fff]   ${context.isSidebarOpen===true?'pl-73':'pl-5'} flex items-center justify-between transition-all`}>
       <div className="part1">
-        <Button className="!w-[50px] !h-[50px] !min-w-[40px] !rounded-md !text-black ">
-          <img
-            src="/menu.png"
-            alt=""
-            className="w-full object-cover "
-          />
+        <Button className="!z-1000 !w-[50px] !h-[50px] !min-w-[40px] !rounded-md !text-black "
+        onClick={()=>context.setIsSidebarOpen(!context.isSidebarOpen)}
+        >
+          <RiMenu2Line className="text-[25px]"/>
+          
         </Button>
       </div>
  .     <div className="part2 w-[40%] flex items-center justify-end gap-5">
