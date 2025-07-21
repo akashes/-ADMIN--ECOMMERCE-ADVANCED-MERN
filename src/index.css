@@ -1,0 +1,51 @@
+@import "tailwindcss";
+
+
+body{
+  font-family: 'Nunito', sans-serif;
+    font-optical-sizing: auto;
+    background-color:#f1f1f1;
+}
+@theme{
+
+   --color-primary:var(--primary);
+   --color-secondary:var(--secondary);
+   --color-tertiary:var(--tertiary)
+}
+
+@layer base{
+  :root{
+    --primary:#ff5252;
+    --secondary:#0083e0;
+    --tertiary:#7ce854;
+    --primary-lighter:#ff7a7a;
+
+  }
+}
+
+/* react-collapse smooth transition */
+.ReactCollapse--collapse {
+  transition: height 300ms;
+  
+}
+
+.btn-blue{
+  background-color:#0083e0 !important;
+  color:white !important;
+  padding:8px 20px !important;
+}
+.btn-blue:hover{
+  background-color:#1690e5 !important;
+  color:#f1f1f1 !important;
+}
+::-webkit-scrollbar{
+  width: 5px;
+  height: 6px;
+}
+::-webkit-scrollbar-thumb{
+  
+  background-color:#7ce854 !important;
+  border-radius:50px
+
+}
+
