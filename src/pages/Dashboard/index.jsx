@@ -10,7 +10,7 @@ import ProgressBar from '../../components/ProgressBar'
 import { AiFillEdit } from "react-icons/ai";
 import { FaEye } from "react-icons/fa";
 import { MdDelete } from "react-icons/md";
-import Tooltip from '@mui/material/Tooltip';
+import TooltipMUI from '@mui/material/Tooltip';
 
 
 
@@ -26,6 +26,7 @@ import TableRow from '@mui/material/TableRow';
 import MenuItem from '@mui/material/MenuItem';
 import Select from '@mui/material/Select';
 
+import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
 
 
 const columns=[
@@ -45,7 +46,54 @@ function createData(name, code, population, size) {
 
 
 
+
 const Dashboard = () => {
+  const[chart1Data,setChart1Data]=useState(
+    [
+  {
+    name: 'JAN',
+    TotalSales: 4000,
+    TotalUsers: 2400,
+    amt: 2400,
+  },
+  {
+    name: 'FEB',
+    TotalSales: 3000,
+    TotalUsers: 1398,
+    amt: 2210,
+  },
+  {
+    name: 'MAR',
+    TotalSales: 2000,
+    TotalUsers: 9800,
+    amt: 2290,
+  },
+  {
+    name: 'APR',
+    TotalSales: 2780,
+    TotalUsers: 3908,
+    amt: 2000,
+  },
+  {
+    name: 'MAY',
+    TotalSales: 1890,
+    TotalUsers: 4800,
+    amt: 2181,
+  },
+  {
+    name: 'JUN',
+    TotalSales: 2390,
+    TotalUsers: 3800,
+    amt: 2500,
+  },
+  {
+    name: 'JUL',
+    TotalSales: 3490,
+    TotalUsers: 4300,
+    amt: 2100,
+  },
+]
+  )
 
     const [categoryFilterVal, setCategoryFilterVal] = React.useState('');
 
@@ -219,7 +267,7 @@ const Dashboard = () => {
 
   <td className="px-6 py-2">
     <div className="flex items-center gap-1">
-      <Tooltip placement='top' title='Edit Product'>
+      <TooltipMUI placement='top' title='Edit Product'>
 
       <Button className='!w-[35px] !h-[35px]  bg-[#f1f1f1] !min-w-[35px]  !border !border-[rgba(0,0,0,0.1)] !rounded-full hover:!bg-[#f1f1f1] hover:!shadow-sm hover:scale-110'>
 
@@ -227,21 +275,21 @@ const Dashboard = () => {
       </Button>
 
       
-      </Tooltip>
-      <Tooltip placement='top' title='View Product details'>
+      </TooltipMUI>
+      <TooltipMUI placement='top' title='View Product details'>
 
       <Button className='!w-[35px] !h-[35px]  bg-[#f1f1f1] !min-w-[35px]  !border !border-[rgba(0,0,0,0.1)] !rounded-full hover:!bg-[#f1f1f1] hover:!shadow-sm hover:scale-110'>
 
         <FaEye className='text-[rgba(0,0,0,0.7)] text-[20px] '/>
       </Button>
-      </Tooltip>
-      <Tooltip placement='top' title='Remove Product'>
+      </TooltipMUI>
+      <TooltipMUI placement='top' title='Remove Product'>
 
       <Button className='!w-[35px] !h-[35px]  bg-[#f1f1f1] !min-w-[35px]  !border !border-[rgba(0,0,0,0.1)] !rounded-full hover:!bg-[#f1f1f1] hover:!shadow-sm hover:scale-110'>
 
         <MdDelete className='text-[rgba(0,0,0,0.7)] text-[20px] '/>
       </Button>
-      </Tooltip>
+      </TooltipMUI>
     </div>
 
   </td>
@@ -302,7 +350,7 @@ const Dashboard = () => {
 
   <td className="px-6 py-2">
     <div className="flex items-center gap-1">
-      <Tooltip placement='top' title='Edit Product'>
+      <TooltipMUI placement='top' title='Edit Product'>
 
       <Button className='!w-[35px] !h-[35px]  bg-[#f1f1f1] !min-w-[35px]  !border !border-[rgba(0,0,0,0.1)] !rounded-full hover:!bg-[#f1f1f1] hover:!shadow-sm hover:scale-110'>
 
@@ -310,21 +358,21 @@ const Dashboard = () => {
       </Button>
 
       
-      </Tooltip>
-      <Tooltip placement='top' title='View Product details'>
+      </TooltipMUI>
+      <TooltipMUI placement='top' title='View Product details'>
 
       <Button className='!w-[35px] !h-[35px]  bg-[#f1f1f1] !min-w-[35px]  !border !border-[rgba(0,0,0,0.1)] !rounded-full hover:!bg-[#f1f1f1] hover:!shadow-sm hover:scale-110'>
 
         <FaEye className='text-[rgba(0,0,0,0.7)] text-[20px] '/>
       </Button>
-      </Tooltip>
-      <Tooltip placement='top' title='Remove Product'>
+      </TooltipMUI>
+      <TooltipMUI placement='top' title='Remove Product'>
 
       <Button className='!w-[35px] !h-[35px]  bg-[#f1f1f1] !min-w-[35px]  !border !border-[rgba(0,0,0,0.1)] !rounded-full hover:!bg-[#f1f1f1] hover:!shadow-sm hover:scale-110'>
 
         <MdDelete className='text-[rgba(0,0,0,0.7)] text-[20px] '/>
       </Button>
-      </Tooltip>
+      </TooltipMUI>
     </div>
 
   </td>
@@ -385,7 +433,7 @@ const Dashboard = () => {
 
   <td className="px-6 py-2">
     <div className="flex items-center gap-1">
-      <Tooltip placement='top' title='Edit Product'>
+      <TooltipMUI placement='top' title='Edit Product'>
 
       <Button className='!w-[35px] !h-[35px]  bg-[#f1f1f1] !min-w-[35px]  !border !border-[rgba(0,0,0,0.1)] !rounded-full hover:!bg-[#f1f1f1] hover:!shadow-sm hover:scale-110'>
 
@@ -393,21 +441,21 @@ const Dashboard = () => {
       </Button>
 
       
-      </Tooltip>
-      <Tooltip placement='top' title='View Product details'>
+      </TooltipMUI>
+      <TooltipMUI placement='top' title='View Product details'>
 
       <Button className='!w-[35px] !h-[35px]  bg-[#f1f1f1] !min-w-[35px]  !border !border-[rgba(0,0,0,0.1)] !rounded-full hover:!bg-[#f1f1f1] hover:!shadow-sm hover:scale-110'>
 
         <FaEye className='text-[rgba(0,0,0,0.7)] text-[20px] '/>
       </Button>
-      </Tooltip>
-      <Tooltip placement='top' title='Remove Product'>
+      </TooltipMUI>
+      <TooltipMUI placement='top' title='Remove Product'>
 
       <Button className='!w-[35px] !h-[35px]  bg-[#f1f1f1] !min-w-[35px]  !border !border-[rgba(0,0,0,0.1)] !rounded-full hover:!bg-[#f1f1f1] hover:!shadow-sm hover:scale-110'>
 
         <MdDelete className='text-[rgba(0,0,0,0.7)] text-[20px] '/>
       </Button>
-      </Tooltip>
+      </TooltipMUI>
     </div>
 
   </td>
@@ -468,7 +516,7 @@ const Dashboard = () => {
 
   <td className="px-6 py-2">
     <div className="flex items-center gap-1">
-      <Tooltip placement='top' title='Edit Product'>
+      <TooltipMUI placement='top' title='Edit Product'>
 
       <Button className='!w-[35px] !h-[35px]  bg-[#f1f1f1] !min-w-[35px]  !border !border-[rgba(0,0,0,0.1)] !rounded-full hover:!bg-[#f1f1f1] hover:!shadow-sm hover:scale-110'>
 
@@ -476,21 +524,21 @@ const Dashboard = () => {
       </Button>
 
       
-      </Tooltip>
-      <Tooltip placement='top' title='View Product details'>
+      </TooltipMUI>
+      <TooltipMUI placement='top' title='View Product details'>
 
       <Button className='!w-[35px] !h-[35px]  bg-[#f1f1f1] !min-w-[35px]  !border !border-[rgba(0,0,0,0.1)] !rounded-full hover:!bg-[#f1f1f1] hover:!shadow-sm hover:scale-110'>
 
         <FaEye className='text-[rgba(0,0,0,0.7)] text-[20px] '/>
       </Button>
-      </Tooltip>
-      <Tooltip placement='top' title='Remove Product'>
+      </TooltipMUI>
+      <TooltipMUI placement='top' title='Remove Product'>
 
       <Button className='!w-[35px] !h-[35px]  bg-[#f1f1f1] !min-w-[35px]  !border !border-[rgba(0,0,0,0.1)] !rounded-full hover:!bg-[#f1f1f1] hover:!shadow-sm hover:scale-110'>
 
         <MdDelete className='text-[rgba(0,0,0,0.7)] text-[20px] '/>
       </Button>
-      </Tooltip>
+      </TooltipMUI>
     </div>
 
   </td>
@@ -551,7 +599,7 @@ const Dashboard = () => {
 
   <td className="px-6 py-2">
     <div className="flex items-center gap-1">
-      <Tooltip placement='top' title='Edit Product'>
+      <TooltipMUI placement='top' title='Edit Product'>
 
       <Button className='!w-[35px] !h-[35px]  bg-[#f1f1f1] !min-w-[35px]  !border !border-[rgba(0,0,0,0.1)] !rounded-full hover:!bg-[#f1f1f1] hover:!shadow-sm hover:scale-110'>
 
@@ -559,21 +607,21 @@ const Dashboard = () => {
       </Button>
 
       
-      </Tooltip>
-      <Tooltip placement='top' title='View Product details'>
+      </TooltipMUI>
+      <TooltipMUI placement='top' title='View Product details'>
 
       <Button className='!w-[35px] !h-[35px]  bg-[#f1f1f1] !min-w-[35px]  !border !border-[rgba(0,0,0,0.1)] !rounded-full hover:!bg-[#f1f1f1] hover:!shadow-sm hover:scale-110'>
 
         <FaEye className='text-[rgba(0,0,0,0.7)] text-[20px] '/>
       </Button>
-      </Tooltip>
-      <Tooltip placement='top' title='Remove Product'>
+      </TooltipMUI>
+      <TooltipMUI placement='top' title='Remove Product'>
 
       <Button className='!w-[35px] !h-[35px]  bg-[#f1f1f1] !min-w-[35px]  !border !border-[rgba(0,0,0,0.1)] !rounded-full hover:!bg-[#f1f1f1] hover:!shadow-sm hover:scale-110'>
 
         <MdDelete className='text-[rgba(0,0,0,0.7)] text-[20px] '/>
       </Button>
-      </Tooltip>
+      </TooltipMUI>
     </div>
 
   </td>
@@ -702,7 +750,7 @@ const Dashboard = () => {
               </TableCell>
               <TableCell style={{minWidth:columns.minWidth}}>
                    <div className="flex items-center gap-1">
-      <Tooltip placement='top' title='Edit Product'>
+      <TooltipMUI placement='top' title='Edit Product'>
 
       <Button className='!w-[35px] !h-[35px]  bg-[#f1f1f1] !min-w-[35px]  !border !border-[rgba(0,0,0,0.1)] !rounded-full hover:!bg-[#f1f1f1] hover:!shadow-sm hover:scale-110'>
 
@@ -710,21 +758,21 @@ const Dashboard = () => {
       </Button>
 
       
-      </Tooltip>
-      <Tooltip placement='top' title='View Product details'>
+      </TooltipMUI>
+      <TooltipMUI placement='top' title='View Product details'>
 
       <Button className='!w-[35px] !h-[35px]  bg-[#f1f1f1] !min-w-[35px]  !border !border-[rgba(0,0,0,0.1)] !rounded-full hover:!bg-[#f1f1f1] hover:!shadow-sm hover:scale-110'>
 
         <FaEye className='text-[rgba(0,0,0,0.7)] text-[20px] '/>
       </Button>
-      </Tooltip>
-      <Tooltip placement='top' title='Remove Product'>
+      </TooltipMUI>
+      <TooltipMUI placement='top' title='Remove Product'>
 
       <Button className='!w-[35px] !h-[35px]  bg-[#f1f1f1] !min-w-[35px]  !border !border-[rgba(0,0,0,0.1)] !rounded-full hover:!bg-[#f1f1f1] hover:!shadow-sm hover:scale-110'>
 
         <MdDelete className='text-[rgba(0,0,0,0.7)] text-[20px] '/>
       </Button>
-      </Tooltip>
+      </TooltipMUI>
     </div>
               </TableCell>
         
@@ -772,7 +820,7 @@ const Dashboard = () => {
               </TableCell>
               <TableCell style={{minWidth:columns.minWidth}}>
                    <div className="flex items-center gap-1">
-      <Tooltip placement='top' title='Edit Product'>
+      <TooltipMUI placement='top' title='Edit Product'>
 
       <Button className='!w-[35px] !h-[35px]  bg-[#f1f1f1] !min-w-[35px]  !border !border-[rgba(0,0,0,0.1)] !rounded-full hover:!bg-[#f1f1f1] hover:!shadow-sm hover:scale-110'>
 
@@ -780,21 +828,21 @@ const Dashboard = () => {
       </Button>
 
       
-      </Tooltip>
-      <Tooltip placement='top' title='View Product details'>
+      </TooltipMUI>
+      <TooltipMUI placement='top' title='View Product details'>
 
       <Button className='!w-[35px] !h-[35px]  bg-[#f1f1f1] !min-w-[35px]  !border !border-[rgba(0,0,0,0.1)] !rounded-full hover:!bg-[#f1f1f1] hover:!shadow-sm hover:scale-110'>
 
         <FaEye className='text-[rgba(0,0,0,0.7)] text-[20px] '/>
       </Button>
-      </Tooltip>
-      <Tooltip placement='top' title='Remove Product'>
+      </TooltipMUI>
+      <TooltipMUI placement='top' title='Remove Product'>
 
       <Button className='!w-[35px] !h-[35px]  bg-[#f1f1f1] !min-w-[35px]  !border !border-[rgba(0,0,0,0.1)] !rounded-full hover:!bg-[#f1f1f1] hover:!shadow-sm hover:scale-110'>
 
         <MdDelete className='text-[rgba(0,0,0,0.7)] text-[20px] '/>
       </Button>
-      </Tooltip>
+      </TooltipMUI>
     </div>
               </TableCell>
         
@@ -842,7 +890,7 @@ const Dashboard = () => {
               </TableCell>
               <TableCell style={{minWidth:columns.minWidth}}>
                    <div className="flex items-center gap-1">
-      <Tooltip placement='top' title='Edit Product'>
+      <TooltipMUI placement='top' title='Edit Product'>
 
       <Button className='!w-[35px] !h-[35px]  bg-[#f1f1f1] !min-w-[35px]  !border !border-[rgba(0,0,0,0.1)] !rounded-full hover:!bg-[#f1f1f1] hover:!shadow-sm hover:scale-110'>
 
@@ -850,21 +898,21 @@ const Dashboard = () => {
       </Button>
 
       
-      </Tooltip>
-      <Tooltip placement='top' title='View Product details'>
+      </TooltipMUI>
+      <TooltipMUI placement='top' title='View Product details'>
 
       <Button className='!w-[35px] !h-[35px]  bg-[#f1f1f1] !min-w-[35px]  !border !border-[rgba(0,0,0,0.1)] !rounded-full hover:!bg-[#f1f1f1] hover:!shadow-sm hover:scale-110'>
 
         <FaEye className='text-[rgba(0,0,0,0.7)] text-[20px] '/>
       </Button>
-      </Tooltip>
-      <Tooltip placement='top' title='Remove Product'>
+      </TooltipMUI>
+      <TooltipMUI placement='top' title='Remove Product'>
 
       <Button className='!w-[35px] !h-[35px]  bg-[#f1f1f1] !min-w-[35px]  !border !border-[rgba(0,0,0,0.1)] !rounded-full hover:!bg-[#f1f1f1] hover:!shadow-sm hover:scale-110'>
 
         <MdDelete className='text-[rgba(0,0,0,0.7)] text-[20px] '/>
       </Button>
-      </Tooltip>
+      </TooltipMUI>
     </div>
               </TableCell>
         
@@ -912,7 +960,7 @@ const Dashboard = () => {
               </TableCell>
               <TableCell style={{minWidth:columns.minWidth}}>
                    <div className="flex items-center gap-1">
-      <Tooltip placement='top' title='Edit Product'>
+      <TooltipMUI placement='top' title='Edit Product'>
 
       <Button className='!w-[35px] !h-[35px]  bg-[#f1f1f1] !min-w-[35px]  !border !border-[rgba(0,0,0,0.1)] !rounded-full hover:!bg-[#f1f1f1] hover:!shadow-sm hover:scale-110'>
 
@@ -920,21 +968,21 @@ const Dashboard = () => {
       </Button>
 
       
-      </Tooltip>
-      <Tooltip placement='top' title='View Product details'>
+      </TooltipMUI>
+      <TooltipMUI placement='top' title='View Product details'>
 
       <Button className='!w-[35px] !h-[35px]  bg-[#f1f1f1] !min-w-[35px]  !border !border-[rgba(0,0,0,0.1)] !rounded-full hover:!bg-[#f1f1f1] hover:!shadow-sm hover:scale-110'>
 
         <FaEye className='text-[rgba(0,0,0,0.7)] text-[20px] '/>
       </Button>
-      </Tooltip>
-      <Tooltip placement='top' title='Remove Product'>
+      </TooltipMUI>
+      <TooltipMUI placement='top' title='Remove Product'>
 
       <Button className='!w-[35px] !h-[35px]  bg-[#f1f1f1] !min-w-[35px]  !border !border-[rgba(0,0,0,0.1)] !rounded-full hover:!bg-[#f1f1f1] hover:!shadow-sm hover:scale-110'>
 
         <MdDelete className='text-[rgba(0,0,0,0.7)] text-[20px] '/>
       </Button>
-      </Tooltip>
+      </TooltipMUI>
     </div>
               </TableCell>
         
@@ -982,7 +1030,7 @@ const Dashboard = () => {
               </TableCell>
               <TableCell style={{minWidth:columns.minWidth}}>
                    <div className="flex items-center gap-1">
-      <Tooltip placement='top' title='Edit Product'>
+      <TooltipMUI placement='top' title='Edit Product'>
 
       <Button className='!w-[35px] !h-[35px]  bg-[#f1f1f1] !min-w-[35px]  !border !border-[rgba(0,0,0,0.1)] !rounded-full hover:!bg-[#f1f1f1] hover:!shadow-sm hover:scale-110'>
 
@@ -990,21 +1038,21 @@ const Dashboard = () => {
       </Button>
 
       
-      </Tooltip>
-      <Tooltip placement='top' title='View Product details'>
+      </TooltipMUI>
+      <TooltipMUI placement='top' title='View Product details'>
 
       <Button className='!w-[35px] !h-[35px]  bg-[#f1f1f1] !min-w-[35px]  !border !border-[rgba(0,0,0,0.1)] !rounded-full hover:!bg-[#f1f1f1] hover:!shadow-sm hover:scale-110'>
 
         <FaEye className='text-[rgba(0,0,0,0.7)] text-[20px] '/>
       </Button>
-      </Tooltip>
-      <Tooltip placement='top' title='Remove Product'>
+      </TooltipMUI>
+      <TooltipMUI placement='top' title='Remove Product'>
 
       <Button className='!w-[35px] !h-[35px]  bg-[#f1f1f1] !min-w-[35px]  !border !border-[rgba(0,0,0,0.1)] !rounded-full hover:!bg-[#f1f1f1] hover:!shadow-sm hover:scale-110'>
 
         <MdDelete className='text-[rgba(0,0,0,0.7)] text-[20px] '/>
       </Button>
-      </Tooltip>
+      </TooltipMUI>
     </div>
               </TableCell>
         
@@ -1193,6 +1241,49 @@ const Dashboard = () => {
 
           </div>
    </div>
+
+      <div className="card my-4 shadow-md sm:rounded-lg bg-white">
+        <div className='flex items-center justify-between px-5 py-5 pb-0 '>
+          <h2 className='text-[18px] font-[700]'>
+            Total Users & Total Sales
+
+             </h2>
+
+        </div>
+        <div className='flex items-center justify-start px-5 py-5 pt-0 gap-3 '>
+          <span className='flex items-center gap-1 text-[15px]'>
+            <span className='block bg-green-500 rounded-full w-[10px] h-[10px] '></span>
+            Total Users
+          </span>
+          <span className='flex items-center gap-1 text-[15px]'>
+            <span className='block bg-secondary rounded-full w-[10px] h-[10px] '></span>
+            Total Sales
+          </span>
+
+        </div>
+      <LineChart
+        width={1000}
+        height={500}
+        data={chart1Data}
+        margin={{
+          top: 5,
+          right: 30,
+          left: 20,
+          bottom: 5,
+        }}
+      >
+        <CartesianGrid strokeDasharray="3 3"
+        stroke='none'
+        />
+        <XAxis dataKey="name" tick={{fontSize:12}} />
+        <YAxis tick={{fontSize:12}} />
+        <Tooltip />
+        <Legend />
+        <Line type="monotone" dataKey="TotalSales" stroke="#8884d8" activeDot={{ r: 8 }} strokeWidth={3} />
+        <Line type="monotone" dataKey="TotalUsers" stroke="#82ca9d" strokeWidth={3} />
+      </LineChart>
+        </div>
+
    </> 
   )
 }
