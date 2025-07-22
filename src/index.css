@@ -2,9 +2,9 @@
 
 
 body{
-  font-family: 'Nunito', sans-serif;
+  font-family: "Raleway", sans-serif;
     font-optical-sizing: auto;
-    background-color:#f1f1f1;
+    
 }
 @theme{
 
@@ -40,6 +40,10 @@ body{
   padding:6px 20px !important ; 
   font-size:13px !important;
 }
+.btn-lg{
+  padding:8px 20px !important ; 
+  font-size:16px !important;
+}
 .btn-blue:hover{
   background-color:#1690e5 !important;
   color:#f1f1f1 !important;
@@ -59,4 +63,10 @@ body{
 th.MuiTableCell-root{
   @apply bg-[#f1f1f1]
   py-2
+}
+
+
+/* default checked labeled checkbox in login page */
+.css-rizt0-MuiTypography-root{
+  font-size: 14px !important;
 }

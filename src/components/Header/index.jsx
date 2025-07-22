@@ -60,7 +60,10 @@ const Header = () => {
             />
           </Button>
         </StyledBadge>
-        <div
+           {
+          context.isLogin ===true ?
+          (
+               <div
           className="rounded-full w-[35px] h-[35px] overflow-hidden cursor-pointer"
           onClick={handleClickMyProfile}
         >
@@ -70,6 +73,14 @@ const Header = () => {
             className="object-cover w-full h-full"
           />
         </div>
+          )
+          :
+          (
+            <Button className="btn-blue btn-sm !shadow-lg !rounded-full">Sign In</Button>
+          )
+        }
+     
+     
       </div>
 
       <Menu
