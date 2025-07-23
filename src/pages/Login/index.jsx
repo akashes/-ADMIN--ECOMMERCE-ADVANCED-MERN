@@ -19,7 +19,7 @@ const[isPasswordShow,setIsPasswordShow]=useState(false);
     setLoadingGoogle(true);
   }
   return (
-   <section className=' bg-[#fff] w-full  '>
+   <section className='  w-full  '>
     <header className='w-full fixed top-0 left-0 z-100 px-4 py-3 flex items-center justify-between'>
         <Link to='/'>
         <img src="https://serviceapi.spicezgold.com/download/1750047766437_logo.jpg" alt="" className='w-[200px]' />
@@ -42,7 +42,7 @@ const[isPasswordShow,setIsPasswordShow]=useState(false);
 
     </header>
     {/* background image */}
-<div className="fixed top-0 left-0 w-full h-full opacity-10 bg-[url('https://res.cloudinary.com/dllelmzim/image/upload/v1753140814/patern_z0bmzz.webp')] bg-repeat"></div>
+<div className="fixed top-0 left-0 w-full h-full opacity-7 bg-[url('https://res.cloudinary.com/dllelmzim/image/upload/v1753140814/patern_z0bmzz.webp')] bg-repeat z-[-1]"></div>
 
     <div className="loginBox card w-[600px] h-auto pb-25 mx-auto mt-20 relative z-50 ">
         <div className="text-center">

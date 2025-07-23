@@ -1,4 +1,4 @@
-
+import React from 'react'
 import { createBrowserRouter,Router,RouterProvider } from 'react-router'
 import Dashboard from './pages/Dashboard'
 import Header from './components/Header'
@@ -6,19 +6,50 @@ import Sidebar from './components/Sidebar'
 import { createContext, useState } from 'react'
 import Login from './pages/Login'
 import SignUp from './pages/SignUp'
+import Products from './pages/Products'
 
+import Dialog from '@mui/material/Dialog';
+
+import AppBar from '@mui/material/AppBar';
+import Toolbar from '@mui/material/Toolbar';
+import IconButton from '@mui/material/IconButton';
+import Typography from '@mui/material/Typography';
+import Slide from '@mui/material/Slide';
+import { IoIosClose } from "react-icons/io";
+import AddProduct from './pages/Products/AddProduct'
+import HomeSliderBanners from './pages/HomeSliderBanners'
+import AddHomeSlide from './pages/HomeSliderBanners/AddHomeSlide'
+import CategoryList from './pages/Category'
+import AddCategory from './pages/Category/AddCategory'
+import SubCategoryList from './pages/Category/SubCatList'
+import AddSubCategory from './pages/Category/AddSubCategory'
+import Users from './pages/Users'
+import Orders from './pages/Orders'
+
+
+
+const Transition = React.forwardRef(function Transition(props, ref) {
+  return <Slide direction="up" ref={ref} {...props} />;
+});
 
 export const MyContext = createContext()
 
 function App() {
-  const[isSidebarOpen,setIsSidebarOpen]=useState(false)
+  const[isSidebarOpen,setIsSidebarOpen]=useState(true)
   const[isLogin,setIsLogin]=useState(false)
+
+  const[isAddProductModalOpen,setIsAddProductModalOpen]=useState({
+    open:false,
+    modal:''
+  })
   
   const values={
     isSidebarOpen,
     setIsSidebarOpen,
     isLogin,
-    setIsLogin
+    setIsLogin,
+    isAddProductModalOpen,
+    setIsAddProductModalOpen
   }
   
 const router = createBrowserRouter([
@@ -56,15 +87,212 @@ const router = createBrowserRouter([
    element: 
    <SignUp/>
   },
+    {
+    path:'/products',
+   element: 
+   <>
+   <section className="main">
+    <Header/>
+    <div className="contentMain flex">
+      <div  
+
+      className={`sidebarWrapper overflow-hidden
+        ${isSidebarOpen===true?'w-[18%]':'w-[0px] opacity-0  '}
+        transition-all
+        `}
+      >
+        <Sidebar/>
+      </div>
+      <div className={`contentRight py-4 px-5  ${isSidebarOpen===false?'w-[100%]':'w-[82%]'} `} >
+        <Products />
+      </div>
+    </div>
+    
+   </section>
+   </>
+  },
+    {
+    path:'/homeSlider/list',
+   element: 
+   <>
+   <section className="main">
+    <Header/>
+    <div className="contentMain flex">
+      <div  
+
+      className={`sidebarWrapper overflow-hidden
+        ${isSidebarOpen===true?'w-[18%]':'w-[0px] opacity-0  '}
+        transition-all
+        `}
+      >
+        <Sidebar/>
+      </div>
+      <div className={`contentRight py-4 px-5  ${isSidebarOpen===false?'w-[100%]':'w-[82%]'} `} >
+        <HomeSliderBanners />
+      </div>
+    </div>
+    
+   </section>
+   </>
+  },
+    {
+    path:'/category/list',
+   element: 
+   <>
+   <section className="main">
+    <Header/>
+    <div className="contentMain flex">
+      <div  
+
+      className={`sidebarWrapper overflow-hidden
+        ${isSidebarOpen===true?'w-[18%]':'w-[0px] opacity-0  '}
+        transition-all
+        `}
+      >
+        <Sidebar/>
+      </div>
+      <div className={`contentRight py-4 px-5  ${isSidebarOpen===false?'w-[100%]':'w-[82%]'} `} >
+        <CategoryList />
+      </div>
+    </div>
+    
+   </section>
+   </>
+  },
+    {
+    path:'/subCategory/list',
+   element: 
+   <>
+   <section className="main">
+    <Header/>
+    <div className="contentMain flex">
+      <div  
+
+      className={`sidebarWrapper overflow-hidden
+        ${isSidebarOpen===true?'w-[18%]':'w-[0px] opacity-0  '}
+        transition-all
+        `}
+      >
+        <Sidebar/>
+      </div>
+      <div className={`contentRight py-4 px-5  ${isSidebarOpen===false?'w-[100%]':'w-[82%]'} `} >
+        <SubCategoryList />
+      </div>
+    </div>
+    
+   </section>
+   </>
+  },
+    {
+    path:'/users',
+   element: 
+   <>
+   <section className="main">
+    <Header/>
+    <div className="contentMain flex">
+      <div  
+
+      className={`sidebarWrapper overflow-hidden
+        ${isSidebarOpen===true?'w-[18%]':'w-[0px] opacity-0  '}
+        transition-all
+        `}
+      >
+        <Sidebar/>
+      </div>
+      <div className={`contentRight py-4 px-5  ${isSidebarOpen===false?'w-[100%]':'w-[82%]'} `} >
+        <Users />
+      </div>
+    </div>
+    
+   </section>
+   </>
+  },
+    {
+    path:'/orders',
+   element: 
+   <>
+   <section className="main">
+    <Header/>
+    <div className="contentMain flex">
+      <div  
+
+      className={`sidebarWrapper overflow-hidden
+        ${isSidebarOpen===true?'w-[18%]':'w-[0px] opacity-0  '}
+        transition-all
+        `}
+      >
+        <Sidebar/>
+      </div>
+      <div className={`contentRight py-4 px-5  ${isSidebarOpen===false?'w-[100%]':'w-[82%]'} `} >
+        <Orders />
+      </div>
+    </div>
+    
+   </section>
+   </>
+  },
+
+
 
 ])  
 
-console.log(isSidebarOpen)
+const handleCloseAddProductModal = () => {
+  setIsAddProductModalOpen({
+    open:false,
+    modal:''
+  });
+};
+
+console.log(isAddProductModalOpen)
+
+console.log(isAddProductModalOpen)
   return (
     <>
     <MyContext.Provider value={values}>
 
       <RouterProvider router={router} />
+
+
+           <Dialog
+        fullScreen
+        open={isAddProductModalOpen.open}
+        onClose={handleCloseAddProductModal}
+        slots={{
+          transition: Transition,
+        }}
+      >
+        <AppBar sx={{ position: 'relative' }}>
+          <Toolbar>
+            <IconButton
+              edge="start"
+              color="inherit"
+              onClick={handleCloseAddProductModal}
+              aria-label="close"
+            >
+              <IoIosClose className=' !text-gray-800' />
+            </IconButton>
+            <Typography sx={{ ml: 2, flex: 1 }} variant="h6" component="div">
+              <span className="text-gray-800">
+
+              {isAddProductModalOpen?.modal}
+              </span>
+            </Typography>
+            
+          </Toolbar>
+        </AppBar>
+        {
+          isAddProductModalOpen?.modal === 'Add Product' && <AddProduct/>
+        }
+        {
+          isAddProductModalOpen?.modal ==='Add Home Slide' && <AddHomeSlide/>
+        }
+        {
+          isAddProductModalOpen?.modal ==='Add New Category' && <AddCategory/>
+        }
+        {
+          isAddProductModalOpen?.modal ==='Add New Sub Category' && <AddSubCategory/>
+        }
+      </Dialog>
     </MyContext.Provider>
     </>
   )

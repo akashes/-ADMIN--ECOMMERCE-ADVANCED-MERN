@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useContext, useState } from 'react'
 import DashboardBoxes from '../../components/DashboardBoxes'
 import { Button, Pagination } from '@mui/material'
 import { FaAngleDown } from 'react-icons/fa6'
@@ -27,6 +27,7 @@ import MenuItem from '@mui/material/MenuItem';
 import Select from '@mui/material/Select';
 
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
+import { MyContext } from '../../App'
 
 
 const columns=[
@@ -46,8 +47,9 @@ function createData(name, code, population, size) {
 
 
 
-
+``
 const Dashboard = () => {
+  const context = useContext(MyContext)
   const[chart1Data,setChart1Data]=useState(
     [
   {
@@ -145,7 +147,9 @@ const Dashboard = () => {
       <h1 className='text-[35px] font-bold leading-12 mb-3 '>Welcome, <br /> Akash  👋</h1>
       <p>Here’s What happening on your store today. See the statistics at once.</p>
       <br />
-       <Button className='btn-blue flex gap-2 !capitalize group'>
+       <Button className='btn-blue flex gap-2 !capitalize group'
+       onClick={()=>context.setIsAddProductModalOpen({open:true,modal:'Add Product'})}
+       >
         <img src="/ecommerce.png" alt="" className='w-[30px] group-hover:scale-105' />
         Add Product
        </Button>
@@ -155,7 +159,6 @@ const Dashboard = () => {
    </div>
    <DashboardBoxes/>
 
-{/* recent orders section */}
    <div className="card my-4 shadow-md sm:rounded-lg bg-white">
     <div className="flex items-center justify-between px-3 py-5">
       <h2 className='text-[18px] font-[600]'>Products(Tailwind css table)</h2>
@@ -183,7 +186,10 @@ const Dashboard = () => {
         </div>
         <div className="col w-[25%] ml-auto flex items-center justify-end gap-3">
           <Button className='btn !bg-green-600 !text-white btn-sm'>Export</Button>
-          <Button className='btn-blue btn-sm'>Add Product</Button>
+          <Button className='btn-blue btn-sm' 
+                 onClick={()=>context.setIsAddProductModalOpen({open:true,modal:'Add Product'})}
+
+          >Add Product</Button>
 
         </div>
       </div>
@@ -640,7 +646,7 @@ const Dashboard = () => {
    </div>
 
 
-{/* testing */}
+{/* testing - products mui table*/}
    <div className="card my-4 shadow-md sm:rounded-lg bg-white">
     <div className="flex items-center justify-between px-3 py-5">
       <h2 className='text-[18px] font-[600]'>Products(Material ui  table)</h2>
@@ -1076,7 +1082,7 @@ const Dashboard = () => {
         
 
    </div> 
-
+ {/* recent orders section */}
    <div className="card my-4 shadow-md sm:rounded-lg bg-white">
     <div className="flex items-center justify-between px-3 py-5">
       <h2 className='text-[18px] font-[600]'>Recent Orders</h2>
@@ -1241,7 +1247,7 @@ const Dashboard = () => {
 
           </div>
    </div>
-
+{/* chart section */}
       <div className="card my-4 shadow-md sm:rounded-lg bg-white">
         <div className='flex items-center justify-between px-5 py-5 pb-0 '>
           <h2 className='text-[18px] font-[700]'>

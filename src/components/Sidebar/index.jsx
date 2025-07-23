@@ -69,12 +69,18 @@ const Sidebar = () => {
                 <Collapse isOpened={subMenuIndex===1}>
                 <ul className='!w-full'> 
                     <li className='!w-full'>
+                        <Link to='/homeSlider/list'>
                         <Button className='!text-[rgba(0,0,0,0.7)] !justify-start   !capitalize !text-[13px] !font-[500] !pl-9 flex gap-3'>
                             <span className='block w-[5px] h-[5px] rounded-full bg-[rgba(0,0,0,0.3)]'></span>
                             Home Banners List</Button>
+                        </Link>
                     </li>
                     <li className='!w-full'>
-                        <Button className='!text-[rgba(0,0,0,0.7)] !justify-start   !capitalize !text-[13px] !font-[500] !pl-9 flex gap-3'>
+                        <Button className='!text-[rgba(0,0,0,0.7)] !justify-start   !capitalize !text-[13px] !font-[500] !pl-9 flex gap-3'
+        onClick={()=>context.setIsAddProductModalOpen({
+                            open:true,
+                            modal:'Add Home Slide'
+                        })}                        >
                             <span className='block w-[5px] h-[5px] rounded-full bg-[rgba(0,0,0,0.3)]'></span>
                             Add Home Banner Slide</Button>
 
@@ -99,22 +105,26 @@ const Sidebar = () => {
                 <Collapse isOpened={subMenuIndex===2}>
                 <ul className='!w-full'> 
                     <li className='!w-full'>
-                        <Link to='/categories'>
+                        <Link to='/category/list'>
                         <Button className='!text-[rgba(0,0,0,0.7)] !justify-start   !capitalize !text-[13px] !font-[500] !pl-9 flex gap-3'>
                             <span className='block w-[5px] h-[5px] rounded-full bg-[rgba(0,0,0,0.3)]'></span>
                             Category List</Button>
                         </Link>
                     </li>
                     <li className='!w-full'>
-                        <Link to='/category-add' >
-                        <Button className='!text-[rgba(0,0,0,0.7)] !justify-start   !capitalize !text-[13px] !font-[500] !pl-9 flex gap-3'>
+                        <Button className='!text-[rgba(0,0,0,0.7)] !justify-start   !capitalize !text-[13px] !font-[500] !pl-9 flex gap-3'
+                        
+                        onClick={()=>context.setIsAddProductModalOpen({
+                            open:true,
+                            modal:'Add New Category'
+                        })}
+                        >
                             <span className='block w-[5px] h-[5px] rounded-full bg-[rgba(0,0,0,0.3)]'></span>
                             Add A Category</Button>
-                        </Link>
 
                     </li>
                     <li className='!w-full'>
-                        <Link to='/category/subCat' >
+                        <Link to='/subCategory/list' >
                         <Button className='!text-[rgba(0,0,0,0.7)] !justify-start   !capitalize !text-[13px] !font-[500] !pl-9 flex gap-3'>
                             <span className='block w-[5px] h-[5px] rounded-full bg-[rgba(0,0,0,0.3)]'></span>
                             Sub Category List</Button>
@@ -122,11 +132,14 @@ const Sidebar = () => {
 
                     </li>
                     <li className='!w-full'>
-                        <Link to='/category/subCat/add' >
-                        <Button className='!text-[rgba(0,0,0,0.7)] !justify-start   !capitalize !text-[13px] !font-[500] !pl-9 flex gap-3'>
+                        <Button className='!text-[rgba(0,0,0,0.7)] !justify-start   !capitalize !text-[13px] !font-[500] !pl-9 flex gap-3'
+                           onClick={()=>context.setIsAddProductModalOpen({
+                            open:true,
+                            modal:'Add New Sub Category'
+                        })}
+                        >
                             <span className='block w-[5px] h-[5px] rounded-full bg-[rgba(0,0,0,0.3)]'></span>
                             Add A Sub Category</Button>
-                        </Link>
 
                     </li>
                 </ul>
@@ -150,33 +163,36 @@ const Sidebar = () => {
                 <ul className='!w-full'> 
                     <li className='!w-full'>
                     <Link to='/products'>
-                        <Button className='!text-[rgba(0,0,0,0.7)] !justify-start   !capitalize !text-[13px] !font-[500] !pl-9 flex gap-3'>
-                            <span className='block w-[5px] h-[5px] rounded-full bg-[rgba(0,0,0,0.3)]'></span>
+                        <Button className='!text-[rgba(0,0,0,0.7)] !justify-start   !capitalize !text-[13px] !font-[500] !pl-9 flex gap-3 w-full'>
+                            <span className='block w-[5px] h-[5px] rounded-full bg-[rgba(0,0,0,0.3)] '></span>
                             Product List</Button>
                     </Link>
                     </li>
                     <li className='!w-full'>
-                        <Link to='/product/upload' >
-                        <Button className='!text-[rgba(0,0,0,0.7)] !justify-start   !capitalize !text-[13px] !font-[500] !pl-9 flex gap-3'>
+                        <Button className='!text-[rgba(0,0,0,0.7)] !justify-start   !capitalize !text-[13px] !font-[500] !pl-9 flex gap-3 w-full'
+                        onClick={()=>context.setIsAddProductModalOpen({
+                            open:true,
+                            modal:'Add Product'
+                        })}
+                        >
                             <span className='block w-[5px] h-[5px] rounded-full bg-[rgba(0,0,0,0.3)]'></span>
                             Product Upload</Button>
-                        </Link>
 
                     </li>
                     <li className='!w-full'>
-                        <Button className='!text-[rgba(0,0,0,0.7)] !justify-start   !capitalize !text-[13px] !font-[500] !pl-9 flex gap-3'>
+                        <Button className='!text-[rgba(0,0,0,0.7)] !justify-start   !capitalize !text-[13px] !font-[500] !pl-9 flex gap-3 w-full'>
                             <span className='block w-[5px] h-[5px] rounded-full bg-[rgba(0,0,0,0.3)]'></span>
                             Add Product RAMS</Button>
 
                     </li>
                     <li className='!w-full'>
-                        <Button className='!text-[rgba(0,0,0,0.7)] !justify-start   !capitalize !text-[13px] !font-[500] !pl-9 flex gap-3'>
+                        <Button className='!text-[rgba(0,0,0,0.7)] !justify-start   !capitalize !text-[13px] !font-[500] !pl-9 flex gap-3 w-full'>
                             <span className='block w-[5px] h-[5px] rounded-full bg-[rgba(0,0,0,0.3)]'></span>
                             Add Product WEIGHT</Button>
 
                     </li>
                     <li className='!w-full'>
-                        <Button className='!text-[rgba(0,0,0,0.7)] !justify-start   !capitalize !text-[13px] !font-[500] !pl-9 flex gap-3'>
+                        <Button className='!text-[rgba(0,0,0,0.7)] !justify-start   !capitalize !text-[13px] !font-[500] !pl-9 flex gap-3 w-full'>
                             <span className='block w-[5px] h-[5px] rounded-full bg-[rgba(0,0,0,0.3)]'></span>
                             Add Product SIZE</Button>
 
@@ -194,10 +210,12 @@ const Sidebar = () => {
             </Link>
         </li>
         <li>
+            <Link to='/orders'>
             <Button className='w-full !capitalize  !py-2 hover:!bg-[#f1f1f1] !text-[rgba(0,0,0,0.9)] !justify-start gap-3 !text-[14px] !font-[500] items-center'>
                <IoBagCheckOutline className='text-[18px]'/> 
                <span>Orders</span>
                 </Button>
+            </Link>
         </li>
         <li>
             <Button className='w-full !capitalize  !py-2 hover:!bg-[#f1f1f1] !text-[rgba(0,0,0,0.9)] !justify-start gap-3 !text-[14px] !font-[500] items-center'>
