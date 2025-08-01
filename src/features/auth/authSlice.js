@@ -109,9 +109,11 @@ export const tryAutoLogin = createAsyncThunk(
       console.log('token not found or expired');
       
       try {
+        console.log('calling refres-token endpoint')
         const res = await postData('/api/user/refresh-token');
         console.log(res)
         const newToken = res.data?.accessToken;
+        console.log('got new acess token',newToken)
         if (!newToken) throw new Error('Token refresh failed');
         localStorage.setItem('accessToken', newToken);
         token = newToken;
@@ -122,6 +124,8 @@ export const tryAutoLogin = createAsyncThunk(
 
     try {
       console.log('second try')
+      console.log('token not expired or available')
+      console.log('calling user-detaiils endpoint')
 
       const res = await axios.get('/api/user/user-details');
       console.log('response from user details',res)
@@ -183,7 +187,9 @@ export const scheduleTokenRefresh = createAsyncThunk(
     const refreshTime = exp * 1000 - Date.now() - 30 * 1000;
 
     refreshTimer = setTimeout(async () => {
+      console.log('hitting refresh token inside scheduleRefresh thunk')
       const newToken = await refreshAccessToken();
+      console.log(newToken)
       if (newToken) {
         localStorage.setItem('accessToken', newToken);
         dispatch(scheduleTokenRefresh(newToken));
@@ -214,6 +220,33 @@ export const resetPassword=createAsyncThunk(
   }
 )
 
+
+export const uploadAvatar=createAsyncThunk(
+  'auth/uploadAvatar',
+  async (formData,{rejectWithValue})=>{
+    try {
+      const res=await axios.put('/api/user/upload-avatar',formData)
+      console.log(res)
+      if(!res.data.success){
+        throw new Error(res.data.message || 'Avatar upload failed')
+      }
+      return res.data
+    } catch (err) {
+      return rejectWithValue(err.response?.data?.message || err.message || 'Avatar upload failed')
+    }
+  })
+
+  export const updateUserDetails=createAsyncThunk('auth/updateUserDetails',async ({name,mobile},{rejectWithValue})=>{
+    try {
+      const res=await axios.put('/api/user/update-user-details',{name,mobile})
+      if(!res.data.success){
+        throw new Error(res.data.message || 'User details update failed')
+      }
+      return res.data
+    } catch (err) {
+      return rejectWithValue(err.response?.data?.message || err.message || 'User details update failed')
+    }
+  })
 const initialState = {
   isLogin: false,
   user: null,
@@ -221,7 +254,9 @@ const initialState = {
   loading: false,
   error: null,
   resetPasswordToken: null,
-  authChecked:false
+  authChecked:false,
+  userLoading:false,
+  userError:null
 };
 
 const authSlice = createSlice({
@@ -342,6 +377,34 @@ const authSlice = createSlice({
         state.loading = false;
         state.error = action.payload || 'Password reset failed';
       })
+
+      .addCase(uploadAvatar.pending, (state) => {
+        state.userLoading = true;
+        state.userError = null;
+      })
+      .addCase(uploadAvatar.fulfilled, (state, action) => {
+        state.userLoading = false;
+        state.userError = null;
+        state.user.avatar.url = action.payload.avatar;
+      })
+      .addCase(uploadAvatar.rejected, (state, action) => {
+        state.userLoading = false;
+        state.userError = action.payload || 'Avatar upload failed';
+      })
+      .addCase(updateUserDetails.pending, (state) => {
+        state.userLoading = true;
+        state.userError = null;
+      })
+      .addCase(updateUserDetails.fulfilled, (state, action) => {
+        state.userLoading = false;
+        state.userError = null;
+        state.user.name = action.payload.name;
+        state.user.mobile = action.payload.mobile;
+      })
+      .addCase(updateUserDetails.rejected, (state, action) => {
+        state.userLoading = false;
+        state.userError = action.payload || 'User details update failed';
+      });
   },
 });
 

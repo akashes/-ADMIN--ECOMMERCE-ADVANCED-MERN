@@ -33,6 +33,7 @@ import { useDispatch } from 'react-redux'
 import { tryAutoLogin } from './features/auth/authSlice'
 import PrivateRoute from './routes/PrivateRoute'
 import ResetPassword from './pages/ResetPassword'
+import Profile from './pages/Profile'
 
 
 const Transition = React.forwardRef(function Transition(props, ref) {
@@ -265,7 +266,31 @@ const router = createBrowserRouter([
   {
     path:"/reset-password",
     element:<ResetPassword/>
-  }
+  },
+   {
+    path:'/profile',
+   element: 
+   <>
+   <section className="main">
+    <Header/>
+    <div className="contentMain flex">
+      <div  
+
+      className={`sidebarWrapper overflow-hidden
+        ${isSidebarOpen===true?'w-[18%]':'w-[0px] opacity-0  '}
+        transition-all
+        `}
+      >
+        <Sidebar/>
+      </div>
+      <div className={`contentRight py-4 px-5  ${isSidebarOpen===false?'w-[100%]':'w-[82%]'} `} >
+        <Profile />
+      </div>
+    </div>
+    
+   </section>
+   </>
+  },
 
 
 

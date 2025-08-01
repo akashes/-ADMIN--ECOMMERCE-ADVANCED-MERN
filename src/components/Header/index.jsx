@@ -167,12 +167,14 @@ const Header = () => {
         </div>
         </MenuItem>
         <Divider/>
+        <Link to='/profile'>
         <MenuItem onClick={handleCloseMyProfile}
         className="flex items-center gap-3 "
         >
         <FaUserAlt/> 
         <span className="text-[14px]">Profile</span>
         </MenuItem>
+          </Link>
         <MenuItem onClick={()=>{
           handleLogout();
           handleCloseMyProfile();
