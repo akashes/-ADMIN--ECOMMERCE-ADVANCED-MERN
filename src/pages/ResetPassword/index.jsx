@@ -12,65 +12,48 @@ import { FaEyeSlash } from "react-icons/fa";
 import CircularProgress from '@mui/material/CircularProgress';
 import { useDispatch, useSelector } from 'react-redux';
 import { showError, showSuccess, showWarning } from '../../utils/toastUtils';
-import {  loginUser, userLogin } from '../../features/auth/authSlice';
+import {  loginUser, resetPassword, userLogin } from '../../features/auth/authSlice';
 
 
 
-const Login = () => {
+const ResetPassword = () => {
     const{loading}=useSelector(state=>state.auth)
 const[isPasswordShow,setIsPasswordShow]=useState(false);
-const[email,setEmail]=useState('');
 const[password,setPassword]=useState('');
+
+const[confirmPassword,setConfirmPassword]=useState('');
+const[isConfirmPasswordShow,setIsConfirmPasswordShow]=useState(false);
 
 const dispatch = useDispatch()
 const navigate = useNavigate()
-const [loadingGoogle, setLoadingGoogle] = useState(false);
-  function handleClickGoogle() {
-    setLoadingGoogle(true);
-  }
-  const navigateToForgot=()=>{
-    navigate('/forgot-password',{state:{email}})
-  }
-  const handleLogin=async(e)=>{
+  const handleResetPassword=async(e)=>{
     e.preventDefault()
     //input validation
-    if(!email || !password){
+    if(!password || !confirmPassword){
         showWarning('Please fill all the fields')
         return
     }
-    if(password.length<6){
+    if(password.length<6 || confirmPassword.length<6){
         showWarning('Password must be at least 6 characters long')
         return
     }
-    const resultAction = await dispatch(userLogin({email,password}))
-    console.log(resultAction)
-    if(userLogin.fulfilled.match(resultAction)){
-        
-        showSuccess(resultAction.payload.message ||'Login successful')
-        navigate('/')
-        await dispatch(loginUser({
-            token: resultAction.payload.accessToken,
-            user: resultAction.payload.user
-        }))
-
-  } 
-  if(userLogin.rejected.match(resultAction)){
-    showError(resultAction.payload.message ||'Login failed')
-  }
-
-  }
-  const navigateToVerify=()=>{
-    if(!email){
-        showWarning('Please enter a valid email address')
+    if(password!==confirmPassword){
+        showWarning('Passwords does not match')
         return
     }
-      navigate('/verify',{
-        replace:true,
-        state:{
-            email,
-            message:"An OTP has been sent to your email address. Please verify to continue",
-        }
-    })
+    const resultAction = await dispatch(resetPassword({newPassword:password,confirmPassword}))
+    console.log(resultAction)
+    if(resetPassword.fulfilled.match(resultAction)){
+        
+        showSuccess(resultAction.payload ||'Password reset successful')
+        navigate('/login')
+     
+
+  } 
+  if(resetPassword.rejected.match(resultAction)){
+    showError(resultAction.payload ||'Password reset failed')
+  }
+
   }
    return (
    <section className='  w-full  '>
@@ -106,42 +89,19 @@ const [loadingGoogle, setLoadingGoogle] = useState(false);
 
         <img src="https://ecommerce-admin-view.netlify.app/icon.svg" alt="" className='m-auto' />
         </div>
-        <h1 className='text-center text-[35px] font-[800] mt-4'>Welcome Back! <br />
-        <span className='text-nowrap'>Sign in with your credentials.</span>
+        <h1 className='text-center text-[35px] font-[800] mt-4'>Reset Your Password <br />
+        <span className='text-nowrap'>from here!</span>
         </h1>
         {/* google signin button */}
-        <div className="flex items-center justify-center w-full mt-5">
-             <Button
-          size="small"
-          onClick={handleClickGoogle}
-          endIcon={<FcGoogle className='!text-[28px]' />}
-          loading={loadingGoogle}
-        //   loadingIndicator="Loading..."
-          loadingPosition="end"
-          variant="outlined"
-          className='!capitalize !bg-none !text-[rgba(0,0,0,0.7)] !text-[16px]   !px-5  !py-2'
-        >
-          Sign in with Google
-        </Button>
-        </div>
+      
         <br />
-        <div className='w-full flex items-center justify-center gap-3'>
-            <span className='flex items-center w-[100px] h-[1px] bg-[rgba(0,0,0,0.2)] '></span>
-            <span className='text-nowrap text-[15px] text-[rgba(0,0,0,0.9)] font-[500]'>Or, Sign in with your email</span>
-            <span className='flex items-center w-[100px] h-[1px] bg-[rgba(0,0,0,0.2)] '></span>
-        </div>
+ 
           <br />
 
-        <form className='w-full px-8 mt-3' onSubmit={handleLogin} >
-            <div className="form-group mb-4 w-full">
-                <h4 className='text-[14px] font-[500] mb-1'>Email</h4>
-                <input type="email" name="email" id="email"
-                className='w-full h-[45px] border-2 border-[rgba(0,0,0,0.2)] rounded-md  px-3 focus:border-[rgba(0,0,0,0.5)] focus:outline-none'
-                autoFocus
-                value={email}
-                onChange={(e)=>setEmail(e.target.value)}
-                />
-            </div>
+        <form className='w-full px-8 mt-3' 
+        onSubmit={handleResetPassword}
+         >
+          
             <div className="form-group mb-4 w-full">
                 <h4 className='text-[14px] font-[500] mb-1'>Password</h4>
                <div className='relative w-full'>
@@ -160,14 +120,33 @@ const [loadingGoogle, setLoadingGoogle] = useState(false);
 
                 </Button>
                </div>
+               
+            </div>
+            <div className="form-group mb-4 w-full">
+                <h4 className='text-[14px] font-[500] mb-1'>Confirm Password</h4>
+               <div className='relative w-full'>
+                     <input type={isConfirmPasswordShow ? 'text' : 'password'} name="confirm-password" id="confirm-password"
+                className='w-full h-[45px] border-2 border-[rgba(0,0,0,0.2)] rounded-md  px-3 focus:border-[rgba(0,0,0,0.5)] focus:outline-none'
+                value={confirmPassword}
+                onChange={(e)=>setConfirmPassword(e.target.value)}
+                />
+                <Button className='!absolute !text-[rgba(0,0,0,0.6)] top-[50%] -translate-y-1/2 right-[10px] z-50 !rounded-full !w-[40px] !h-[40px] !min-w-[40px]'
+                onClick={()=>setIsConfirmPasswordShow(!isConfirmPasswordShow)}
+                >
+                {
+                    isConfirmPasswordShow ? <FaRegEye className='text-[18px]' /> : <FaEyeSlash className='text-[18px]' />
+                }
+                    
+
+                </Button>
+               </div>
+               
             </div>
             <div className="form-group mb-4 w-full flex items-center justify-between">
-              <button type='button' className='text-gray-600 font-[700] text-[15px] hover:underline hover:text-gray-700'
-              onClick={navigateToVerify}
-              >Verify Email</button>
-                  <p onClick={navigateToForgot} className='text-secondary font-[700] text-[15px] hover:underline hover:text-gray-700' >
-                  Forgot Password
-                  </p>
+                  <Link to='/login' className='text-secondary font-[700] text-[15px] hover:underline hover:text-gray-700' >
+                  Login
+                  </Link>
+               
 
 
             </div>
@@ -175,7 +154,7 @@ const [loadingGoogle, setLoadingGoogle] = useState(false);
             type='submit'
             >
                 {
-                    loading ? <CircularProgress size={30} />:'Sign In'
+                    loading ? <CircularProgress size={30} />:'Reset Password'
                 }
             </Button>
         </form>
@@ -190,4 +169,4 @@ const [loadingGoogle, setLoadingGoogle] = useState(false);
   )
 }
 
-export default Login
+export default ResetPassword

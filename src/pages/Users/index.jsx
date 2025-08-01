@@ -14,6 +14,7 @@ import TableHead from '@mui/material/TableHead';
 import TablePagination from '@mui/material/TablePagination';
 import TableRow from '@mui/material/TableRow';
 
+import { RxCalendar } from "react-icons/rx";
 
 import ProgressBar from '../../components/ProgressBar'
 
@@ -41,6 +42,7 @@ const columns=[
   {id:'userName',label:'USER NAME',minWidth:100},
   {id:'userEmail',label:'EMAIL',minWidth:150},
   {id:'phoneNumber',label:'PHONE.NO',minWidth:100},
+  {id:'createdDate',label:'CREATED DATE',minWidth:100},
 
 ]
 const Users = () => {
@@ -118,7 +120,7 @@ const Users = () => {
 
               </TableCell>
               <TableCell style={{minWidth:columns.minWidth}}>
-                <div className="flex items-center gap-4 w-[70px]"><div className="img w-[65px] h-[65px] rounded-md overflow-hidden group">
+                <div className="flex items-center gap-4 w-[70px]"><div className="img w-[45px] h-[45px] rounded-md overflow-hidden group">
                   <Link to='/'>
                 <img alt="" className="w-full group-hover:scale-105 transition-transform" src="https://th.bing.com/th/id/OIP.hTxZrOQUYguQuDSHn0ctrwHaHZ?w=172&h=180&c=7&r=0&o=7&dpr=1.3&pid=1.7&rm=3"/>
                   </Link>
@@ -143,6 +145,232 @@ const Users = () => {
 
                 <MdOutlineLocalPhone className='text-[20px]'/>
               +91-9768675579
+                </div>
+                         </TableCell>
+              <TableCell style={{minWidth:columns.minWidth}}>
+                <div className="flex items-center gap-2">
+                    <RxCalendar className='text-[22px]'/>
+                 13-12-2023
+                </div>
+                         </TableCell>
+            
+        
+             
+        
+            </TableRow>
+            <TableRow >
+              <TableCell style={{minWidth:columns.minWidth}}>
+                <Checkbox {...label} size='small'/>
+
+              </TableCell>
+              <TableCell style={{minWidth:columns.minWidth}}>
+                <div className="flex items-center gap-4 w-[70px]"><div className="img w-[45px] h-[45px] rounded-md overflow-hidden group">
+                  <Link to='/'>
+                <img alt="" className="w-full group-hover:scale-105 transition-transform" src="https://th.bing.com/th/id/OIP.hTxZrOQUYguQuDSHn0ctrwHaHZ?w=172&h=180&c=7&r=0&o=7&dpr=1.3&pid=1.7&rm=3"/>
+                  </Link>
+              
+                </div>
+              
+                </div>
+
+              </TableCell>
+              <TableCell style={{minWidth:columns.minWidth}}>
+                 Akash es
+              </TableCell>
+              <TableCell style={{minWidth:columns.minWidth}}>
+                <div className="flex items-center gap-2">
+
+                <MdOutlineMarkEmailRead />
+                  akashes@gmail.com
+                </div>
+              </TableCell>
+              <TableCell style={{minWidth:columns.minWidth}}>
+                <div className="flex items-center gap-2">
+
+                <MdOutlineLocalPhone className='text-[20px]'/>
+              +91-9768675579
+                </div>
+                         </TableCell>
+              <TableCell style={{minWidth:columns.minWidth}}>
+                <div className="flex items-center gap-2">
+                    <RxCalendar className='text-[22px]'/>
+                 13-12-2023
+                </div>
+                         </TableCell>
+            
+        
+             
+        
+            </TableRow>
+            <TableRow >
+              <TableCell style={{minWidth:columns.minWidth}}>
+                <Checkbox {...label} size='small'/>
+
+              </TableCell>
+              <TableCell style={{minWidth:columns.minWidth}}>
+                <div className="flex items-center gap-4 w-[70px]"><div className="img w-[45px] h-[45px] rounded-md overflow-hidden group">
+                  <Link to='/'>
+                <img alt="" className="w-full group-hover:scale-105 transition-transform" src="https://th.bing.com/th/id/OIP.hTxZrOQUYguQuDSHn0ctrwHaHZ?w=172&h=180&c=7&r=0&o=7&dpr=1.3&pid=1.7&rm=3"/>
+                  </Link>
+              
+                </div>
+              
+                </div>
+
+              </TableCell>
+              <TableCell style={{minWidth:columns.minWidth}}>
+                 Akash es
+              </TableCell>
+              <TableCell style={{minWidth:columns.minWidth}}>
+                <div className="flex items-center gap-2">
+
+                <MdOutlineMarkEmailRead />
+                  akashes@gmail.com
+                </div>
+              </TableCell>
+              <TableCell style={{minWidth:columns.minWidth}}>
+                <div className="flex items-center gap-2">
+
+                <MdOutlineLocalPhone className='text-[20px]'/>
+              +91-9768675579
+                </div>
+                         </TableCell>
+              <TableCell style={{minWidth:columns.minWidth}}>
+                <div className="flex items-center gap-2">
+                    <RxCalendar className='text-[22px]'/>
+                 13-12-2023
+                </div>
+                         </TableCell>
+            
+        
+             
+        
+            </TableRow>
+            <TableRow >
+              <TableCell style={{minWidth:columns.minWidth}}>
+                <Checkbox {...label} size='small'/>
+
+              </TableCell>
+              <TableCell style={{minWidth:columns.minWidth}}>
+                <div className="flex items-center gap-4 w-[70px]"><div className="img w-[45px] h-[45px] rounded-md overflow-hidden group">
+                  <Link to='/'>
+                <img alt="" className="w-full group-hover:scale-105 transition-transform" src="https://th.bing.com/th/id/OIP.hTxZrOQUYguQuDSHn0ctrwHaHZ?w=172&h=180&c=7&r=0&o=7&dpr=1.3&pid=1.7&rm=3"/>
+                  </Link>
+              
+                </div>
+              
+                </div>
+
+              </TableCell>
+              <TableCell style={{minWidth:columns.minWidth}}>
+                 Akash es
+              </TableCell>
+              <TableCell style={{minWidth:columns.minWidth}}>
+                <div className="flex items-center gap-2">
+
+                <MdOutlineMarkEmailRead />
+                  akashes@gmail.com
+                </div>
+              </TableCell>
+              <TableCell style={{minWidth:columns.minWidth}}>
+                <div className="flex items-center gap-2">
+
+                <MdOutlineLocalPhone className='text-[20px]'/>
+              +91-9768675579
+                </div>
+                         </TableCell>
+              <TableCell style={{minWidth:columns.minWidth}}>
+                <div className="flex items-center gap-2">
+                    <RxCalendar className='text-[22px]'/>
+                 13-12-2023
+                </div>
+                         </TableCell>
+            
+        
+             
+        
+            </TableRow>
+            <TableRow >
+              <TableCell style={{minWidth:columns.minWidth}}>
+                <Checkbox {...label} size='small'/>
+
+              </TableCell>
+              <TableCell style={{minWidth:columns.minWidth}}>
+                <div className="flex items-center gap-4 w-[70px]"><div className="img w-[45px] h-[45px] rounded-md overflow-hidden group">
+                  <Link to='/'>
+                <img alt="" className="w-full group-hover:scale-105 transition-transform" src="https://th.bing.com/th/id/OIP.hTxZrOQUYguQuDSHn0ctrwHaHZ?w=172&h=180&c=7&r=0&o=7&dpr=1.3&pid=1.7&rm=3"/>
+                  </Link>
+              
+                </div>
+              
+                </div>
+
+              </TableCell>
+              <TableCell style={{minWidth:columns.minWidth}}>
+                 Akash es
+              </TableCell>
+              <TableCell style={{minWidth:columns.minWidth}}>
+                <div className="flex items-center gap-2">
+
+                <MdOutlineMarkEmailRead />
+                  akashes@gmail.com
+                </div>
+              </TableCell>
+              <TableCell style={{minWidth:columns.minWidth}}>
+                <div className="flex items-center gap-2">
+
+                <MdOutlineLocalPhone className='text-[20px]'/>
+              +91-9768675579
+                </div>
+                         </TableCell>
+              <TableCell style={{minWidth:columns.minWidth}}>
+                <div className="flex items-center gap-2">
+                    <RxCalendar className='text-[22px]'/>
+                 13-12-2023
+                </div>
+                         </TableCell>
+            
+        
+             
+        
+            </TableRow>
+            <TableRow >
+              <TableCell style={{minWidth:columns.minWidth}}>
+                <Checkbox {...label} size='small'/>
+
+              </TableCell>
+              <TableCell style={{minWidth:columns.minWidth}}>
+                <div className="flex items-center gap-4 w-[70px]"><div className="img w-[45px] h-[45px] rounded-md overflow-hidden group">
+                  <Link to='/'>
+                <img alt="" className="w-full group-hover:scale-105 transition-transform" src="https://th.bing.com/th/id/OIP.hTxZrOQUYguQuDSHn0ctrwHaHZ?w=172&h=180&c=7&r=0&o=7&dpr=1.3&pid=1.7&rm=3"/>
+                  </Link>
+              
+                </div>
+              
+                </div>
+
+              </TableCell>
+              <TableCell style={{minWidth:columns.minWidth}}>
+                 Akash es
+              </TableCell>
+              <TableCell style={{minWidth:columns.minWidth}}>
+                <div className="flex items-center gap-2">
+
+                <MdOutlineMarkEmailRead />
+                  akashes@gmail.com
+                </div>
+              </TableCell>
+              <TableCell style={{minWidth:columns.minWidth}}>
+                <div className="flex items-center gap-2">
+
+                <MdOutlineLocalPhone className='text-[20px]'/>
+              +91-9768675579
+                </div>
+                         </TableCell>
+              <TableCell style={{minWidth:columns.minWidth}}>
+                <div className="flex items-center gap-2">
+                    <RxCalendar className='text-[22px]'/>
+                 13-12-2023
                 </div>
                          </TableCell>
             

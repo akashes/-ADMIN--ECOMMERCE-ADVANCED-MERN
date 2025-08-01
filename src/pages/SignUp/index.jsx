@@ -1,6 +1,6 @@
 import { Button } from '@mui/material'
 import React, { useState } from 'react'
-import { Link, NavLink } from 'react-router-dom'
+import { Link, NavLink, useLocation, useNavigate } from 'react-router-dom'
 import { MdOutlineLogin } from "react-icons/md";
 import { FaRegUser } from "react-icons/fa6";
 import { FcGoogle } from "react-icons/fc";
@@ -9,15 +9,90 @@ import FormControlLabel from '@mui/material/FormControlLabel';
 import Checkbox from '@mui/material/Checkbox';
 import { FaRegEye } from "react-icons/fa";
 import { FaEyeSlash } from "react-icons/fa";
+import { showError, showSuccess, showWarning } from '../../utils/toastUtils';
+import CircularProgress from '@mui/material/CircularProgress';
+import { useDispatch, useSelector } from 'react-redux';
+import { registerUser } from '../../features/auth/authSlice';
 
 
 const SignUp = () => {
+    const navigate = useNavigate()
+    const dispatch = useDispatch()
+    const location = useLocation()
+    const {loading}=useSelector(state=>state.auth)
+
+    const[isLoading,setIsLoading]=useState(false)
 const[isPasswordShow,setIsPasswordShow]=useState(false);
+  const [formFields,setFormFields]=useState({
+    name: "",
+    email: "",
+    password: ""
+  })
+
+  const handleSubmit = async(e) => {
+      e.preventDefault();
+
+    //input validation
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if(!emailRegex.test(formFields.email)){
+        showWarning('Please enter a valid email address')
+        return
+    }
+    if(!formFields.name || !formFields.email || !formFields.password){
+        showWarning('Please fill all the fields')
+        return
+    
+    }
+     if(formFields.password.length<6){
+        showWarning('Password must be at least 6 characters long')
+        return
+    }
+    setIsLoading(true)
+    const resultAction = await dispatch(registerUser(formFields))
+    console.log(resultAction)
+    if(registerUser.fulfilled.match(resultAction)){
+        showSuccess(resultAction.payload ||'Registration successful')
+        localStorage.setItem('verifyEmail',formFields.email)
+        
+ 
+    setTimeout(()=>{
+         navigate('/verify',{
+        replace:true,
+        state:{
+            email:formFields.email,
+            message:"An OTP has been sent to your email address. Please verify to continue",
+        }
+    })
+
+
+    },2000)
+       setFormFields({
+        name: "",
+        email: "",
+        password: ""
+    })
+  
+    }else{
+        showError(resultAction.payload ||'Registration failed')
+    }
+    
+    setIsLoading(false)
+   
+
+
+
+
+
+    
+
+
+  }
 
       const [loadingGoogle, setLoadingGoogle] = useState(false);
   function handleClickGoogle() {
     setLoadingGoogle(true);
   }
+  console.log(formFields)
   return (
    <section className='  w-full  '>
     <header className='w-full fixed top-0 left-0 z-100 px-4 py-3 flex items-center justify-between'>
@@ -35,6 +110,7 @@ const[isPasswordShow,setIsPasswordShow]=useState(false);
 
             <Button className='!rounded-full !text-[rgba(0,0,0,0.9)]  !px-5 flex gap-1'>
                 <FaRegUser className='text-[15px] '/>
+
                 Sign Up
                 </Button>
             </NavLink>
@@ -79,17 +155,23 @@ benefits and stay up-to-date.
         </div>
           <br />
 
-        <form className='w-full px-8 mt-3' >
+        <form className='w-full px-8 mt-3'  onSubmit={handleSubmit} >
             <div className="form-group mb-4 w-full">
                 <h4 className='text-[14px] font-[500] mb-1'>Full Name</h4>
-                <input type="email" name="name" id=""
+                <input type="text" name="name" id=""
+                autoFocus
+
                 className='w-full h-[45px] border-2 border-[rgba(0,0,0,0.2)] rounded-md  px-3 focus:border-[rgba(0,0,0,0.5)] focus:outline-none'
+                value={formFields.name}
+                onChange={(e)=>setFormFields({...formFields,name:e.target.value})}
                 />
             </div>
             <div className="form-group mb-4 w-full">
                 <h4 className='text-[14px] font-[500] mb-1'>Email</h4>
                 <input type="email" name="email" id=""
                 className='w-full h-[45px] border-2 border-[rgba(0,0,0,0.2)] rounded-md  px-3 focus:border-[rgba(0,0,0,0.5)] focus:outline-none'
+                value={formFields.email}
+                onChange={(e)=>setFormFields({...formFields,email:e.target.value})}
                 />
             </div>
             <div className="form-group mb-4 w-full">
@@ -97,6 +179,8 @@ benefits and stay up-to-date.
                <div className='relative w-full'>
                      <input type={isPasswordShow ? 'text' : 'password'} name="password" id=""
                 className='w-full h-[45px] border-2 border-[rgba(0,0,0,0.2)] rounded-md  px-3 focus:border-[rgba(0,0,0,0.5)] focus:outline-none'
+                value={formFields.password}
+                onChange={(e)=>setFormFields({...formFields,password:e.target.value})}
                 />
                 <Button className='!absolute !text-[rgba(0,0,0,0.6)] top-[50%] -translate-y-1/2 right-[10px] z-50 !rounded-full !w-[40px] !h-[40px] !min-w-[40px]'
                 onClick={()=>setIsPasswordShow(!isPasswordShow)}
@@ -117,8 +201,12 @@ benefits and stay up-to-date.
 
 
             </div>
-            <Button className='!capitalize btn-blue btn-lg w-full '>
-                Sign Up
+            <Button disabled={isLoading} type='submit' className={`!capitalize btn-blue btn-lg w-full ${isLoading && 'opacity-70 cursor-not-allowed'}`}
+            onClick={handleSubmit}
+            >
+            {
+                isLoading ? <CircularProgress color='inherit' size={30} /> : 'Sign Up'
+            }
             </Button>
         </form>
 

@@ -79,6 +79,11 @@ input[type="number"]::-webkit-outer-spin-button {
 
 }
 
+input::-ms-reveal,
+input::-ms-clear {
+  display: none;
+}
+
 
 th.MuiTableCell-root{
   @apply bg-[#f1f1f1]
@@ -105,4 +110,10 @@ th.MuiTableCell-root{
 /* background for all modals  */
 .MuiDialog-paper{
   background: #f9fafb !important;
+}
+
+
+/* stripped style for all MUI tables */
+.MuiTableBody-root tr:nth-child(even){
+  @apply bg-gray-50
 }

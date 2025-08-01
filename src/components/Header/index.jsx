@@ -15,10 +15,16 @@ import { IoLogOutSharp } from "react-icons/io5";
 
 import { RiMenu2Line } from "react-icons/ri";
 import { MyContext } from "../../App";
-
+import { Link } from "react-router-dom";
+import { useSelector } from "react-redux";
+import { logoutUser } from "../../features/auth/authSlice";
+import { useDispatch } from "react-redux";
+import {showError,showSuccess} from '../../utils/toastUtils'
 
 
 const Header = () => {
+  const{isLogin}=useSelector(state=>state.auth)
+  const dispatch = useDispatch()
   const StyledBadge = styled(Badge)(({ theme }) => ({
     "& .MuiBadge-badge": {
       right: 5,
@@ -34,9 +40,25 @@ const Header = () => {
   const handleClickMyProfile = (event) => {
     setAnchorMyProfile(event.currentTarget);
   };
-  const handleCloseMyProfile = () => {
+  const handleCloseMyProfile = (val) => {
     setAnchorMyProfile(null);
+
   };
+  const handleLogout=async()=>{
+   try {
+    const result = await dispatch(logoutUser()).unwrap()
+    console.log(result)
+   if(result==='success'){
+    console.log('show succes toast')
+    showSuccess('Logout successful')
+     
+    navigate('/login')
+   }
+   } catch (error) {
+     showError('Failed to logout')
+    
+   }
+  }
  const context = useContext(MyContext)
   return (
     <header
@@ -61,7 +83,7 @@ const Header = () => {
           </Button>
         </StyledBadge>
            {
-          context.isLogin ===true ?
+          isLogin ===true ?
           (
                <div
           className="rounded-full w-[35px] h-[35px] overflow-hidden cursor-pointer"
@@ -76,7 +98,11 @@ const Header = () => {
           )
           :
           (
-            <Button className="btn-blue btn-sm !shadow-lg !rounded-full">Sign In</Button>
+            <Link to='/login'>
+                        <Button className="btn-blue btn-sm !shadow-lg !rounded-full">Sign In</Button>
+
+            </Link> 
+
           )
         }
      
@@ -88,7 +114,6 @@ const Header = () => {
         id="account-menu"
         open={openMyProfile}
         onClose={handleCloseMyProfile}
-        onClick={handleCloseMyProfile}
         slotProps={{
           paper: {
             elevation: 0,
@@ -148,8 +173,12 @@ const Header = () => {
         <FaUserAlt/> 
         <span className="text-[14px]">Profile</span>
         </MenuItem>
-        <MenuItem onClick={handleCloseMyProfile}
+        <MenuItem onClick={()=>{
+          handleLogout();
+          handleCloseMyProfile();
+        }}
         className="flex items-center gap-3 "
+
         >
         <IoLogOutSharp className="text-[18px]"/> 
         <span className="text-[14px]">Logout</span>

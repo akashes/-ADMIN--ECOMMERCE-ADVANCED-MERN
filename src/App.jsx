@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useEffect } from 'react'
 import { createBrowserRouter,Router,RouterProvider } from 'react-router'
 import Dashboard from './pages/Dashboard'
 import Header from './components/Header'
@@ -25,7 +25,14 @@ import SubCategoryList from './pages/Category/SubCatList'
 import AddSubCategory from './pages/Category/AddSubCategory'
 import Users from './pages/Users'
 import Orders from './pages/Orders'
-
+import ForgotPassword from './pages/ForgotPassword'
+import VerifyAccount from './pages/verifyAccount'
+import ChangePassword from './pages/ChangePassword'
+import {Toaster} from 'react-hot-toast'
+import { useDispatch } from 'react-redux'
+import { tryAutoLogin } from './features/auth/authSlice'
+import PrivateRoute from './routes/PrivateRoute'
+import ResetPassword from './pages/ResetPassword'
 
 
 const Transition = React.forwardRef(function Transition(props, ref) {
@@ -35,6 +42,7 @@ const Transition = React.forwardRef(function Transition(props, ref) {
 export const MyContext = createContext()
 
 function App() {
+  const dispatch = useDispatch()
   const[isSidebarOpen,setIsSidebarOpen]=useState(true)
   const[isLogin,setIsLogin]=useState(false)
 
@@ -70,7 +78,10 @@ const router = createBrowserRouter([
         <Sidebar/>
       </div>
       <div className={`contentRight py-4 px-5  ${isSidebarOpen===false?'w-[100%]':'w-[82%]'} `} >
+        <PrivateRoute>
+
         <Dashboard />
+        </PrivateRoute>
       </div>
     </div>
     
@@ -231,6 +242,30 @@ const router = createBrowserRouter([
    </section>
    </>
   },
+    {
+    path:'/forgot-password',
+   element: 
+   <ForgotPassword/>
+  },
+    {
+    path:'/verify',
+   element: 
+   <VerifyAccount resetPassword={false} />
+  },
+    {
+    path:'/forgot-verify',
+   element: 
+   <VerifyAccount resetPassword={true} />
+  },
+      {
+    path:'/change-password',
+   element: 
+   <ChangePassword/>
+  },
+  {
+    path:"/reset-password",
+    element:<ResetPassword/>
+  }
 
 
 
@@ -246,9 +281,13 @@ const handleCloseAddProductModal = () => {
 console.log(isAddProductModalOpen)
 
 console.log(isAddProductModalOpen)
+  useEffect(() => {
+    dispatch(tryAutoLogin());
+  }, []);
   return (
     <>
     <MyContext.Provider value={values}>
+      <Toaster reverseOrder={true} />
 
       <RouterProvider router={router} />
 
