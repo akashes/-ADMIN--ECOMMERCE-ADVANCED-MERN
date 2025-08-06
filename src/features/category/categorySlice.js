@@ -52,15 +52,82 @@ export const addCategory=createAsyncThunk('category/addCategory',async(category,
     }
 })
 
+export const getCategories=createAsyncThunk('category/getCategories',async(_,{rejectWithValue})=>{
+    try {
+        console.log('inside get categores slice')
+        const result = await axios.get('/api/category')
+        console.log(result)
+        if(!result.data.success){
+            
+            throw new Error(result.data.message || 'Categories get failed')
+        }
+        return result.data
+
+    } catch (error) {
+        return rejectWithValue(error.response?.data?.message || error.message || 'Categories get failed')
+        
+    }
+})
+
+export const updateCategory = createAsyncThunk('category/updateCategory',async(category,{rejectWithValue,getState})=>{
+    try {
+        const state = getState()
+        const categoryImages = state.category.categoryImages
+        const result = await axios.put(`/api/category/update-category/${category.id}`,{...category,categoryImages})
+        console.log(result)
+        if(!result.data.success){
+            
+            throw new Error(result.data.message || 'Category update failed')
+        }
+        return result.data
+            }
+            catch(error){
+                return rejectWithValue(error.response?.data?.message || error.message || 'Category update failed')
+
+            }
+ })
+
+ export const deleteCategory = createAsyncThunk('category/deleteCategory',async(id,{rejectWithValue})=>{
+    try {
+        const result = await axios.delete(`/api/category/delete-category/${id}`)
+        console.log(result)
+        if(!result.data.success){
+            
+            throw new Error(result.data.message || 'Category delete failed')
+        }
+        return result.data
+    } catch (error) {
+        return rejectWithValue(error.response?.data?.message || error.message || 'Category delete failed')
+        
+    }
+ })
+
+  
+
 
 
 
 const categorySlice = createSlice({
     name:'category',
     initialState:{
+        categories:[],
+        loading:false,
+        error:null,
         categoryImages:[],
+        editSelectedCategory:null
     },
-    reducers:{},
+    reducers:{
+        setCategoryImages:(state,action)=>{
+            console.log(action.payload)
+            state.categoryImages = action.payload
+        },
+        setEditSelectedCategory:(state,action)=>{
+            state.editSelectedCategory = action.payload
+        },
+        clearEditSelectedCategory:(state)=>{
+            state.editSelectedCategory = null
+        }
+    },
     extraReducers:(builder)=>{
        builder.addCase(addCategoryImage.pending,(state)=>{
            state.loading = true
@@ -112,8 +179,49 @@ const categorySlice = createSlice({
            state.loading = false
            state.error = action.payload || 'Category image delete failed'
        })
+       .addCase(getCategories.pending,(state)=>{
+           state.loading = true
+           state.error = null
+       })
+       .addCase(getCategories.fulfilled,(state,action)=>{
+           state.loading = false
+           state.error = null
+           state.categories = action.payload.categories
+       })
+       .addCase(getCategories.rejected,(state,action)=>{
+           state.loading = false
+           state.error = action.payload || 'Categories get failed'
+       })
+       .addCase(updateCategory.pending,(state)=>{
+        state.loading =true
+        state.error = null
+
+       })
+       .addCase(updateCategory.fulfilled,(state,action)=>{
+        state.loading = false
+        state.error = null
+        state.categories = state.categories.map(category=>category._id === action.payload.category._id ? action.payload.category : category)
+       })
+       .addCase(updateCategory.rejected,(state,action)=>{
+        state.loading = false
+        state.error = action.payload
+       })
+       .addCase(deleteCategory.pending,(state)=>{
+        state.loading =true
+        state.error = null
+
+       })
+       .addCase(deleteCategory.fulfilled,(state,action)=>{
+        state.loading = false
+        state.error = null
+       })
+       .addCase(deleteCategory.rejected,(state,action)=>{
+        state.loading = false
+        state.error = action.payload?.error || 'Category delete failed'
+       })
     }
 })
 
 
 export default categorySlice.reducer
+export const {setEditSelectedCategory,clearEditSelectedCategory,setCategoryImages} = categorySlice.actions

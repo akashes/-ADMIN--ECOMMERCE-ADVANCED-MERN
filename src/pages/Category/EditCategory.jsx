@@ -6,16 +6,17 @@ import { LazyLoadImage } from "react-lazy-load-image-component";
 import "react-lazy-load-image-component/src/effects/blur.css";
 import { IoIosClose, IoMdCloudUpload } from "react-icons/io";
 import { Button } from "@mui/material";
-import { addCategory, addCategoryImage, deleteCategoryImage, getCategories } from "../../features/category/categorySlice";
+import { addCategory, addCategoryImage, deleteCategoryImage, getCategories, setCategoryImages, setEditSelectedCategory } from "../../features/category/categorySlice";
 import {  showError, showSuccess, showWarning } from "../../utils/toastUtils";
 import { useDispatch, useSelector } from "react-redux";
 import { addAddress } from "../../features/user/userSlice";
 import { useContext } from "react";
 import { MyContext } from "../../App";
+import { updateCategory } from "../../features/category/categorySlice";
 
-const AddCategory = () => {
+const EditCategory = () => {
   const context = useContext(MyContext)
-  const {categoryImages } = useSelector(state=>state.category)
+  const {categoryImages,editSelectedCategory } = useSelector(state=>state.category)
   const[loading,setLoading] = useState(false)
   const[isUploading,setIsUploading] = useState(false)
   const[previews,setPreviews] = useState([])
@@ -89,6 +90,11 @@ const AddCategory = () => {
        
       }
   const handleRemoveImage=async(id)=>{
+    //blocks if categoryimage count is 1
+    if(categoryImages.length===1){
+      showError('Atleast one image is required')
+      return
+    }
   const resultAction=  await dispatch(deleteCategoryImage(id))
   console.log(resultAction)
   if(deleteCategoryImage.fulfilled.match(resultAction)){
@@ -113,9 +119,10 @@ const AddCategory = () => {
     setLoading(false)
     return
   }
-  const resultAction = await dispatch(addCategory(formFields))
+  formFields.id = editSelectedCategory._id
+  const resultAction = await dispatch(updateCategory(formFields))
   console.log(resultAction)
-  if(addCategory.fulfilled.match(resultAction)){
+  if(updateCategory.fulfilled.match(resultAction)){
     showSuccess(resultAction.payload.message || 'Category added successfully')
     setLoading(false)
     setFormFields({name:''})
@@ -130,23 +137,41 @@ const AddCategory = () => {
   
     return
   }
-  if(addCategory.rejected.match(resultAction)){
+  if(updateCategory.rejected.match(resultAction)){
     showError(resultAction.payload || 'Failed to add category')
     setLoading(false)
     return
   }
 
-  // useEffect(()=>{
-  //   if(categoryImages){
-  //     console.log('upadting formfields images')
-  //     setFormFields(prev=>({
-  //       ...prev,
-  //       images:[...prev.images,...categoryImages]
-  //     }))
-  //   }
 
-  // },[categoryImages])
+
+
 }
+  useEffect(()=>{
+    console.log('initial setup useeffect')
+    if(editSelectedCategory){
+      setFormFields({name:editSelectedCategory.name})
+    }
+    if(editSelectedCategory && editSelectedCategory.images.length>0){
+      //populating category images array in redux
+      dispatch(setCategoryImages(editSelectedCategory.images))
+      
+    }
+
+  },[editSelectedCategory])
+
+
+
+
+useEffect(() => {
+
+  //cleanup for removing categoryImages and editSelectedCategory from redux
+  return () => {
+    console.log('Cleaning up EditCategory...');
+    dispatch(setCategoryImages([]));
+    dispatch(setEditSelectedCategory(null));
+  };
+}, []);
 console.log(formFields)
   return (
     <section className="p-5  bg-gray-50">
@@ -210,7 +235,7 @@ console.log(formFields)
         <div className="w-[250px]">
           <Button type="submit" className="btn-blue btn-lg mt-3 w-full gap ">
             <IoMdCloudUpload className="text-[25px] text-white" />
-            Publish and View
+            Edit Category
           </Button>
         </div>
       </form>
@@ -218,4 +243,4 @@ console.log(formFields)
   );
 };
 
-export default AddCategory;
+export default EditCategory;

@@ -35,6 +35,7 @@ import PrivateRoute from './routes/PrivateRoute'
 import ResetPassword from './pages/ResetPassword'
 import Profile from './pages/Profile'
 import AddAddress from './pages/Address/addAddress.jsx'
+import EditCategory from './pages/Category/EditCategory.jsx'
 
 
 const Transition = React.forwardRef(function Transition(props, ref) {
@@ -50,7 +51,8 @@ function App() {
 
   const[isAddProductModalOpen,setIsAddProductModalOpen]=useState({
     open:false,
-    modal:''
+    modal:'',
+    id:''
   })
   console.log(isAddProductModalOpen)
   
@@ -360,6 +362,9 @@ console.log(isAddProductModalOpen)
         }
         {
           isAddProductModalOpen?.modal ==='Add New Address' && <AddAddress/>
+        }
+        {
+          isAddProductModalOpen?.modal ==='Edit Category' && <EditCategory/>
         }
 
       </Dialog>

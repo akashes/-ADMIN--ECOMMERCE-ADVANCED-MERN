@@ -1,7 +1,6 @@
 import  Button  from '@mui/material/Button'
-import React, { useContext, useState } from 'react'
+import React, { useContext, useEffect, useState } from 'react'
 
-import { IoIosAdd } from "react-icons/io";
 
 import Checkbox from '@mui/material/Checkbox';
 import { Link } from 'react-router-dom'
@@ -13,23 +12,24 @@ import TableContainer from '@mui/material/TableContainer';
 import TableHead from '@mui/material/TableHead';
 import TablePagination from '@mui/material/TablePagination';
 import TableRow from '@mui/material/TableRow';
-import Select from '@mui/material/Select';
-import MenuItem from '@mui/material/MenuItem';
+
 import TooltipMUI from '@mui/material/Tooltip';
 
-import ProgressBar from '../../components/ProgressBar'
 
-
+import { LazyLoadImage } from "react-lazy-load-image-component";
+import "react-lazy-load-image-component/src/effects/blur.css";
 
 import { AiFillEdit } from "react-icons/ai";
 import { FaEye } from "react-icons/fa";
 import { MdDelete } from "react-icons/md";
-import SearchBox from '../../components/SearchBox';
 
 
 
 import { MyContext } from '../../App';
-
+import { useDispatch, useSelector } from 'react-redux';
+import { deleteCategory, getCategories, setEditSelectedCategory } from '../../features/category/categorySlice';
+import { Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle } from '@mui/material';
+import { showError, showSuccess } from '../../utils/toastUtils.js';
 
 
 const columns=[
@@ -40,6 +40,20 @@ const columns=[
 ]
 const CategoryList = () => {
     const context = useContext(MyContext)
+    const{categories}=useSelector(state=>state.category)
+    const dispatch = useDispatch()
+    const[deleteCategoryId,setDeleteCategoryId]=useState('')
+
+     const [open, setOpen] = React.useState(false);
+
+  const handleClickOpen = () => {
+    setOpen(true);
+  };
+
+  const handleClose = () => {
+    setOpen(false);
+  };
+
       const [rowsPerPage, setRowsPerPage] = React.useState(10);
       const [page, setPage] = React.useState(0);
         const [categoryFilterVal, setCategoryFilterVal] = useState('');
@@ -57,6 +71,36 @@ const CategoryList = () => {
       };
       const label = { inputProps: { 'aria-label': 'Checkbox demo' } };
 
+      const handleDeleteCategory=async()=>{
+        handleClose()
+        const resultAction = await dispatch(deleteCategory(deleteCategoryId))
+        console.log(resultAction)
+        if(deleteCategory.fulfilled.match(resultAction)){
+          showSuccess(resultAction.payload.message || 'Category deleted successfully')
+          dispatch(getCategories())
+        }
+        if(deleteCategory.rejected.match(resultAction)){
+          showError(resultAction.payload || 'Failed to delete category')
+        }
+
+
+
+      }
+      useEffect(()=>{
+
+        const fetchCategoriesFunction=async()=>{
+
+          const resultAction = await dispatch(getCategories())
+          console.log(resultAction)
+       
+
+        }
+        fetchCategoriesFunction()
+
+
+      },[])
+      console.log(categories)
+      const paginatedCategories = categories.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage);
   return (
    <>
    {/* welcome banner */}
@@ -94,21 +138,9 @@ const CategoryList = () => {
             </TableRow>
           </TableHead>
           <TableBody>
-            {/* <TableRow hover role='checkbox' tabIndex={-1} key={row.code}>
-              {
-                columns.map((column)=>{
-                  const value=row(column.id)
-                  return(
-                    <TableCell key={column.id} align={column.align} >
-                      {column.format && typeof value==='number' ? column.format(value):value}
-                    </TableCell>
-                  )
-                })
-              }
-
-            </TableRow> */}
-          
-            <TableRow >
+            {
+              paginatedCategories.length>0 && paginatedCategories.map((item)=>(
+                  <TableRow >
               <TableCell 
               width={60}
               >
@@ -122,7 +154,17 @@ const CategoryList = () => {
                 <div className="flex items-center gap-4">
                   <div className="img w-[80px] h-auto rounded-md overflow-hidden group">
                   <Link to='/'>
-                <img alt="" className="w-full group-hover:scale-105 transition-transform" src="https://res.cloudinary.com/dllelmzim/image/upload/v1752148661/electronics_w1qixi.png"/>
+
+                     <LazyLoadImage
+                                    className="w-full h-full object-cover  group-hover:scale-105 transition-transform"
+                                    effect="blur"
+                                    wrapperProps={{
+                                      style: { transitionDelay: "1s" },
+                                    }}
+                                    alt={"preview"}
+                                    src={item.images[0].url}
+
+                                  />
                   </Link>
               
                 </div>
@@ -133,7 +175,7 @@ const CategoryList = () => {
                   <TableCell 
               width={100}
               >
-               Fashion
+               {item.name}
               </TableCell>
           
 
@@ -143,7 +185,12 @@ const CategoryList = () => {
                    <div className="flex items-center gap-1">
       <TooltipMUI placement='top' title='Edit Product'>
 
-      <Button className='!w-[35px] !h-[35px]  bg-[#f1f1f1] !min-w-[35px]  !border !border-[rgba(0,0,0,0.1)] !rounded-full hover:!bg-[#f1f1f1] hover:!shadow-sm hover:scale-110'>
+      <Button
+      onClick={()=>{
+        dispatch(setEditSelectedCategory(item))
+        context.setIsAddProductModalOpen({open:true,modal:'Edit Category'})
+      }}
+       className='!w-[35px] !h-[35px]  bg-[#f1f1f1] !min-w-[35px]  !border !border-[rgba(0,0,0,0.1)] !rounded-full hover:!bg-[#f1f1f1] hover:!shadow-sm hover:scale-110'>
 
         <AiFillEdit className='text-[rgba(0,0,0,0.7)] text-[20px] '/>
       </Button>
@@ -159,7 +206,14 @@ const CategoryList = () => {
       </TooltipMUI>
       <TooltipMUI placement='top' title='Remove Product'>
 
-      <Button className='!w-[35px] !h-[35px]  bg-[#f1f1f1] !min-w-[35px]  !border !border-[rgba(0,0,0,0.1)] !rounded-full hover:!bg-[#f1f1f1] hover:!shadow-sm hover:scale-110'>
+      <Button
+      // onClick={()=>confirmDelete(item._id,item.name)}
+      onClick={()=>{
+        setDeleteCategoryId(item._id)
+        handleClickOpen()
+        
+      }}
+       className='!w-[35px] !h-[35px]  bg-[#f1f1f1] !min-w-[35px]  !border !border-[rgba(0,0,0,0.1)] !rounded-full hover:!bg-[#f1f1f1] hover:!shadow-sm hover:scale-110'>
 
         <MdDelete className='text-[rgba(0,0,0,0.7)] text-[20px] '/>
       </Button>
@@ -168,6 +222,23 @@ const CategoryList = () => {
               </TableCell>
         
             </TableRow>
+              ))
+            }
+            {/* <TableRow hover role='checkbox' tabIndex={-1} key={row.code}>
+              {
+                columns.map((column)=>{
+                  const value=row(column.id)
+                  return(
+                    <TableCell key={column.id} align={column.align} >
+                      {column.format && typeof value==='number' ? column.format(value):value}
+                    </TableCell>
+                  )
+                })
+              }
+
+            </TableRow> */}
+          
+          
          
        
    
@@ -179,7 +250,7 @@ const CategoryList = () => {
        <TablePagination
         rowsPerPageOptions={[10, 25, 100]}
         component="div"
-        count={10}
+        count={categories.length}
         rowsPerPage={rowsPerPage}
         page={page}
         onPageChange={handleChangePage}
@@ -191,6 +262,33 @@ const CategoryList = () => {
         
 
    </div> 
+     <Dialog
+        open={open}
+        onClose={handleClose}
+        aria-labelledby="alert-dialog-title"
+        aria-describedby="alert-dialog-description"
+      >
+        <DialogTitle id="alert-dialog-title">
+          {"Do you want to delete this category?"}
+        </DialogTitle>
+        <DialogContent>
+          <DialogContentText id="alert-dialog-description">
+            Deleting this category also deletes all the products under this category as well its subcategories
+
+          </DialogContentText>
+        </DialogContent>
+        <DialogActions>
+          <Button
+          className='!bg-black !text-white btn-md'
+          onClick={()=>{
+            handleClose()
+            setDeleteCategoryId(null)
+          }}>Close</Button>
+          <Button className='!bg-secondary !text-white !btn-sm' onClick={handleDeleteCategory} autoFocus>
+            Delete
+          </Button>
+        </DialogActions>
+      </Dialog>
    </>
   )
 }
