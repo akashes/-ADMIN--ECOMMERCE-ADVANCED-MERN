@@ -1,0 +1,33 @@
+@keyframes shimmer {
+  0% {
+    background-position: -400px 0;
+  }
+  100% {
+    background-position: 400px 0;
+  }
+}
+
+.uploading-gradient {
+  background: linear-gradient(
+    110deg,
+    #f3f3f3 8%,
+    #e0e0e0 18%,
+    #f3f3f3 33%
+  );
+  background-size: 800px 100%;
+  animation: shimmer 1.4s infinite linear;
+}
+
+
+
+@keyframes dots {
+  0%   { content: ''; }
+  33%  { content: '.'; }
+  66%  { content: '..'; }
+  100% { content: '...'; }
+}
+
+.dot-animation::after {
+  content: '';
+  animation: dots 1.2s steps(3, end) infinite;
+}

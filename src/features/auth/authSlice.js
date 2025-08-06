@@ -110,9 +110,9 @@ export const tryAutoLogin = createAsyncThunk(
       
       try {
         console.log('calling refres-token endpoint')
-        const res = await postData('/api/user/refresh-token');
+        const res = await refreshAccessToken();
         console.log(res)
-        const newToken = res.data?.accessToken;
+        const newToken = res
         console.log('got new acess token',newToken)
         if (!newToken) throw new Error('Token refresh failed');
         localStorage.setItem('accessToken', newToken);
@@ -195,6 +195,9 @@ export const scheduleTokenRefresh = createAsyncThunk(
         dispatch(scheduleTokenRefresh(newToken));
       } else {
         dispatch(logoutUser());
+    //         localStorage.removeItem('accessToken');
+    // localStorage.removeItem('user');
+    // if (refreshTimer) clearTimeout(refreshTimer);
       }
     }, refreshTime);
   }
@@ -247,6 +250,20 @@ export const uploadAvatar=createAsyncThunk(
       return rejectWithValue(err.response?.data?.message || err.message || 'User details update failed')
     }
   })
+  export const updatePassword = createAsyncThunk(
+    'auth/updatePassword',
+    async ({ oldPassword, newPassword, confirmPassword }, { rejectWithValue }) => {
+      try {
+        const res = await axios.put('/api/user/update-password', { oldPassword, newPassword, confirmPassword });
+        if (!res.data.success) {
+          throw new Error(res.data.message || 'Password update failed');
+        }
+        return res.data.message;
+      } catch (err) {
+        return rejectWithValue(err.response?.data?.message || err.message || 'Password update failed');
+      }
+    }
+  )
 const initialState = {
   isLogin: false,
   user: null,
@@ -404,8 +421,20 @@ const authSlice = createSlice({
       .addCase(updateUserDetails.rejected, (state, action) => {
         state.userLoading = false;
         state.userError = action.payload || 'User details update failed';
-      });
-  },
+      })
+      .addCase(updatePassword.pending, (state) => {
+        state.userLoading = true;
+        state.userError = null;
+      })
+      .addCase(updatePassword.fulfilled, (state, action) => {
+        state.userLoading = false;
+        state.userError = null;
+      })
+      .addCase(updatePassword.rejected, (state, action) => {
+        state.userLoading = false;
+        state.userError = action.payload || 'Password update failed';
+      })
+  }
 });
 
 export const { setResetPasswordToken } = authSlice.actions;

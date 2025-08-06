@@ -3,6 +3,11 @@ import { Navigate } from 'react-router-dom';
 
 const PrivateRoute = ({ children }) => {
   const { isLogin, loading, authChecked } = useSelector((state) => state.auth);
+  console.log(isLogin, loading, authChecked);
+
+  if(!localStorage.getItem('accessToken')){
+    <Navigate to={'login'} />
+  }
 
   if (loading || !authChecked) {
     return (

@@ -175,7 +175,7 @@ const [loadingGoogle, setLoadingGoogle] = useState(false);
             type='submit'
             >
                 {
-                    loading ? <CircularProgress size={30} />:'Sign In'
+                    loading ? <CircularProgress size={30} className='!text-white' />:'Sign In'
                 }
             </Button>
         </form>

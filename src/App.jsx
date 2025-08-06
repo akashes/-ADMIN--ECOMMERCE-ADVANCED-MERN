@@ -34,6 +34,7 @@ import { tryAutoLogin } from './features/auth/authSlice'
 import PrivateRoute from './routes/PrivateRoute'
 import ResetPassword from './pages/ResetPassword'
 import Profile from './pages/Profile'
+import AddAddress from './pages/Address/addAddress.jsx'
 
 
 const Transition = React.forwardRef(function Transition(props, ref) {
@@ -51,6 +52,7 @@ function App() {
     open:false,
     modal:''
   })
+  console.log(isAddProductModalOpen)
   
   const values={
     isSidebarOpen,
@@ -356,6 +358,10 @@ console.log(isAddProductModalOpen)
         {
           isAddProductModalOpen?.modal ==='Add New Sub Category' && <AddSubCategory/>
         }
+        {
+          isAddProductModalOpen?.modal ==='Add New Address' && <AddAddress/>
+        }
+
       </Dialog>
     </MyContext.Provider>
     </>
