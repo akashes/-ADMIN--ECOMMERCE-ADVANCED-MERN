@@ -102,7 +102,20 @@ export const updateCategory = createAsyncThunk('category/updateCategory',async(c
     }
  })
 
-  
+  export const updateSubCategory = createAsyncThunk('category/updateSubCategory',async(category,{rejectWithValue})=>{
+    try {
+        const result = await axios.put(`/api/category/update-sub-category/${category.id}`,category)
+        console.log(result)
+        if(!result.data.success){
+            
+            throw new Error(result.data.message || 'Sub category update failed')
+        }
+        return result.data
+    } catch (error) {
+        return rejectWithValue(error.response?.data?.message || error.message || 'Sub category update failed')
+        
+    }
+  })
 
 
 
@@ -218,6 +231,20 @@ const categorySlice = createSlice({
        .addCase(deleteCategory.rejected,(state,action)=>{
         state.loading = false
         state.error = action.payload?.error || 'Category delete failed'
+       })
+       .addCase(updateSubCategory.pending,(state)=>{
+        state.loading =true
+        state.error = null
+
+       })
+       .addCase(updateSubCategory.fulfilled,(state,action)=>{
+        state.loading = false
+        state.error = null
+        // state.categories = state.categories.map(category=>category._id === action.payload.category._id ? action.payload.category : category)
+       })
+       .addCase(updateSubCategory.rejected,(state,action)=>{
+        state.loading = false
+        state.error = action.payload
        })
     }
 })
