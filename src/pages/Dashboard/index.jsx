@@ -1,4 +1,4 @@
-import React, { useContext, useState } from 'react'
+import React, { useContext, useEffect, useState } from 'react'
 import DashboardBoxes from '../../components/DashboardBoxes'
 import { Button, Pagination } from '@mui/material'
 import { FaAngleDown } from 'react-icons/fa6'
@@ -28,6 +28,8 @@ import Select from '@mui/material/Select';
 
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
 import { MyContext } from '../../App'
+import { useDispatch } from 'react-redux'
+import { getCategories } from '../../features/category/categorySlice'
 
 
 const columns=[
@@ -49,6 +51,7 @@ function createData(name, code, population, size) {
 
 ``
 const Dashboard = () => {
+  const dispatch = useDispatch()
   const context = useContext(MyContext)
   const[chart1Data,setChart1Data]=useState(
     [
@@ -139,6 +142,18 @@ const Dashboard = () => {
   }
   console.log(showProducts)
   const[isOpen,setIsOpen]=useState(false)
+     useEffect(()=>{
+  
+          const fetchCategoriesFunction=async()=>{
+  
+            const resultAction = await dispatch(getCategories())
+         
+  
+          }
+          fetchCategoriesFunction()
+  
+  
+        },[])
   return (
    <>
    {/* gretting container with cta button */}
