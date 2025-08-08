@@ -12,11 +12,13 @@ import { useDispatch, useSelector } from 'react-redux';
 import { showError, showSuccess, showWarning } from '../../utils/toastUtils';
 import { addCategory, getCategories } from '../../features/category/categorySlice';
 import { MyContext } from '../../App';
+import { useNavigate } from 'react-router-dom';
 
 
 const AddSubCategory = () => {
   const{categories}=useSelector(state=>state.category)
   const dispatch = useDispatch()
+  const navigate  = useNavigate()
   const context = useContext(MyContext)
   const[subCatName,setSubCatName]=useState('')
  const [parentCatId, setParentCatId] = useState('');
@@ -75,6 +77,7 @@ const selectedSubCategory = subCategories.find((category) => category._id === su
         })
           
         }, 1000);
+        navigate('/subCategory/list')
       
         return
       }
@@ -138,6 +141,7 @@ const selectedSubCategory = subCategories.find((category) => category._id === su
       })
         
       }, 1000);
+      navigate('/subCategory/list')
     
       return
     }

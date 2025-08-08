@@ -1,5 +1,5 @@
 import  Button  from '@mui/material/Button'
-import React, { useContext, useState } from 'react'
+import React, { useContext, useEffect, useState } from 'react'
 
 import { IoIosAdd } from "react-icons/io";
 
@@ -19,6 +19,9 @@ import TooltipMUI from '@mui/material/Tooltip';
 
 import ProgressBar from '../../components/ProgressBar'
 
+import { LazyLoadImage } from "react-lazy-load-image-component";
+import "react-lazy-load-image-component/src/effects/blur.css";
+
 
 
 import { AiFillEdit } from "react-icons/ai";
@@ -29,6 +32,8 @@ import SearchBox from '../../components/SearchBox';
 
 
 import { MyContext } from '../../App';
+import { useDispatch, useSelector } from 'react-redux';
+import { getAllProducts, setProductAdded } from '../../features/product/productSlice';
 
 
 
@@ -40,8 +45,12 @@ const columns=[
   {id:"sales",label:'SALES',minWidth:130},
   {id:'action',label:'ACTION',minWidth:120}
 ]
+
+
 const Products = () => {
+  const{products,totalProducts,totalPages,currentPage,productAdded}=useSelector(state=>state.product)
     const context = useContext(MyContext)
+    const dispatch = useDispatch()
       const [rowsPerPage, setRowsPerPage] = React.useState(10);
       const [page, setPage] = React.useState(0);
         const [categoryFilterVal, setCategoryFilterVal] = useState('');
@@ -58,6 +67,22 @@ const Products = () => {
         setCategoryFilterVal(event.target.value);
       };
       const label = { inputProps: { 'aria-label': 'Checkbox demo' } };
+
+
+      useEffect(()=>{
+
+        if(productAdded){
+          dispatch(getAllProducts({page:page+1,perPage:rowsPerPage}))
+          setProductAdded(false)
+        }
+  const fetchProductData=async()=>{
+    console.log(page,rowsPerPage)
+    await dispatch(getAllProducts({page:page+1,perPage:rowsPerPage}))
+  }
+  fetchProductData()
+
+},[dispatch,page,rowsPerPage,productAdded])
+
 
   return (
    <>
@@ -137,32 +162,46 @@ const Products = () => {
               }
 
             </TableRow> */}
-            <TableRow >
+            {
+           products.length>0 && products.map((product)=>(
+
+                <TableRow key={product._id} >
               <TableCell style={{minWidth:columns.minWidth}}>
                 <Checkbox {...label} size='small'/>
 
               </TableCell>
               <TableCell style={{minWidth:columns.minWidth}}>
                 <div className="flex items-center gap-4 w-[300px]"><div className="img w-[65px] h-[65px] rounded-md overflow-hidden group">
-                  <Link to='/'>
-                <img alt="" className="w-full group-hover:scale-105 transition-transform" src="https://serviceapi.spicezgold.com/download/1751861347253_shikha-store-gold-plated-alloy-earring-and-necklace-set-yellow-product-images-rvabwqrupy-0-202309131552.jpg"/>
+                  <Link to={`/product/${product._id}`}>
+                       <LazyLoadImage
+                                    className="w-full h-full object-cover  group-hover:scale-105 transition-transform"
+                                    effect="blur"
+                                    wrapperProps={{
+                                      style: { transitionDelay: "1s" },
+                                    }}
+                                    alt={"preview"}
+                                    src={product?.images && product?.images[0]?.url}
+                                  />
                   </Link>
               
-                </div><div className="info w-[75%]"><a href="/product/123" data-discover="true"><h3 className="font-[700] text-[13px] leading-4 hover:text-secondary">Shikha Store Gold Plated Alloy Earring and Necklac</h3>
-                </a><span className="text-[12px]">Shikha store</span>
+                </div><div className="info w-[75%]">
+                  <Link href={`/product/${product._id}`} data-discover="true"
+                  ><h3 className="font-[700] text-[13px] leading-4 hover:text-secondary">{product.name}</h3>
+                </Link>
+                <span className="text-[12px]">{product?.brand}</span>
                 </div></div>
 
               </TableCell>
               <TableCell style={{minWidth:columns.minWidth}}>
-                 Jewellery
+                 {product.catName}
               </TableCell>
               <TableCell style={{minWidth:columns.minWidth}}>
-                  no sub category
+                  {product?.subCat}
               </TableCell>
               <TableCell style={{minWidth:columns.minWidth}}>
                     <div className="flex  gap-1 flex-col">
-                <span className='oldPrice line-through text-gray-500 text-[13px] font-[500]'>₹ 1,999</span>
-                <span className="price text-primary font-[600] text-[14px]">1444</span>
+                <span className='oldPrice line-through text-gray-500 text-[13px] font-[500]'> &#x20b9;{product.oldPrice}</span>
+                <span className="price text-primary font-[600] text-[14px]">&#x20b9;{product.price}</span>
                 
             </div>
               </TableCell>
@@ -170,7 +209,7 @@ const Products = () => {
                   <p className='text-[14px] w-[100px]'>
       <span className='font-[800] mr-1'>
 
-    3232
+    {product?.sale}
       </span>
        sale
 
@@ -207,286 +246,12 @@ const Products = () => {
               </TableCell>
         
             </TableRow>
-            <TableRow >
-              <TableCell style={{minWidth:columns.minWidth}}>
-                <Checkbox {...label} size='small'/>
+            ))
 
-              </TableCell>
-              <TableCell style={{minWidth:columns.minWidth}}>
-                <div className="flex items-center gap-4 w-[300px]"><div className="img w-[65px] h-[65px] rounded-md overflow-hidden group">
-                  <Link to='/'>
-                <img alt="" className="w-full group-hover:scale-105 transition-transform" src="https://serviceapi.spicezgold.com/download/1751861347253_shikha-store-gold-plated-alloy-earring-and-necklace-set-yellow-product-images-rvabwqrupy-0-202309131552.jpg"/>
-                  </Link>
-              
-                </div><div className="info w-[75%]"><a href="/product/123" data-discover="true"><h3 className="font-[700] text-[13px] leading-4 hover:text-secondary">Shikha Store Gold Plated Alloy Earring and Necklac</h3>
-                </a><span className="text-[12px]">Shikha store</span>
-                </div></div>
+            }
 
-              </TableCell>
-              <TableCell style={{minWidth:columns.minWidth}}>
-                 Jewellery
-              </TableCell>
-              <TableCell style={{minWidth:columns.minWidth}}>
-                  no sub category
-              </TableCell>
-              <TableCell style={{minWidth:columns.minWidth}}>
-                    <div className="flex  gap-1 flex-col">
-                <span className='oldPrice line-through text-gray-500 text-[13px] font-[500]'>₹ 1,999</span>
-                <span className="price text-primary font-[600] text-[14px]">1444</span>
-                
-            </div>
-              </TableCell>
-              <TableCell style={{minWidth:columns.minWidth}}>
-                  <p className='text-[14px] w-[100px]'>
-      <span className='font-[800] mr-1'>
-
-    3232
-      </span>
-       sale
-
-    </p>
-    <ProgressBar value={40} type={'success'} />
-
-              </TableCell>
-              <TableCell style={{minWidth:columns.minWidth}}>
-                   <div className="flex items-center gap-1">
-      <TooltipMUI placement='top' title='Edit Product'>
-
-      <Button className='!w-[35px] !h-[35px]  bg-[#f1f1f1] !min-w-[35px]  !border !border-[rgba(0,0,0,0.1)] !rounded-full hover:!bg-[#f1f1f1] hover:!shadow-sm hover:scale-110'>
-
-        <AiFillEdit className='text-[rgba(0,0,0,0.7)] text-[20px] '/>
-      </Button>
-
-      
-      </TooltipMUI>
-      <TooltipMUI placement='top' title='View Product details'>
-
-      <Button className='!w-[35px] !h-[35px]  bg-[#f1f1f1] !min-w-[35px]  !border !border-[rgba(0,0,0,0.1)] !rounded-full hover:!bg-[#f1f1f1] hover:!shadow-sm hover:scale-110'>
-
-        <FaEye className='text-[rgba(0,0,0,0.7)] text-[20px] '/>
-      </Button>
-      </TooltipMUI>
-      <TooltipMUI placement='top' title='Remove Product'>
-
-      <Button className='!w-[35px] !h-[35px]  bg-[#f1f1f1] !min-w-[35px]  !border !border-[rgba(0,0,0,0.1)] !rounded-full hover:!bg-[#f1f1f1] hover:!shadow-sm hover:scale-110'>
-
-        <MdDelete className='text-[rgba(0,0,0,0.7)] text-[20px] '/>
-      </Button>
-      </TooltipMUI>
-    </div>
-              </TableCell>
-        
-            </TableRow>
-            <TableRow >
-              <TableCell style={{minWidth:columns.minWidth}}>
-                <Checkbox {...label} size='small'/>
-
-              </TableCell>
-              <TableCell style={{minWidth:columns.minWidth}}>
-                <div className="flex items-center gap-4 w-[300px]"><div className="img w-[65px] h-[65px] rounded-md overflow-hidden group">
-                  <Link to='/'>
-                <img alt="" className="w-full group-hover:scale-105 transition-transform" src="https://serviceapi.spicezgold.com/download/1751861347253_shikha-store-gold-plated-alloy-earring-and-necklace-set-yellow-product-images-rvabwqrupy-0-202309131552.jpg"/>
-                  </Link>
-              
-                </div><div className="info w-[75%]"><a href="/product/123" data-discover="true"><h3 className="font-[700] text-[13px] leading-4 hover:text-secondary">Shikha Store Gold Plated Alloy Earring and Necklac</h3>
-                </a><span className="text-[12px]">Shikha store</span>
-                </div></div>
-
-              </TableCell>
-              <TableCell style={{minWidth:columns.minWidth}}>
-                 Jewellery
-              </TableCell>
-              <TableCell style={{minWidth:columns.minWidth}}>
-                  no sub category
-              </TableCell>
-              <TableCell style={{minWidth:columns.minWidth}}>
-                    <div className="flex  gap-1 flex-col">
-                <span className='oldPrice line-through text-gray-500 text-[13px] font-[500]'>₹ 1,999</span>
-                <span className="price text-primary font-[600] text-[14px]">1444</span>
-                
-            </div>
-              </TableCell>
-              <TableCell style={{minWidth:columns.minWidth}}>
-                  <p className='text-[14px] w-[100px]'>
-      <span className='font-[800] mr-1'>
-
-    3232
-      </span>
-       sale
-
-    </p>
-    <ProgressBar value={40} type={'success'} />
-
-              </TableCell>
-              <TableCell style={{minWidth:columns.minWidth}}>
-                   <div className="flex items-center gap-1">
-      <TooltipMUI placement='top' title='Edit Product'>
-
-      <Button className='!w-[35px] !h-[35px]  bg-[#f1f1f1] !min-w-[35px]  !border !border-[rgba(0,0,0,0.1)] !rounded-full hover:!bg-[#f1f1f1] hover:!shadow-sm hover:scale-110'>
-
-        <AiFillEdit className='text-[rgba(0,0,0,0.7)] text-[20px] '/>
-      </Button>
-
-      
-      </TooltipMUI>
-      <TooltipMUI placement='top' title='View Product details'>
-
-      <Button className='!w-[35px] !h-[35px]  bg-[#f1f1f1] !min-w-[35px]  !border !border-[rgba(0,0,0,0.1)] !rounded-full hover:!bg-[#f1f1f1] hover:!shadow-sm hover:scale-110'>
-
-        <FaEye className='text-[rgba(0,0,0,0.7)] text-[20px] '/>
-      </Button>
-      </TooltipMUI>
-      <TooltipMUI placement='top' title='Remove Product'>
-
-      <Button className='!w-[35px] !h-[35px]  bg-[#f1f1f1] !min-w-[35px]  !border !border-[rgba(0,0,0,0.1)] !rounded-full hover:!bg-[#f1f1f1] hover:!shadow-sm hover:scale-110'>
-
-        <MdDelete className='text-[rgba(0,0,0,0.7)] text-[20px] '/>
-      </Button>
-      </TooltipMUI>
-    </div>
-              </TableCell>
-        
-            </TableRow>
-            <TableRow >
-              <TableCell style={{minWidth:columns.minWidth}}>
-                <Checkbox {...label} size='small'/>
-
-              </TableCell>
-              <TableCell style={{minWidth:columns.minWidth}}>
-                <div className="flex items-center gap-4 w-[300px]"><div className="img w-[65px] h-[65px] rounded-md overflow-hidden group">
-                  <Link to='/'>
-                <img alt="" className="w-full group-hover:scale-105 transition-transform" src="https://serviceapi.spicezgold.com/download/1751861347253_shikha-store-gold-plated-alloy-earring-and-necklace-set-yellow-product-images-rvabwqrupy-0-202309131552.jpg"/>
-                  </Link>
-              
-                </div><div className="info w-[75%]"><a href="/product/123" data-discover="true"><h3 className="font-[700] text-[13px] leading-4 hover:text-secondary">Shikha Store Gold Plated Alloy Earring and Necklac</h3>
-                </a><span className="text-[12px]">Shikha store</span>
-                </div></div>
-
-              </TableCell>
-              <TableCell style={{minWidth:columns.minWidth}}>
-                 Jewellery
-              </TableCell>
-              <TableCell style={{minWidth:columns.minWidth}}>
-                  no sub category
-              </TableCell>
-              <TableCell style={{minWidth:columns.minWidth}}>
-                    <div className="flex  gap-1 flex-col">
-                <span className='oldPrice line-through text-gray-500 text-[13px] font-[500]'>₹ 1,999</span>
-                <span className="price text-primary font-[600] text-[14px]">1444</span>
-                
-            </div>
-              </TableCell>
-              <TableCell style={{minWidth:columns.minWidth}}>
-                  <p className='text-[14px] w-[100px]'>
-      <span className='font-[800] mr-1'>
-
-    3232
-      </span>
-       sale
-
-    </p>
-    <ProgressBar value={40} type={'success'} />
-
-              </TableCell>
-              <TableCell style={{minWidth:columns.minWidth}}>
-                   <div className="flex items-center gap-1">
-      <TooltipMUI placement='top' title='Edit Product'>
-
-      <Button className='!w-[35px] !h-[35px]  bg-[#f1f1f1] !min-w-[35px]  !border !border-[rgba(0,0,0,0.1)] !rounded-full hover:!bg-[#f1f1f1] hover:!shadow-sm hover:scale-110'>
-
-        <AiFillEdit className='text-[rgba(0,0,0,0.7)] text-[20px] '/>
-      </Button>
-
-      
-      </TooltipMUI>
-      <TooltipMUI placement='top' title='View Product details'>
-
-      <Button className='!w-[35px] !h-[35px]  bg-[#f1f1f1] !min-w-[35px]  !border !border-[rgba(0,0,0,0.1)] !rounded-full hover:!bg-[#f1f1f1] hover:!shadow-sm hover:scale-110'>
-
-        <FaEye className='text-[rgba(0,0,0,0.7)] text-[20px] '/>
-      </Button>
-      </TooltipMUI>
-      <TooltipMUI placement='top' title='Remove Product'>
-
-      <Button className='!w-[35px] !h-[35px]  bg-[#f1f1f1] !min-w-[35px]  !border !border-[rgba(0,0,0,0.1)] !rounded-full hover:!bg-[#f1f1f1] hover:!shadow-sm hover:scale-110'>
-
-        <MdDelete className='text-[rgba(0,0,0,0.7)] text-[20px] '/>
-      </Button>
-      </TooltipMUI>
-    </div>
-              </TableCell>
-        
-            </TableRow>
-            <TableRow >
-              <TableCell style={{minWidth:columns.minWidth}}>
-                <Checkbox {...label} size='small'/>
-
-              </TableCell>
-              <TableCell style={{minWidth:columns.minWidth}}>
-                <div className="flex items-center gap-4 w-[300px]"><div className="img w-[65px] h-[65px] rounded-md overflow-hidden group">
-                  <Link to='/'>
-                <img alt="" className="w-full group-hover:scale-105 transition-transform" src="https://serviceapi.spicezgold.com/download/1751861347253_shikha-store-gold-plated-alloy-earring-and-necklace-set-yellow-product-images-rvabwqrupy-0-202309131552.jpg"/>
-                  </Link>
-              
-                </div><div className="info w-[75%]"><a href="/product/123" data-discover="true"><h3 className="font-[700] text-[13px] leading-4 hover:text-secondary">Shikha Store Gold Plated Alloy Earring and Necklac</h3>
-                </a><span className="text-[12px]">Shikha store</span>
-                </div></div>
-
-              </TableCell>
-              <TableCell style={{minWidth:columns.minWidth}}>
-                 Jewellery
-              </TableCell>
-              <TableCell style={{minWidth:columns.minWidth}}>
-                  no sub category
-              </TableCell>
-              <TableCell style={{minWidth:columns.minWidth}}>
-                    <div className="flex  gap-1 flex-col">
-                <span className='oldPrice line-through text-gray-500 text-[13px] font-[500]'>₹ 1,999</span>
-                <span className="price text-primary font-[600] text-[14px]">1444</span>
-                
-            </div>
-              </TableCell>
-              <TableCell style={{minWidth:columns.minWidth}}>
-                  <p className='text-[14px] w-[100px]'>
-      <span className='font-[800] mr-1'>
-
-    3232
-      </span>
-       sale
-
-    </p>
-    <ProgressBar value={40} type={'success'} />
-
-              </TableCell>
-              <TableCell style={{minWidth:columns.minWidth}}>
-                   <div className="flex items-center gap-1">
-      <TooltipMUI placement='top' title='Edit Product'>
-
-      <Button className='!w-[35px] !h-[35px]  bg-[#f1f1f1] !min-w-[35px]  !border !border-[rgba(0,0,0,0.1)] !rounded-full hover:!bg-[#f1f1f1] hover:!shadow-sm hover:scale-110'>
-
-        <AiFillEdit className='text-[rgba(0,0,0,0.7)] text-[20px] '/>
-      </Button>
-
-      
-      </TooltipMUI>
-      <TooltipMUI placement='top' title='View Product details'>
-
-      <Button className='!w-[35px] !h-[35px]  bg-[#f1f1f1] !min-w-[35px]  !border !border-[rgba(0,0,0,0.1)] !rounded-full hover:!bg-[#f1f1f1] hover:!shadow-sm hover:scale-110'>
-
-        <FaEye className='text-[rgba(0,0,0,0.7)] text-[20px] '/>
-      </Button>
-      </TooltipMUI>
-      <TooltipMUI placement='top' title='Remove Product'>
-
-      <Button className='!w-[35px] !h-[35px]  bg-[#f1f1f1] !min-w-[35px]  !border !border-[rgba(0,0,0,0.1)] !rounded-full hover:!bg-[#f1f1f1] hover:!shadow-sm hover:scale-110'>
-
-        <MdDelete className='text-[rgba(0,0,0,0.7)] text-[20px] '/>
-      </Button>
-      </TooltipMUI>
-    </div>
-              </TableCell>
-        
-            </TableRow>
+          
+    
           
           </TableBody>
         </Table>
@@ -494,7 +259,7 @@ const Products = () => {
        <TablePagination
         rowsPerPageOptions={[10, 25, 100]}
         component="div"
-        count={10}
+        count={totalProducts||0}
         rowsPerPage={rowsPerPage}
         page={page}
         onPageChange={handleChangePage}

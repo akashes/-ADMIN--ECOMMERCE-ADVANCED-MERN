@@ -1,4 +1,4 @@
-import { Button } from "@mui/material";
+import { Button, Dialog, Slide } from "@mui/material";
 import React, { useContext, useState } from "react";
 import Badge from "@mui/material/Badge";
 import { styled } from "@mui/material/styles";
@@ -20,9 +20,32 @@ import { useSelector } from "react-redux";
 import { logoutUser } from "../../features/auth/authSlice";
 import { useDispatch } from "react-redux";
 import {showError,showSuccess} from '../../utils/toastUtils'
+import EditCategory from "../../pages/Category/EditCategory";
+import AddAddress from "../../pages/Address/addAddress";
+import AddSubCategory from "../../pages/Category/AddSubCategory";
+import AddCategory from "../../pages/Category/AddCategory";
+import AddHomeSlide from "../../pages/HomeSliderBanners/AddHomeSlide";
+import AddProduct from "../../pages/Products/AddProduct";
+import AppBar from "@mui/material/AppBar";
+import Toolbar from '@mui/material/Toolbar';
+import Typography from '@mui/material/Typography';
+import { IoIosClose } from "react-icons/io";
 
+const Transition = React.forwardRef(function Transition(props, ref) {
+  return <Slide direction="up" ref={ref} {...props} />;
+});
 
 const Header = () => {
+  const{isAddProductModalOpen,setIsAddProductModalOpen}=useContext(MyContext)
+const handleCloseAddProductModal = () => {
+  setIsAddProductModalOpen({
+    open:false,
+    modal:''
+  });
+};
+
+
+
   const{isLogin}=useSelector(state=>state.auth)
   const dispatch = useDispatch()
   const StyledBadge = styled(Badge)(({ theme }) => ({
@@ -61,7 +84,9 @@ const Header = () => {
   }
  const context = useContext(MyContext)
   return (
-    <header
+    <>
+    
+      <header
     className={`w-full pr-7 shadow-md h-auto py-2 bg-[#fff]   ${context.isSidebarOpen===true?'pl-73':'pl-5'} flex items-center justify-between transition-all`}>
       <div className="part1">
         <Button className="!z-1000 !w-[50px] !h-[50px] !min-w-[40px] !rounded-md !text-black "
@@ -189,6 +214,59 @@ const Header = () => {
 
       </Menu>
     </header>
+
+
+
+
+         <Dialog
+        fullScreen
+        open={isAddProductModalOpen.open}
+        onClose={handleCloseAddProductModal}
+        slots={{
+          transition: Transition,
+        }}
+      >
+        <AppBar sx={{ position: 'relative' }}>
+          <Toolbar>
+            <IconButton
+              edge="start"
+              color="inherit"
+              onClick={handleCloseAddProductModal}
+              aria-label="close"
+            >
+              <IoIosClose className=' !text-gray-800' />
+            </IconButton>
+            <Typography sx={{ ml: 2, flex: 1 }} variant="h6" component="div">
+              <span className="text-gray-800">
+
+              {isAddProductModalOpen?.modal}
+              </span>
+            </Typography>
+            
+          </Toolbar>
+        </AppBar>
+        {
+          isAddProductModalOpen?.modal === 'Add Product' && <AddProduct/>
+        }
+        {
+          isAddProductModalOpen?.modal ==='Add Home Slide' && <AddHomeSlide/>
+        }
+        {
+          isAddProductModalOpen?.modal ==='Add New Category' && <AddCategory/>
+        }
+        {
+          isAddProductModalOpen?.modal ==='Add New Sub Category' && <AddSubCategory/>
+        }
+        {
+          isAddProductModalOpen?.modal ==='Add New Address' && <AddAddress/>
+        }
+        {
+          isAddProductModalOpen?.modal ==='Edit Category' && <EditCategory/>
+        }
+
+      </Dialog>
+    </>
+  
   );
 };
 

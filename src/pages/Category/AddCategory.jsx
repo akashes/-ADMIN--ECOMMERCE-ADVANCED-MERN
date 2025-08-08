@@ -12,9 +12,11 @@ import { useDispatch, useSelector } from "react-redux";
 import { addAddress } from "../../features/user/userSlice";
 import { useContext } from "react";
 import { MyContext } from "../../App";
+import { useNavigate } from "react-router-dom";
 
 const AddCategory = () => {
   const context = useContext(MyContext)
+  const navigate = useNavigate()
   const {categoryImages } = useSelector(state=>state.category)
   const[loading,setLoading] = useState(false)
   const[isUploading,setIsUploading] = useState(false)
@@ -127,6 +129,8 @@ const AddCategory = () => {
     })
       
     }, 1000);
+    navigate('/category/list')
+
   
     return
   }

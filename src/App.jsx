@@ -38,9 +38,7 @@ import AddAddress from './pages/Address/addAddress.jsx'
 import EditCategory from './pages/Category/EditCategory.jsx'
 
 
-const Transition = React.forwardRef(function Transition(props, ref) {
-  return <Slide direction="up" ref={ref} {...props} />;
-});
+
 
 export const MyContext = createContext()
 
@@ -300,16 +298,8 @@ const router = createBrowserRouter([
 
 ])  
 
-const handleCloseAddProductModal = () => {
-  setIsAddProductModalOpen({
-    open:false,
-    modal:''
-  });
-};
 
-console.log(isAddProductModalOpen)
 
-console.log(isAddProductModalOpen)
   useEffect(() => {
     dispatch(tryAutoLogin());
   }, []);
@@ -321,53 +311,7 @@ console.log(isAddProductModalOpen)
       <RouterProvider router={router} />
 
 
-           <Dialog
-        fullScreen
-        open={isAddProductModalOpen.open}
-        onClose={handleCloseAddProductModal}
-        slots={{
-          transition: Transition,
-        }}
-      >
-        <AppBar sx={{ position: 'relative' }}>
-          <Toolbar>
-            <IconButton
-              edge="start"
-              color="inherit"
-              onClick={handleCloseAddProductModal}
-              aria-label="close"
-            >
-              <IoIosClose className=' !text-gray-800' />
-            </IconButton>
-            <Typography sx={{ ml: 2, flex: 1 }} variant="h6" component="div">
-              <span className="text-gray-800">
-
-              {isAddProductModalOpen?.modal}
-              </span>
-            </Typography>
-            
-          </Toolbar>
-        </AppBar>
-        {
-          isAddProductModalOpen?.modal === 'Add Product' && <AddProduct/>
-        }
-        {
-          isAddProductModalOpen?.modal ==='Add Home Slide' && <AddHomeSlide/>
-        }
-        {
-          isAddProductModalOpen?.modal ==='Add New Category' && <AddCategory/>
-        }
-        {
-          isAddProductModalOpen?.modal ==='Add New Sub Category' && <AddSubCategory/>
-        }
-        {
-          isAddProductModalOpen?.modal ==='Add New Address' && <AddAddress/>
-        }
-        {
-          isAddProductModalOpen?.modal ==='Edit Category' && <EditCategory/>
-        }
-
-      </Dialog>
+      
     </MyContext.Provider>
     </>
   )

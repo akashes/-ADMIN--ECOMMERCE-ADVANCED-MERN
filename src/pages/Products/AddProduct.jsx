@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useContext, useEffect, useRef, useState } from "react";
 import InputLabel from '@mui/material/InputLabel';
 import MenuItem from '@mui/material/MenuItem';
 import FormControl from '@mui/material/FormControl';
@@ -9,40 +9,376 @@ import UploadBox from "../../components/UploadBox";
 import { LazyLoadImage } from 'react-lazy-load-image-component';
 import 'react-lazy-load-image-component/src/effects/blur.css';
 import { IoIosClose } from "react-icons/io";
-import { Button } from "@mui/material";
+import { Button, CircularProgress } from "@mui/material";
 import { IoMdCloudUpload } from "react-icons/io";
+import { useDispatch, useSelector } from "react-redux";
+import { addProduct, addProductImages, deleteProductImagesDuringCreation, getAllProducts, setProductAdded } from "../../features/product/productSlice";
+import { showError, showSuccess, showWarning } from "../../utils/toastUtils";
+import { getCategories } from "../../features/category/categorySlice";
+import { MyContext } from "../../App";
+import { useNavigate } from "react-router-dom";
+
+const attributeSuggestions = {
+  main: {
+    fashion: {
+      attributes: ["Size", "Weight", "Color"],
+      lockedKeys: ['Size']
+    },
+    laptops: {
+      attributes: ["Processor", "RAM", "Graphics"],
+      lockedKeys: ["Processor"]
+    }
+  },
+  sub: {
+    smartphone: {
+      attributes: ["Camera", "OS"],
+      lockedKeys: ["OS"]
+    },
+    tshirt: {
+      attributes: ["Size", "Material"],
+      lockedKeys: []
+    }
+  },
+  third: {
+    gaming: {
+      attributes: ["Cooling System", "Refresh Rate"],
+      lockedKeys: ["Cooling System"]
+    }
+  }
+};
+
+const mergeAttributeSuggestions = (catName, subCatName, thirdCatName) => {
+  const seenKeys = new Set();
+  const merged = [];
+
+  const levels = [
+    attributeSuggestions.main[catName?.toLowerCase()],
+    attributeSuggestions.sub[subCatName?.toLowerCase()],
+    attributeSuggestions.third[thirdCatName?.toLowerCase()]
+  ];
+
+  for (const level of levels) {
+    if (!level) continue;
+    for (const key of level.attributes) {
+      if (!seenKeys.has(key)) {
+        merged.push({
+          key,
+          value: '',
+          locked: level.lockedKeys.includes(key)
+        });
+        seenKeys.add(key);
+      }
+    }
+  }
+
+  return merged;
+};
+
+
+
 
 const AddProduct = () => {
-      const [productCat, setProductCat] = useState('');
-      const [productSubCat, setProductSubCat] = useState('');
-      const[productFeatured,setProductFeatured]=useState('');
-      const[productRams,setProductRams]=useState('');
-      const[productWeight,setProductWeight]=useState('');
-      const[productSize,setProductSize]=useState('');
-  const handleChangeProductCat = (event) => {
-    setProductCat(event.target.value);
-  };
-  const handleChangeProductSubCat = (event) => {
-    setProductSubCat(event.target.value);
-  };
+  //test
+  //testing
+  const dispatch = useDispatch()
+  const context = useContext(MyContext)
+  const navigate = useNavigate()
+  const{categories}=useSelector(state=>state.category)
+  const{productImages}=useSelector(state=>state.product)
+  const[isUploading, setIsUploading] = useState(false)
+  const[productSubmitted, setProductSubmitted] = useState(false)
+  const[loading, setLoading] = useState(false)
+  const productSubmittedRef = useRef(false)
+  
 
-  const handleChangeProductFeatured=(event) => {
-    setProductFeatured(event.target.value);
-  };
-  const handleChangeProductRams=(event) => {
-    setProductRams(event.target.value);
-  };
-  const handleChangeProductWeight=(event) => {
-    setProductWeight(event.target.value);
-  };
-  const handleChangeProductSize=(event) => {
-    setProductSize(event.target.value);
-  };
+  // const [attributes, setAttributes] = useState([{ key: '', value: '' }]);
+  const [attributes, setAttributes] = useState([]);
+
+const handleAttributeChange = (index, field, value) => {
+  console.log(index,field,value)
+  const newAttrs = [...attributes];
+  newAttrs[index][field] = value;
+  setAttributes(newAttrs);
+};
+
+const addAttributeField = () => {
+  setAttributes([...attributes, { key: '', value: '' }]);
+};
+
+const removeAttributeField = (e,index) => {
+  e.preventDefault()
+
+  const newAttrs = attributes.filter((_, i) => i !== index);
+  setAttributes(newAttrs);
+};
+
+
+console.log(attributes)
+
+      const[suggestedFields, setSuggestedFields] = useState([]);
+
+      const[formFields,setFormFields]=useState({
+        name:'',
+        description:"",
+        catName:"",
+        category:"",//id 
+        subCat:"", //name
+        subCatId:"",
+        thirdSubCat:"", //name
+        thirdSubCatId:"",
+        countInStock:0,
+        price:0,
+        oldPrice:0,
+        rating:0,
+        images:[],
+        brand:"",
+        isFeatured:false,
+    
+
+            })
+
+            const onChangeInput=(e)=>{
+                const{name,value}=e.target
+                setFormFields({
+                    ...formFields,
+                    [name]:value
+                })
+            }
+
+const handleChangeProductCat = (event) => {
+  const selectedCategoryId = event.target.value;
+  const selectedCategoryObj = categories.find(cat => cat._id === selectedCategoryId);
+  const selectedCategoryName = selectedCategoryObj?.name?.toLowerCase() || '';
+
+  setFormFields(prev => ({
+    ...prev,
+    category: selectedCategoryId,
+    catName: selectedCategoryName,
+    subCat: '',
+    subCatId: '',
+    thirdSubCat: '',
+    thirdSubCatId: ''
+  }));
+
+  const mergedAttributes = mergeAttributeSuggestions(selectedCategoryName, '', '');
+  setAttributes(mergedAttributes);
+};
+
+const handleChangeProductSubCat = (event) => {
+  const newSubCatId = event.target.value;
+
+  const subCatName =
+    selectedRootCategory?.children?.find(child => child._id === newSubCatId)?.name?.toLowerCase() || '';
+
+  setFormFields((prev) => ({
+    ...prev,
+    subCat: subCatName,
+    subCatId: newSubCatId,
+    thirdSubCat: '',
+    thirdSubCatId: ''
+  }));
+
+  const mergedAttributes = mergeAttributeSuggestions(formFields.catName, subCatName, '');
+  setAttributes(mergedAttributes);
+};
+
+
+
+
+const handleChangeThirdLevelSubCat = (event) => {
+  const newThirdLevelSubCatId = event.target.value;
+  const thirdLevelSubCatName = thirdLevelCategories.find(cat => cat._id === newThirdLevelSubCatId)?.name?.toLowerCase() || '';
+
+  setFormFields(prev => ({
+    ...prev,
+    thirdSubCat: thirdLevelSubCatName,
+    thirdSubCatId: newThirdLevelSubCatId
+  }));
+
+  const mergedAttributes = mergeAttributeSuggestions(formFields.catName, formFields.subCat, thirdLevelSubCatName);
+  setAttributes(mergedAttributes);
+};
+
+
+
+
+console.log(formFields)
+console.log(attributes)
+
+const handleAddProduct=async(e)=>{
+  e.preventDefault()
+  //input validation 
+  if(!formFields.name){
+    showWarning('Please enter product name')
+    return
+  }
+  if(!formFields.description){
+    showWarning('Please enter product description')
+    return
+  }
+  if(!formFields.category){
+    showWarning('Please select a category')
+    return
+  }
+  if(!formFields.countInStock){
+    showWarning('Please enter product count in stock')
+    return
+  }
+  if(!formFields.price){
+    showWarning('Please enter product price')
+    return
+  }
+  if(!formFields.oldPrice){
+    showWarning('Please enter product old price')
+    return
+  }
+  if(!formFields.brand){
+    showWarning('Please enter product brand')
+    return
+  }
+  // if(!formFields.images.length){
+  //   showWarning('Please upload at least one image')
+  //   return
+  // }
+
+   //constructing final payload with dynamic values
+
+    const attributeMap = {};
+    if (Array.isArray(attributes)) {
+      attributes.forEach(({ key, value }) => {
+        if (key && value !== undefined) {
+          attributeMap[key] = value;
+        }
+      });
+    }
+    console.log(attributeMap)
+   const productData = {
+    ...formFields,
+    attributes: attributeMap
+   }
+   console.log(productData)
+      if (!productData.subCatId) delete productData.subCatId;
+if (!productData.thirdSubCatId) delete productData.thirdSubCatId;
+setLoading(true)
+   const resultAction =await dispatch(addProduct(productData))
+   console.log(resultAction)
+   if(addProduct.fulfilled.match(resultAction)){
+    setLoading(false)
+    setProductSubmitted(true)
+    //  productSubmittedRef.current = true;
+    showSuccess(resultAction.payload.message || 'Product added successfully')
+    setFormFields({name:'',description:"",catName:"",category:"",subCat:"",subCatId:"",thirdSubCat:"",thirdSubCatId:"",countInStock:0,price:0,oldPrice:0,rating:0,images:[],brand:"",isFeatured:false,})
+    setAttributes([])
+    context.setIsAddProductModalOpen({open:false,modal:''})
+    navigate('/products')
+    setProductAdded(true)
+      
+
+
+
+   }
+   if(addProduct.rejected.match(resultAction)){
+    setLoading(false)
+    showError(resultAction.payload || 'Failed to add product')
+   }
+
+
+
+}
+  const handleImageChange=async(e)=>{
+
+          const filesArray=Array.from(e.target.files)
+          
+          if(filesArray.length===0) return;
+
+       const validTypes = ['image/jpeg', 'image/png', 'image/jpg', 'image/webp'];
+
+          const allValid = filesArray.every((file) =>
+            validTypes.includes(file.type)
+          );
+
+          if (!allValid) {
+            showError('Please select valid image files');
+            return;
+          }
+
+          console.log('valid image types');
+          setIsUploading(true)
+          try {
+               const formData = new FormData()
+               filesArray.forEach((file)=>formData.append('productImages',file))
+  
+      
+          console.log('calling with formdata',formData)
+          const resultAction = await dispatch( addProductImages(formData))
+          console.log(resultAction)
+         if(addProductImages.fulfilled.match(resultAction)){
+             showSuccess('image uploaded successfully')
+
+       
+         }
+         if(addProductImages.rejected.match(resultAction)){
+             showError(resultAction.payload || 'Failed to upload image')
+         }
+              
+          } catch (error) {
+              console.log('upload error',error.response?.data || error.message)
+              showError(error.response?.data?.message || error.message)
+          }finally{
+              setIsUploading(false)
+          }
+          
+         
+       
+  }
+
+
+    const handleRemoveImage=async(id)=>{
+    const resultAction=  await dispatch(deleteProductImagesDuringCreation(id))
+    console.log(resultAction)
+    if(deleteProductImagesDuringCreation.fulfilled.match(resultAction)){
+      showSuccess(resultAction.payload.message || 'Image deleted successfully')
+    }
+    if(deleteProductImagesDuringCreation.rejected.match(resultAction)){
+      showError(resultAction.payload || 'Failed to delete image')
+    }
+    
+    } 
+
+
+
+
+
+const selectedRootCategory = categories.find((category) => category._id === formFields.category);
+const subCategories = selectedRootCategory?.children || [];
+const selectedSubCategory = subCategories.find((category) => category._id === formFields.subCatId);
+const thirdLevelCategories = selectedSubCategory?.children || [];
+
+useEffect(()=>{
+
+  dispatch(getCategories())
+
+
+},[])
+
+// useEffect(() => {
+//   return () => {
+//     console.log("clean up");
+//     console.log({ productSubmitted: productSubmittedRef.current });
+//     if (productImages?.length > 0 && !productSubmittedRef.current) {
+//       console.log('inside')
+//       productImages.forEach((image) => {
+//         dispatch(deleteProductImagesDuringCreation(image.public_id));
+//       });
+//     }
+//   };
+// }, [productImages]);
+
 
 
   return (
     <section className="p-5 bg-gray-50">
-      <form className="addProductForm  p-8 py-3 ">
+      <form onSubmit={handleAddProduct} className="addProductForm  p-8 py-3 ">
         <div className="scroll max-h-[72vh] overflow-y-scroll pr-4">
 
         <div className="grid grid-cols-1 mb-3">
@@ -51,8 +387,10 @@ const AddProduct = () => {
             <input
               type="text"
               name="name"
-              id=""
+              id="name"
               className="w-full h-[40px] p-3 border border-[rgba(0,0,0,0.2)] focus:outline-none focus:border-[rgba(0,0,0,0.5)] rounded-sm text-sm "
+              value={formFields.name}
+              onChange={onChangeInput}
             />
           </div>
         </div>
@@ -62,42 +400,56 @@ const AddProduct = () => {
             <textarea
               type="text"
               name="description"
-              id=""
               className="w-full h-[140px] p-3 border border-[rgba(0,0,0,0.2)] focus:outline-none focus:border-[rgba(0,0,0,0.5)] rounded-sm text-sm "
+              value={formFields.description}
+              onChange={onChangeInput}
+              placeholder="description should not exceed 500 characters"
             />
           </div>
         </div>
         <div className="grid grid-cols-4 mb-3 gap-4">
-          <div className="col">
+          {
+            categories.length!==0 && (
+               <div className="col">
             <h3 className="text-[14px] font-[500] mb-1 text-black">Product Category</h3>
-  <Select
-  sx={{
-    '& .MuiOutlinedInput-notchedOutline': {
-      borderColor: 'rgba(0,0,0,0.2)',
-    },
-    '&:hover .MuiOutlinedInput-notchedOutline': {
-      borderColor: 'rgba(0,0,0,0.4)', 
-    },
-    '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
-      borderColor: 'rgba(0,0,0,0.5)', 
-      outline:'none'
-    },
-  }}
+            <Select
+            sx={{
+              '& .MuiOutlinedInput-notchedOutline': {
+                borderColor: 'rgba(0,0,0,0.2)',
+              },
+              '&:hover .MuiOutlinedInput-notchedOutline': {
+                borderColor: 'rgba(0,0,0,0.4)', 
+              },
+              '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
+                borderColor: 'rgba(0,0,0,0.5)', 
+                outline:'none'
+              },
+            }}
           labelId="productCatDropLabel"
           id="productCatDrop"
-          value={productCat}
+          name="category"
+          value={formFields.category}
           label="Product Category"
           size="small"
           className="w-full border-[rgba(0,0,0,0.1)] focus:!outline-none focus:!border-[rgba(0,0,0,0.5)] "
           onChange={handleChangeProductCat}
         >
-          <MenuItem value={''}>None</MenuItem>
-          <MenuItem value={10}>Fashion</MenuItem>
-          <MenuItem value={20}>Beauty</MenuItem>
-          <MenuItem value={30}>Wellness</MenuItem>
+          {
+            categories&& categories.map((category,index)=><MenuItem className="!flex !justify-between" key={index} value={category._id}>
+              {category.name} 
+              {/* <img src={category.images[0].url} alt="" width={20} /> */}
+               </MenuItem>)
+          }
+        
         </Select>
           </div>
-          <div className="col">
+
+            )
+          }
+         
+         {
+          subCategories.length!==0 && (
+              <div className="col">
             <h3 className="text-[14px] font-[500] mb-1 text-black">Product Sub Category</h3>
   <Select
   sx={{
@@ -113,44 +465,28 @@ const AddProduct = () => {
     },
   }}
           labelId="productCatDropLabel"
+          disabled={!selectedRootCategory}
           id="productCatDrop"
-          value={productSubCat}
+          name="subCatId"
+          value={formFields.subCatId}
           label="Product Category"
           size="small"
           className="w-full border-[rgba(0,0,0,0.1)] focus:!outline-none focus:!border-[rgba(0,0,0,0.5)] "
           onChange={handleChangeProductSubCat}
         >
-          <MenuItem value={''}>None</MenuItem>
-          <MenuItem value={10}>Men</MenuItem>
-          <MenuItem value={20}>Women</MenuItem>
-          <MenuItem value={30}>Kids</MenuItem>
+          {
+            subCategories&& subCategories.map((category,index)=><MenuItem key={index} value={category._id}>{category.name}</MenuItem>)
+          }
         </Select>
           </div>
-          <div className="col">
-            <h3 className="text-[14px] font-[500] mb-1 text-black">Product Old Price</h3>
-            <input
-            
-              type="number"
-              name="price"
-              id="price"
-              className="w-full h-[40px] p-3 border border-[rgba(0,0,0,0.2)] focus:outline-none focus:border-[rgba(0,0,0,0.5)]
-               rounded-sm text-sm "
-            />
-          </div>
-          <div className="col">
-            <h3 className="text-[14px] font-[500] mb-1 text-black">Product Price</h3>
-            <input
-            
-              type="number"
-              name="price"
-              id="price"
-              className="w-full h-[40px] p-3 border border-[rgba(0,0,0,0.2)] focus:outline-none focus:border-[rgba(0,0,0,0.5)]
-               rounded-sm text-sm "
-            />
-          </div>  
-          {/* product featured */}
-          <div className="col">
-            <h3 className="text-[14px] font-[500] mb-1 text-black">Is Featured?</h3>
+
+          )
+         }
+
+         {
+          thirdLevelCategories.length!==0 && (
+                 <div className="col">
+            <h3 className="text-[14px] font-[500] mb-1 text-black">Third Sub Category</h3>
   <Select
   sx={{
     '& .MuiOutlinedInput-notchedOutline': {
@@ -165,15 +501,78 @@ const AddProduct = () => {
     },
   }}
           labelId="productCatDropLabel"
-          id="productCatDrop"
-          value={productFeatured}
+          disabled={!selectedSubCategory}
+          name="thirdSubCatId"
+          value={formFields.thirdSubCatId}
           label="Product Category"
           size="small"
           className="w-full border-[rgba(0,0,0,0.1)] focus:!outline-none focus:!border-[rgba(0,0,0,0.5)] "
-          onChange={handleChangeProductFeatured}
+          onChange={handleChangeThirdLevelSubCat}
         >
-          <MenuItem value={10}>True</MenuItem>
-          <MenuItem value={20}>False</MenuItem>
+          {
+            thirdLevelCategories&& thirdLevelCategories.map((category,index)=><MenuItem key={index} value={category._id}>{category.name}</MenuItem>)
+          }
+        </Select>
+          </div>
+
+          )
+        }
+        
+         
+          
+          <div className="col">
+            <h3 className="text-[14px] font-[500] mb-1 text-black"> Old Price</h3>
+            <input
+            
+              type="number"
+              name="oldPrice"
+              id="oldPrice"
+
+              className="w-full h-[40px] p-3 border border-[rgba(0,0,0,0.2)] focus:outline-none focus:border-[rgba(0,0,0,0.5)]
+               rounded-sm text-sm "
+               value={formFields.oldPrice}
+               onChange={onChangeInput}
+            />
+          </div>
+          <div className="col">
+            <h3 className="text-[14px] font-[500] mb-1 text-black">New Price</h3>
+            <input
+            
+              type="number"
+              name="price"
+              id="price"
+              className="w-full h-[40px] p-3 border border-[rgba(0,0,0,0.2)] focus:outline-none focus:border-[rgba(0,0,0,0.5)]
+               rounded-sm text-sm "
+               value={formFields.price}
+               onChange={onChangeInput}
+            />
+          </div>  
+          {/* product featured */}
+          <div className="col">
+            <h3 className="text-[14px] font-[500] mb-1 text-black">Is Featured?</h3>
+          <Select
+          sx={{
+            '& .MuiOutlinedInput-notchedOutline': {
+              borderColor: 'rgba(0,0,0,0.2)',
+            },
+            '&:hover .MuiOutlinedInput-notchedOutline': {
+              borderColor: 'rgba(0,0,0,0.4)', 
+            },
+            '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
+              borderColor: 'rgba(0,0,0,0.5)', 
+              outline:'none'
+            },
+          }}
+          labelId="productCatDropLabel"
+          name="isFeatured"
+          value={formFields.isFeatured}
+          label="Product Category"
+          size="small"
+          className="w-full border-[rgba(0,0,0,0.1)] focus:!outline-none focus:!border-[rgba(0,0,0,0.5)] "
+          onChange={onChangeInput}
+        >
+          <MenuItem value={true}>True</MenuItem>
+          <MenuItem value={false}>False</MenuItem>
         </Select>
           </div>
           {/* stock */}
@@ -182,10 +581,12 @@ const AddProduct = () => {
             <input
             
               type="number"
-              name="price"
+              name="countInStock"
+              value={formFields.countInStock}
               id="price"
               className="w-full h-[40px] p-3 border border-[rgba(0,0,0,0.2)] focus:outline-none focus:border-[rgba(0,0,0,0.5)]
                rounded-sm text-sm "
+               onChange={onChangeInput}
             />
           </div>
           {/* brand */}
@@ -194,14 +595,16 @@ const AddProduct = () => {
             <input
             
               type="text"
-              name="price"
+              name="brand"
               id="price"
               className="w-full h-[40px] p-3 border border-[rgba(0,0,0,0.2)] focus:outline-none focus:border-[rgba(0,0,0,0.5)]
                rounded-sm text-sm "
+               value={formFields.brand}
+               onChange={onChangeInput}
             />
           </div>
           {/* discount */}
-            <div className="col">
+            {/* <div className="col">
             <h3 className="text-[14px] font-[500] mb-1 text-black">Product Discount</h3>
             <input
             
@@ -211,119 +614,70 @@ const AddProduct = () => {
               className="w-full h-[40px] p-3 border border-[rgba(0,0,0,0.2)] focus:outline-none focus:border-[rgba(0,0,0,0.5)]
                rounded-sm text-sm "
             />
-          </div>
+          </div> */}
 
       
         </div>
         <div className="grid grid-cols-4 mb-3 gap-4">
-            {/* ram */}
-          <div className="col">
-            <h3 className="text-[14px] font-[500] mb-1 text-black">Product RAMS</h3>
-  <Select
-  sx={{
-    '& .MuiOutlinedInput-notchedOutline': {
-      borderColor: 'rgba(0,0,0,0.2)',
-    },
-    '&:hover .MuiOutlinedInput-notchedOutline': {
-      borderColor: 'rgba(0,0,0,0.4)', 
-    },
-    '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
-      borderColor: 'rgba(0,0,0,0.5)', 
-      outline:'none'
-    },
-  }}
-          labelId="productCatDropLabel"
-          id="productCatDrop"
-          value={productRams}
-          label="Product Category"
-          size="small"
-          className="w-full border-[rgba(0,0,0,0.1)] focus:!outline-none focus:!border-[rgba(0,0,0,0.5)] "
-          onChange={handleChangeProductRams}
-        >
-          <MenuItem value={'4GB'}>4GB</MenuItem>
-          <MenuItem value={'6GB'}>6GB</MenuItem>
-          <MenuItem value={'8GB'}>8GB</MenuItem>
-          <MenuItem value={'10GB'}>10GB</MenuItem>
-        </Select>
-          </div>
-          {/* weight */}
-          <div className="col">
-            <h3 className="text-[14px] font-[500] mb-1 text-black">Product Weight</h3>
-  <Select
-  sx={{
-    '& .MuiOutlinedInput-notchedOutline': {
-      borderColor: 'rgba(0,0,0,0.2)',
-    },
-    '&:hover .MuiOutlinedInput-notchedOutline': {
-      borderColor: 'rgba(0,0,0,0.4)', 
-    },
-    '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
-      borderColor: 'rgba(0,0,0,0.5)', 
-      outline:'none'
-    },
-  }}
-          labelId="productCatDropLabel"
-          id="productCatDrop"
-          value={productWeight}
-          label="Product Category"
-          size="small"
-          className="w-full border-[rgba(0,0,0,0.1)] focus:!outline-none focus:!border-[rgba(0,0,0,0.5)] "
-          onChange={handleChangeProductWeight}
-        >
-          <MenuItem value={''}>None</MenuItem>
-          <MenuItem value={10}>2KG</MenuItem>
-          <MenuItem value={20}>4KG</MenuItem>
-          <MenuItem value={30}>5KG</MenuItem>
-        </Select>
-          </div>
-          {/* size */}
-          <div className="col">
-            <h3 className="text-[14px] font-[500] mb-1 text-black">Product Size</h3>
-              <Select
-  sx={{
-    '& .MuiOutlinedInput-notchedOutline': {
-      borderColor: 'rgba(0,0,0,0.2)',
-    },
-    '&:hover .MuiOutlinedInput-notchedOutline': {
-      borderColor: 'rgba(0,0,0,0.4)', 
-    },
-    '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
-      borderColor: 'rgba(0,0,0,0.5)', 
-      outline:'none'
-    },
-  }}
-          labelId="productCatDropLabel"
-          id="productCatDrop"
-          value={productSize}
-          label="Product Category"
-          size="small"
-          className="w-full border-[rgba(0,0,0,0.1)] focus:!outline-none focus:!border-[rgba(0,0,0,0.5)] "
-          onChange={handleChangeProductSize}
-        >
-          <MenuItem value={''}>None</MenuItem>
-          <MenuItem value={'S'}>S</MenuItem>
-          <MenuItem value={'M'}>M</MenuItem>
-          <MenuItem value={'L'}>L</MenuItem>
-        </Select>
-           
-          </div>
+    
           {/* rating */}
-          <div className="col">
+          {/* <div className="col">
             <h3 className="text-[14px] font-[500] mb-1 text-black">Product Rating</h3>
-                 <Rating name="half-rating" defaultValue={2.5} precision={0.5} />
+                 <Rating name="half-rating" defaultValue={2.5} precision={0.5}
+                 
+                 />
 
-          </div>  
+          </div>   */}
        
 
       
         </div>
+        <hr className="my-5 !text-gray-400" />
+        {/* dynamic attributes */}
+ {attributes && attributes.map((attr, i) => (
+  <div key={i} className="flex gap-2 mb-2">
+    <input
+      value={attr.key}
+      readOnly={attr.locked}
+      placeholder="Attribute Key"
+      onChange={(e) => handleAttributeChange(i, 'key', e.target.value)}
+      className="border p-1 px-2 !bg-[#f1faff] rounded w-40 border-[rgba(0,0,0,0.3)] outline-none"
+    />
+    <input
+      value={attr.value}
+      placeholder="Value"
+      onChange={(e) => handleAttributeChange(i, 'value', e.target.value)}
+      className="border p-1 px-2 rounded w-40 !bg-[#f1faff] border-[rgba(0,0,0,0.3)] outline-none"
+    />
+    {/* hiding remove button for locked values */}
+    {
+      !attr.locked && (
+
+        <button onClick={(e) => removeAttributeField(e,i)} className="cursor-pointer">
+          <img src="https://res.cloudinary.com/dllelmzim/image/upload/v1754588723/block_p6nqvy.png" alt="" width={23} />
+        </button>
+      )
+    }
+    {attr.locked && <span className="text-gray-400 inline-block my-auto  text-lg ">
+      <img src="https://res.cloudinary.com/dllelmzim/image/upload/v1754659588/locked_xdpwtn.png" alt="" width={25} />
+      </span>}
+
+  </div>
+))}
+<Button onClick={addAttributeField}>+ Add Custom Field</Button>
+
+
+
         {/* media and image section */}
         <div className="col w-full p-5 px-0">
             <h3 className="font-[700] text-[18px] mb-3">Media and Images</h3>
             <div className="grid grid-cols-7 gap-4 ">
-                <div className="uploadBoxWrapper relative">
+              {
+                productImages && productImages.length>0 && productImages.map((img,i)=>{
+                  return(
+                     <div className="uploadBoxWrapper relative">
                     <span className="absolute w-[20px] h-[20px] opacity-90 rounded-full overflow-hidden bg-primary top-[-5px] right-[-5px] cursor-pointer flex items-center justify-center z-50">
-                        <IoIosClose className="text-white text-[19px]" />
+                        <IoIosClose className="text-white text-[19px]"  onClick={() => handleRemoveImage(img?.public_id)} />
                     </span>
                     
              <div className='uploadBox p-0 rounded-md  overflow-hidden border-2 border-dashed border-[rgba(0,0,0,0.3)] h-[150px] w-[100%] bg-gray-100 cursor-pointer hover:bg-gray-200 transition-colors flex flex-col justify-center items-center relative'>
@@ -336,97 +690,35 @@ const AddProduct = () => {
     }}
 
       alt={"image"}
-                            src={'https://serviceapi.spicezgold.com/download/1749796588779_hp-15-fb0082ax-victus-gaming-laptop-amd-ryzen5-5600h-8gb-512gb-ssd-4-gb-nvidia-geforce-rtx-3050-graphics-windows-11-mso-fhd-39-6-cm-15-6-inch-digital-o493178411-p594412844-0-202406241824.jpeg'}
+                            src={img.url}
                             />
                 </div>
                  </div>
-                <div className="uploadBoxWrapper relative">
-                    <span className="absolute w-[20px] h-[20px] opacity-90 rounded-full overflow-hidden bg-primary top-[-5px] right-[-5px] cursor-pointer flex items-center justify-center z-50">
-                        <IoIosClose className="text-white text-[19px]" />
-                    </span>
-                    
-             <div className='uploadBox p-0 rounded-md  overflow-hidden border-2 border-dashed border-[rgba(0,0,0,0.3)] h-[150px] w-[100%] bg-gray-100 cursor-pointer hover:bg-gray-200 transition-colors flex flex-col justify-center items-center relative'>
+                  )
+                })
+              }
+               
+           
 
-                     <LazyLoadImage
-                     className="w-full h-full object-cover"
-                     effect="blur"
-                         wrapperProps={{
-                   style: {transitionDelay: "1s"},
-    }}
-
-      alt={"image"}
-                            src={'https://serviceapi.spicezgold.com/download/1749796588779_hp-15-fb0082ax-victus-gaming-laptop-amd-ryzen5-5600h-8gb-512gb-ssd-4-gb-nvidia-geforce-rtx-3050-graphics-windows-11-mso-fhd-39-6-cm-15-6-inch-digital-o493178411-p594412844-0-202406241824.jpeg'}
-                            />
-                </div>
-                 </div>
-                <div className="uploadBoxWrapper relative">
-                    <span className="absolute w-[20px] h-[20px] opacity-90 rounded-full overflow-hidden bg-primary top-[-5px] right-[-5px] cursor-pointer flex items-center justify-center z-50">
-                        <IoIosClose className="text-white text-[19px]" />
-                    </span>
-                    
-             <div className='uploadBox p-0 rounded-md  overflow-hidden border-2 border-dashed border-[rgba(0,0,0,0.3)] h-[150px] w-[100%] bg-gray-100 cursor-pointer hover:bg-gray-200 transition-colors flex flex-col justify-center items-center relative'>
-
-                     <LazyLoadImage
-                     className="w-full h-full object-cover"
-                     effect="blur"
-                         wrapperProps={{
-                   style: {transitionDelay: "1s"},
-    }}
-
-      alt={"image"}
-                            src={'https://serviceapi.spicezgold.com/download/1749796588779_hp-15-fb0082ax-victus-gaming-laptop-amd-ryzen5-5600h-8gb-512gb-ssd-4-gb-nvidia-geforce-rtx-3050-graphics-windows-11-mso-fhd-39-6-cm-15-6-inch-digital-o493178411-p594412844-0-202406241824.jpeg'}
-                            />
-                </div>
-                 </div>
-                <div className="uploadBoxWrapper relative">
-                    <span className="absolute w-[20px] h-[20px] opacity-90 rounded-full overflow-hidden bg-primary top-[-5px] right-[-5px] cursor-pointer flex items-center justify-center z-50">
-                        <IoIosClose className="text-white text-[19px]" />
-                    </span>
-                    
-             <div className='uploadBox p-0 rounded-md  overflow-hidden border-2 border-dashed border-[rgba(0,0,0,0.3)] h-[150px] w-[100%] bg-gray-100 cursor-pointer hover:bg-gray-200 transition-colors flex flex-col justify-center items-center relative'>
-
-                     <LazyLoadImage
-                     className="w-full h-full object-cover"
-                     effect="blur"
-                         wrapperProps={{
-                   style: {transitionDelay: "1s"},
-    }}
-
-      alt={"image"}
-                            src={'https://serviceapi.spicezgold.com/download/1749796588779_hp-15-fb0082ax-victus-gaming-laptop-amd-ryzen5-5600h-8gb-512gb-ssd-4-gb-nvidia-geforce-rtx-3050-graphics-windows-11-mso-fhd-39-6-cm-15-6-inch-digital-o493178411-p594412844-0-202406241824.jpeg'}
-                            />
-                </div>
-                 </div>
-                <div className="uploadBoxWrapper relative">
-                    <span className="absolute w-[20px] h-[20px] opacity-90 rounded-full overflow-hidden bg-primary top-[-5px] right-[-5px] cursor-pointer flex items-center justify-center z-50">
-                        <IoIosClose className="text-white text-[19px]" />
-                    </span>
-                    
-             <div className='uploadBox p-0 rounded-md  overflow-hidden border-2 border-dashed border-[rgba(0,0,0,0.3)] h-[150px] w-[100%] bg-gray-100 cursor-pointer hover:bg-gray-200 transition-colors flex flex-col justify-center items-center relative'>
-
-                     <LazyLoadImage
-                     className="w-full h-full object-cover"
-                     effect="blur"
-                         wrapperProps={{
-                   style: {transitionDelay: "1s"},
-    }}
-
-      alt={"image"}
-                            src={'https://serviceapi.spicezgold.com/download/1749796588779_hp-15-fb0082ax-victus-gaming-laptop-amd-ryzen5-5600h-8gb-512gb-ssd-4-gb-nvidia-geforce-rtx-3050-graphics-windows-11-mso-fhd-39-6-cm-15-6-inch-digital-o493178411-p594412844-0-202406241824.jpeg'}
-                            />
-                </div>
-                 </div>
-
-                <UploadBox multiple={true}/>
+                <UploadBox multiple={true} onChange={handleImageChange} isUploading={isUploading} />
             </div>
 
         </div>
         </div>
         <hr />
         <br /> 
-        <Button type="button" className="btn-blue btn-lg mt-3 w-full gap" >
+        <Button type="submit" className="btn-blue btn-lg mt-3 w-full gap-1" >
+          {
+            loading?<>
+            <CircularProgress color="inherit" size={20} />
+            <span>Adding Product...</span>
+            </>:<>
             <IoMdCloudUpload className="text-[25px] text-white"/>
-            Publish and View</Button>
+           Add Product
+            
+            </>
+          }
+            </Button>
      
       </form>
     </section>
