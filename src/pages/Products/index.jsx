@@ -214,7 +214,6 @@ const Products = () => {
        sale
 
     </p>
-    <ProgressBar value={40} type={'success'} />
 
               </TableCell>
               <TableCell style={{minWidth:columns.minWidth}}>
