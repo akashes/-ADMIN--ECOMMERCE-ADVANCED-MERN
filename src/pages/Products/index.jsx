@@ -33,9 +33,10 @@ import SearchBox from '../../components/SearchBox';
 
 import { MyContext } from '../../App';
 import { useDispatch, useSelector } from 'react-redux';
-import { getAllProducts, setProductAdded } from '../../features/product/productSlice';
+import { deleteMultipleProducts, deleteProduct, getAllProducts, setProductAdded } from '../../features/product/productSlice';
+import { showError, showSuccess } from '../../utils/toastUtils';
 
-
+import './products.css'
 
 const columns=[
   {id:'product',label:'PRODUCT',minWidth:150},
@@ -51,6 +52,9 @@ const Products = () => {
   const{products,totalProducts,totalPages,currentPage,productAdded}=useSelector(state=>state.product)
     const context = useContext(MyContext)
     const dispatch = useDispatch()
+    const[isDeleting,setIsDeleting]=useState(false)
+    const[deleteArray,setDeleteArray]=useState([])
+
       const [rowsPerPage, setRowsPerPage] = React.useState(10);
       const [page, setPage] = React.useState(0);
         const [categoryFilterVal, setCategoryFilterVal] = useState('');
@@ -68,6 +72,30 @@ const Products = () => {
       };
       const label = { inputProps: { 'aria-label': 'Checkbox demo' } };
 
+      const handleDeleteProduct=async(id)=>{
+        setIsDeleting(id)
+        const resultAction = await dispatch(deleteProduct(id))
+        console.log(resultAction)
+        if(deleteProduct.fulfilled.match(resultAction)){
+          setIsDeleting(false)
+          showSuccess(resultAction.payload.message || 'Product deleted successfully')
+      }
+      if(deleteProduct.rejected.match(resultAction)){
+        setIsDeleting(false)
+        showError(resultAction.payload || 'Failed to delete product')
+      }
+      }
+      const handleDeleteMultipleProducts=async(ids)=>{
+      const resultAction  = await dispatch(deleteMultipleProducts(ids))
+      console.log(resultAction)
+        if(deleteMultipleProducts.fulfilled.match(resultAction)){
+          showSuccess(resultAction.payload.message || 'Products deleted successfully')
+      }
+      if(deleteMultipleProducts.rejected.match(resultAction)){
+        showError(resultAction.payload || 'Failed to delete products')
+      }
+
+      }
 
       useEffect(()=>{
 
@@ -83,7 +111,7 @@ const Products = () => {
 
 },[dispatch,page,rowsPerPage,productAdded])
 
-
+console.log(deleteArray)
   return (
    <>
    {/* welcome banner */}
@@ -163,11 +191,12 @@ const Products = () => {
 
             </TableRow> */}
             {
+              // products.slice(page*rowsPerPage,page*rowsPerPage+rowsPerPage)
            products.length>0 && products.map((product)=>(
 
-                <TableRow key={product._id} >
+                <TableRow className={`${isDeleting===product._id && 'uploading-gradient-delete'}`} key={product._id} >
               <TableCell style={{minWidth:columns.minWidth}}>
-                <Checkbox {...label} size='small'/>
+                <Checkbox onChange={()=>setDeleteArray(prev=>[...prev,product._id])} {...label} size='small'/>
 
               </TableCell>
               <TableCell style={{minWidth:columns.minWidth}}>
@@ -220,9 +249,12 @@ const Products = () => {
                    <div className="flex items-center gap-1">
       <TooltipMUI placement='top' title='Edit Product'>
 
-      <Button className='!w-[35px] !h-[35px]  bg-[#f1f1f1] !min-w-[35px]  !border !border-[rgba(0,0,0,0.1)] !rounded-full hover:!bg-[#f1f1f1] hover:!shadow-sm hover:scale-110'>
+      <Button 
+                    onClick={()=>context.setIsAddProductModalOpen({open:true,modal:'Edit Product',id:product._id})}
 
-        <AiFillEdit className='text-[rgba(0,0,0,0.7)] text-[20px] '/>
+      className='!w-[35px] !h-[35px]  bg-[#f1f1f1] !min-w-[35px]  !border !border-[rgba(0,0,0,0.1)] !rounded-full hover:!bg-[#f1f1f1] hover:!shadow-sm hover:scale-110'>
+
+        <AiFillEdit  className='text-[rgba(0,0,0,0.7)] text-[20px] '/>
       </Button>
 
       
@@ -236,7 +268,9 @@ const Products = () => {
       </TooltipMUI>
       <TooltipMUI placement='top' title='Remove Product'>
 
-      <Button className='!w-[35px] !h-[35px]  bg-[#f1f1f1] !min-w-[35px]  !border !border-[rgba(0,0,0,0.1)] !rounded-full hover:!bg-[#f1f1f1] hover:!shadow-sm hover:scale-110'>
+      <Button 
+      onClick={()=>handleDeleteProduct(product._id)}
+      className='!w-[35px] !h-[35px]  bg-[#f1f1f1] !min-w-[35px]  !border !border-[rgba(0,0,0,0.1)] !rounded-full hover:!bg-[#f1f1f1] hover:!shadow-sm hover:scale-110'>
 
         <MdDelete className='text-[rgba(0,0,0,0.7)] text-[20px] '/>
       </Button>
@@ -258,7 +292,7 @@ const Products = () => {
        <TablePagination
         rowsPerPageOptions={[10, 25, 100]}
         component="div"
-        count={totalProducts||0}
+        count={11}
         rowsPerPage={rowsPerPage}
         page={page}
         onPageChange={handleChangePage}

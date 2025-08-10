@@ -12,11 +12,11 @@ import { IoIosClose } from "react-icons/io";
 import { Button, CircularProgress } from "@mui/material";
 import { IoMdCloudUpload } from "react-icons/io";
 import { useDispatch, useSelector } from "react-redux";
-import { addProduct, addProductImages, deleteProductImagesDuringCreation, getAllProducts, setProductAdded } from "../../features/product/productSlice";
+import { addProduct, addProductImages, addProductImagesDuringUpdation, deleteProductImageDuringUpdation, getAllProducts, getSingleProduct, setProductAdded, updateProduct } from "../../features/product/productSlice";
 import { showError, showSuccess, showWarning } from "../../utils/toastUtils";
 import { getCategories } from "../../features/category/categorySlice";
 import { MyContext } from "../../App";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 
 const attributeSuggestions = {
   main: {
@@ -77,14 +77,14 @@ const mergeAttributeSuggestions = (catName, subCatName, thirdCatName) => {
 
 
 
-const AddProduct = () => {
-  //test
-  //testing
+const EditProduct = () => {
+  
   const dispatch = useDispatch()
   const context = useContext(MyContext)
   const navigate = useNavigate()
   const{categories}=useSelector(state=>state.category)
-  const{productImages}=useSelector(state=>state.product)
+  const{productImages,currentProduct}=useSelector(state=>state.product)
+  console.log(currentProduct)
   const[isUploading, setIsUploading] = useState(false)
   // const[productSubmitted, setProductSubmitted] = useState(false)
   const[loading, setLoading] = useState(false)
@@ -129,11 +129,8 @@ console.log(attributes)
         countInStock:0,
         price:0,
         oldPrice:0,
-        rating:0,
-        images:[],
         brand:"",
         isFeatured:false,
-    
 
             })
 
@@ -236,6 +233,9 @@ const handleAddProduct=async(e)=>{
     showWarning('Please enter product brand')
     return
   }
+  if(productImages.length===0){
+   showWarning('atleast one image is needed for product')
+  }
   // if(!formFields.images.length){
   //   showWarning('Please upload at least one image')
   //   return
@@ -256,13 +256,16 @@ const handleAddProduct=async(e)=>{
     ...formFields,
     attributes: attributeMap
    }
+
+
    console.log(productData)
       if (!productData.subCatId) delete productData.subCatId;
 if (!productData.thirdSubCatId) delete productData.thirdSubCatId;
+console.log(productData)
 setLoading(true)
-   const resultAction =await dispatch(addProduct(productData))
+   const resultAction =await dispatch(updateProduct(productData))
    console.log(resultAction)
-   if(addProduct.fulfilled.match(resultAction)){
+   if(updateProduct.fulfilled.match(resultAction)){
     console.log('add product fullfilled')
     setLoading(false)
     showSuccess(resultAction.payload.message || 'Product added successfully')
@@ -270,7 +273,7 @@ setLoading(true)
     console.log('dispatching get all products')
     await dispatch(getAllProducts())
     console.log('get all products dispatched')
-    setFormFields({name:'',description:"",catName:"",category:"",subCat:"",subCatId:"",thirdSubCat:"",thirdSubCatId:"",countInStock:0,price:0,oldPrice:0,rating:0,images:[],brand:"",isFeatured:false,})
+    setFormFields({name:'',description:"",catName:"",category:"",subCat:"",subCatId:"",thirdSubCat:"",thirdSubCatId:"",countInStock:0,price:0,oldPrice:0,rating:0,brand:"",isFeatured:false,})
     setAttributes([])
     context.setIsAddProductModalOpen({open:false,modal:''})
     navigate('/products')
@@ -313,14 +316,14 @@ setLoading(true)
   
       
           console.log('calling with formdata',formData)
-          const resultAction = await dispatch( addProductImages(formData))
+          const resultAction = await dispatch( addProductImagesDuringUpdation(formData))
           console.log(resultAction)
-         if(addProductImages.fulfilled.match(resultAction)){
+         if(addProductImagesDuringUpdation.fulfilled.match(resultAction)){
              showSuccess('image uploaded successfully')
 
        
          }
-         if(addProductImages.rejected.match(resultAction)){
+         if(addProductImagesDuringUpdation.rejected.match(resultAction)){
              showError(resultAction.payload || 'Failed to upload image')
          }
               
@@ -337,12 +340,12 @@ setLoading(true)
 
 
     const handleRemoveImage=async(id)=>{
-    const resultAction=  await dispatch(deleteProductImagesDuringCreation(id))
+    const resultAction=  await dispatch(deleteProductImageDuringUpdation(id))
     console.log(resultAction)
-    if(deleteProductImagesDuringCreation.fulfilled.match(resultAction)){
+    if(deleteProductImageDuringUpdation.fulfilled.match(resultAction)){
       showSuccess(resultAction.payload.message || 'Image deleted successfully')
     }
-    if(deleteProductImagesDuringCreation.rejected.match(resultAction)){
+    if(deleteProductImageDuringUpdation.rejected.match(resultAction)){
       showError(resultAction.payload || 'Failed to delete image')
     }
     
@@ -363,6 +366,51 @@ useEffect(()=>{
 
 
 },[])
+
+useEffect(()=>{
+  if(context?.isAddProductModalOpen?.id){
+    let userId  = context?.isAddProductModalOpen?.id
+
+    const fetchSingleProduct=async()=>{
+      await  dispatch(getSingleProduct(userId))
+      
+    }
+    fetchSingleProduct()
+  }
+
+
+},[context?.isAddProductModalOpen?.id])
+useEffect(()=>{
+  if(currentProduct){
+
+    setFormFields(prev => ({
+      ...prev,
+      id:currentProduct._id,
+      name:currentProduct.name,
+      description:currentProduct.description,
+        catName:currentProduct.catName,
+        category:currentProduct.category?._id,//id 
+        subCat:currentProduct.subCat, //name
+        subCatId:currentProduct.subCatId,
+        thirdSubCat:currentProduct.thirdSubCat, //name
+        thirdSubCatId:currentProduct.thirdSubCatId,
+        countInStock:currentProduct.countInStock,
+        price:currentProduct.price,
+        oldPrice:currentProduct.oldPrice,
+        brand:currentProduct.brand,
+        isFeatured:false,
+  }));
+  if(currentProduct?.attributes){
+
+    const attributesArray = Object.entries(currentProduct.attributes).map(([key,value])=>({
+      key,
+      value
+    }))
+    setAttributes(attributesArray)
+  }
+  
+}
+},[currentProduct])
 
 // useEffect(() => {
 //   return () => {
@@ -710,14 +758,14 @@ useEffect(()=>{
         </div>
         <hr />
         <br /> 
-        <Button type="submit" className="btn-blue btn-lg mt-3 w-full gap-1" >
+        <Button disabled={isUploading || loading} type="submit" className={`btn-blue btn-lg mt-3 w-full gap-1 ${isUploading  && '!opacity-70'}`} >
           {
             loading?<>
             <CircularProgress color="inherit" size={20} />
-            <span>Adding Product...</span>
+            <span>Updating Product...</span>
             </>:<>
             <IoMdCloudUpload className="text-[25px] text-white"/>
-           Add Product
+           Update Product
             
             </>
           }
@@ -728,4 +776,4 @@ useEffect(()=>{
   );
 };
 
-export default AddProduct;
+export default EditProduct;

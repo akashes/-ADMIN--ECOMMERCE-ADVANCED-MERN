@@ -30,6 +30,7 @@ import AppBar from "@mui/material/AppBar";
 import Toolbar from '@mui/material/Toolbar';
 import Typography from '@mui/material/Typography';
 import { IoIosClose } from "react-icons/io";
+import EditProduct from "../../pages/Products/EditProduct";
 
 const Transition = React.forwardRef(function Transition(props, ref) {
   return <Slide direction="up" ref={ref} {...props} />;
@@ -262,6 +263,9 @@ const handleCloseAddProductModal = () => {
         }
         {
           isAddProductModalOpen?.modal ==='Edit Category' && <EditCategory/>
+        }
+        {
+          isAddProductModalOpen?.modal ==='Edit Product' && <EditProduct/>
         }
 
       </Dialog>
