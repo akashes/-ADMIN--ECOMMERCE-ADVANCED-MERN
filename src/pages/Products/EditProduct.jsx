@@ -379,7 +379,7 @@ useEffect(()=>{
   }
 
 
-},[context?.isAddProductModalOpen?.id])
+},[context?.isAddProductModalOpen?.id,dispatch,context.isAddProductModalOpen])
 useEffect(()=>{
   if(currentProduct){
 

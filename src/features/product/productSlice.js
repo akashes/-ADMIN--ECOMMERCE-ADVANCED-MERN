@@ -49,10 +49,25 @@ export const deleteProductImagesDuringCreation= createAsyncThunk('product/delete
     }
 })
 
-export const getAllProducts = createAsyncThunk('product/getAllProducts',async({page=1,perPage=10}={},{rejectWithValue})=>{
+// export const getAllProducts = createAsyncThunk('product/getAllProducts',async({page=1,perPage=10}={},{rejectWithValue})=>{
+//     try {
+//         console.log('get all products slice')
+//         const result = await axios.get(`/api/product/get-all-products?page=${page}&perPage=${perPage}`)
+//         console.log(result)
+//         if(!result.data.success){
+            
+//             throw new Error(result.data.message || 'Products get failed')
+//         }
+//         return result.data
+//     } catch (error) {
+//         return rejectWithValue(error.response?.data?.message || error.message || 'Products get failed')
+        
+//     }
+// })  
+export const getAllProducts = createAsyncThunk('product/getAllProducts',async(params,{rejectWithValue})=>{
     try {
         console.log('get all products slice')
-        const result = await axios.get(`/api/product/get-all-products?page=${page}&perPage=${perPage}`)
+        const result = await axios.get(`/api/product/get-all-products-admin`,{params})
         console.log(result)
         if(!result.data.success){
             
@@ -98,7 +113,8 @@ export const getSingleProduct = createAsyncThunk('product/getSingleProduct',asyn
 })
 export const deleteMultipleProducts=createAsyncThunk('product/deleteMultipleProducts',async(ids,{rejectWithValue})=>{
     try {
-        const result = await axios.delete('/api/delete-multiple-products')
+        console.log(ids)
+        const result = await axios.delete('/api/product/delete-multiple-products',{data:{ids}})
           console.log(result)
         if(!result.data.success){
             
@@ -164,6 +180,22 @@ export const updateProduct = createAsyncThunk('product/updateProduct',async(prod
         return rejectWithValue(error.response?.data?.message || error.message || 'Failed to update product')
     }
 })
+export const getSingleProductDataForProductDetailsPage = createAsyncThunk('product/getSingleProductDataForProductDetailsPage',async(productId,{rejectWithValue})=>{
+    try {
+        const result = await axios.get(`/api/product/get-product/${productId}`)
+         console.log(result)
+        if(!result.data.success){
+            
+            throw new Error(result.data.message || 'Failed to get product')
+        }
+        return result.data
+
+        
+    } catch (error) {
+        return rejectWithValue(error.response?.data?.message || error.message || 'Failed to get product')
+        
+    }
+})
 const productSlice = createSlice({
     name:'product',
     initialState:{
@@ -180,7 +212,8 @@ const productSlice = createSlice({
     reducers:{
         setProductAdded:(state,action)=>{
             state.productAdded = action.payload
-        }
+        },
+   
     },
     extraReducers:(builder)=>{
         builder.addCase(addProduct.pending,(state)=>{
@@ -241,17 +274,18 @@ const productSlice = createSlice({
             state.error = action.payload || 'Products get failed'
         })
         .addCase(deleteProduct.pending,(state)=>{
-            state.loading = true
+            // state.loading = true
             state.error = null
         })
         .addCase(deleteProduct.fulfilled,(state,action)=>{
-            state.loading = false
+            // state.loading = false
             state.error = null
+            state.totalProducts-=1
             console.log(action.payload)
             state.products = state.products.filter(product=>product._id !== action.payload.id)
         })
         .addCase(deleteProduct.rejected,(state,action)=>{
-            state.loading = false
+            // state.loading = false
             state.error = action.payload.error || 'Product delete failed'
         })
         .addCase(getSingleProduct.pending,(state)=>{
@@ -274,7 +308,9 @@ const productSlice = createSlice({
         })
         .addCase(deleteMultipleProducts.fulfilled,(state,action)=>{
             state.loading=false,
-            state.error=false
+            state.error=false,
+            state.totalProducts-=action.payload.ids?.length
+            state.products = state.products.filter(product=>!action.payload.ids.includes(product._id))
             
         })
         .addCase(deleteMultipleProducts.rejected,(state,action)=>{
@@ -331,6 +367,20 @@ console.log(state.currentProduct.images)
             state.error=action.payload.error || 'Failed to update product'
 
         })
+           .addCase(getSingleProductDataForProductDetailsPage.pending,(state)=>{
+            state.loading = true
+            state.error = null
+        })
+        .addCase(getSingleProductDataForProductDetailsPage.fulfilled,(state,action)=>{
+            state.loading=false
+            state.error=null
+            state.currentProduct = action.payload.product
+        })
+        .addCase(getSingleProductDataForProductDetailsPage.rejected,(state,action)=>{
+            state.loading=false
+            state.error=action.payload.error || 'Failed to get product'
+        })
+        
 
  
     }

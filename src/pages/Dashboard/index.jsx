@@ -13,8 +13,11 @@ import { MdDelete } from "react-icons/md";
 import TooltipMUI from '@mui/material/Tooltip';
 
 
+import { LazyLoadImage } from "react-lazy-load-image-component";
+import "react-lazy-load-image-component/src/effects/blur.css";
 
-import Paper from '@mui/material/Paper';
+
+
 import Table from '@mui/material/Table';
 import TableBody from '@mui/material/TableBody';
 import TableCell from '@mui/material/TableCell';
@@ -28,8 +31,14 @@ import Select from '@mui/material/Select';
 
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
 import { MyContext } from '../../App'
-import { useDispatch } from 'react-redux'
+import { useDispatch, useSelector } from 'react-redux'
 import { getCategories } from '../../features/category/categorySlice'
+import AlertBox from '../../components/AlertBox'
+import { CircularProgress, Rating } from '@mui/material';
+import useDebounce from '../../hooks/useDebounce'
+import { deleteMultipleProducts, deleteProduct, getAllProducts, setProductAdded } from '../../features/product/productSlice'
+import SearchBox from '../../components/SearchBox'
+
 
 
 const columns=[
@@ -38,6 +47,7 @@ const columns=[
   {id:'subcategory',label:'SUB CATEGORY',minWidth:150},
   {id:'price',label:'PRICE',minWidth:100},
   {id:"sales",label:'SALES',minWidth:130},
+  {id:"rating",label:'RATING',minWidth:130},
   {id:'action',label:'ACTION',minWidth:120}
 ]
 
@@ -49,10 +59,248 @@ function createData(name, code, population, size) {
 
 
 
-``
+
 const Dashboard = () => {
-  const dispatch = useDispatch()
-  const context = useContext(MyContext)
+  // products table related 
+    const{products,totalProducts,totalPages,currentPage,productAdded,loading}=useSelector(state=>state.product)
+  const{categories}=useSelector(state=>state.category)
+    const context = useContext(MyContext)
+    const dispatch = useDispatch()
+const [isAlertOpen, setIsAlertOpen] = useState(false);
+const [deleteTarget, setDeleteTarget] = useState({ type: "", ids: [] });
+
+const[isDeleting,setIsDeleting]=useState([])
+const[deleteArray,setDeleteArray]=useState([])
+
+
+  const handleDeleteProduct=async(id)=>{
+        setIsDeleting(prev=>[...prev,id])
+        const resultAction = await dispatch(deleteProduct(id))
+        console.log(resultAction)
+        if(deleteProduct.fulfilled.match(resultAction)){
+          setIsDeleting([])
+          showSuccess(resultAction.payload.message || 'Product deleted successfully')
+      }
+      if(deleteProduct.rejected.match(resultAction)){
+        setIsDeleting([])
+        showError(resultAction.payload || 'Failed to delete product')
+      }
+      }
+
+
+
+       const handleDeleteMultipleProducts=async(ids)=>{
+        setIsDeleting(prev=>[...prev,...ids])
+        console.log(`deleting multiple products`)
+        console.log(ids)
+      const resultAction  = await dispatch(deleteMultipleProducts(ids))
+      console.log(resultAction)
+        if(deleteMultipleProducts.fulfilled.match(resultAction)){
+          
+          showSuccess(resultAction.payload.message || 'Products deleted successfully')
+      }
+      if(deleteMultipleProducts.rejected.match(resultAction)){
+        showError(resultAction.payload || 'Failed to delete products')
+      }
+          setIsDeleting([])
+
+
+      }
+
+
+const handleConfirmDelete = async () => {
+  setIsAlertOpen(false);
+
+  if (deleteTarget.type === "single") {
+    await handleDeleteProduct(deleteTarget.ids[0]);
+  } else if (deleteTarget.type === "multiple") {
+    await handleDeleteMultipleProducts(deleteTarget.ids);
+    setDeleteArray([]); // Clear selection
+  }
+  setDeleteTarget({type:'',ids:[]})
+};
+const confirmDeleteProduct = (id) => {
+  setDeleteTarget({ type: "single", ids: [id] });
+  setIsAlertOpen(true);
+};
+
+
+const confirmDeleteMultiple = () => {
+  if (deleteArray.length === 0) return;
+  setDeleteTarget({ type: "multiple", ids: deleteArray });
+  setIsAlertOpen(true);
+};
+console.log(deleteArray)
+
+
+    const[searchTerm,setSearchTerm]=useState('')
+    const debouncedSearchTerm = useDebounce(searchTerm,500)
+    const [ratingFilter, setRatingFilter] = useState('');
+
+    console.log(deleteTarget)
+
+    const[formFields,setFormFields]=useState({
+    category: '',
+    catName: '',
+    subCat: '',
+    subCatId: '',
+    thirdSubCat: '',
+    thirdSubCatId: ''
+    })
+    console.log(formFields)
+
+      const [rowsPerPage, setRowsPerPage] = React.useState(10);
+      const [page, setPage] = React.useState(0);
+    
+          const handleChangePage = (event, newPage) => {
+    setPage(newPage);
+  };
+
+  const handleChangeRowsPerPage = (event) => {
+    setRowsPerPage(+event.target.value);
+    setPage(0);
+  };
+ 
+      const label = { inputProps: { 'aria-label': 'Checkbox demo' } };
+
+    
+     
+
+
+
+      const handleChangeProductCat = (event) => {
+  const selectedCategoryId = event.target.value;
+  const selectedCategoryObj = categories.find(cat => cat._id === selectedCategoryId);
+  const selectedCategoryName = selectedCategoryObj?.name?.toLowerCase() || '';
+
+  setFormFields(prev => ({
+    ...prev,
+    category: selectedCategoryId,
+    catName: selectedCategoryName,
+    subCat: '',
+    subCatId: '',
+    thirdSubCat: '',
+    thirdSubCatId: ''
+  }));
+
+
+};
+
+const handleChangeProductSubCat = (event) => {
+  const newSubCatId = event.target.value;
+
+  const subCatName =
+    selectedRootCategory?.children?.find(child => child._id === newSubCatId)?.name?.toLowerCase() || '';
+
+  setFormFields((prev) => ({
+    ...prev,
+    subCat: subCatName,
+    subCatId: newSubCatId,
+    thirdSubCat: '',
+    thirdSubCatId: ''
+  }));
+
+  
+};
+
+
+
+
+const handleChangeThirdLevelSubCat = (event) => {
+  const newThirdLevelSubCatId = event.target.value;
+  const thirdLevelSubCatName = thirdLevelCategories.find(cat => cat._id === newThirdLevelSubCatId)?.name?.toLowerCase() || '';
+
+  setFormFields(prev => ({
+    ...prev,
+    thirdSubCat: thirdLevelSubCatName,
+    thirdSubCatId: newThirdLevelSubCatId
+  }));
+
+
+};
+
+  const handleSearchChange = (e) => {
+    console.log('inside handlesearch chagne')
+    setSearchTerm(e.target.value);
+  };
+
+ const  handleSelectMultipleDelete=(id,checked)=>{
+   setDeleteArray((prev)=>{
+    if(checked){
+      return [...prev,id]
+    }else{
+      return prev.filter(pid=>pid!==id)
+    }
+   })
+  }
+  const handleSelectAllDelete = (checked) => {
+  if (checked) {
+    const ids = products.map(p => p._id);
+    setDeleteArray(ids);
+  } else {
+    setDeleteArray([]);
+  }
+};
+
+  const handleClearAllFilters = () => {
+  setFormFields({
+    category: '',
+    catName: '',
+    subCat: '',
+    subCatId: '',
+    thirdSubCat: '',
+    thirdSubCatId: ''
+
+  });
+  setRatingFilter('');
+  setSearchTerm('');
+  setDeleteArray([])
+  setPage(0);
+};
+
+      useEffect(()=>{
+        const params={
+          page:page+1,
+          perPage:rowsPerPage
+        }
+
+        if(productAdded){
+          dispatch(getAllProducts(params))
+          setProductAdded(false)
+        }
+
+  if (formFields.category) params.category = formFields.category;
+  if (formFields.subCatId) params.subCatId = formFields.subCatId;
+  if (formFields.thirdSubCatId) params.thirdSubCatId = formFields.thirdSubCatId;
+
+  //search filter
+  if(debouncedSearchTerm.trim() !=''){
+    params.search = debouncedSearchTerm.trim();
+  }
+    if (ratingFilter) params.minRating = ratingFilter;
+
+  const fetchProductData=async()=>{
+    console.log(page,rowsPerPage)
+     dispatch(getAllProducts(params))
+  }
+  fetchProductData()
+
+},[dispatch,page,rowsPerPage,productAdded,formFields,debouncedSearchTerm,ratingFilter])
+
+useEffect(()=>{
+
+  dispatch(getCategories())
+},[])
+useEffect(() => {
+  setPage(0);
+}, [ratingFilter]);
+
+const selectedRootCategory = categories.find((category) => category._id === formFields.category);
+const subCategories = selectedRootCategory?.children || [];
+const selectedSubCategory = subCategories.find((category) => category._id === formFields.subCatId);
+const thirdLevelCategories = selectedSubCategory?.children || [];
+
+
   const[chart1Data,setChart1Data]=useState(
     [
   {
@@ -102,22 +350,6 @@ const Dashboard = () => {
 
     const [categoryFilterVal, setCategoryFilterVal] = React.useState('');
 
-  const handleChangeCatFilter = (event) => {
-    setCategoryFilterVal(event.target.value);
-  };
-
-
-    const [page, setPage] = React.useState(0);
-  const [rowsPerPage, setRowsPerPage] = React.useState(10);
-
-  const handleChangePage = (event, newPage) => {
-    setPage(newPage);
-  };
-
-  const handleChangeRowsPerPage = (event) => {
-    setRowsPerPage(+event.target.value);
-    setPage(0);
-  };
 
 
 
@@ -128,7 +360,9 @@ const Dashboard = () => {
 
 
 
-  const label = { inputProps: { 'aria-label': 'Checkbox demo' } };
+
+
+
     const[showProducts,setShowProducts]=useState(null)
   const isShowOrderedProduct=(index)=>{
     if(showProducts===index){
@@ -226,524 +460,138 @@ const Dashboard = () => {
    </div>
    <DashboardBoxes/>
 
-   <div className="card my-4 shadow-md sm:rounded-lg bg-white">
-    <div className="flex items-center justify-between px-3 py-5">
-      <h2 className='text-[18px] font-[600]'>Products(Tailwind css table)</h2>
-    </div>
-     <div className="flex items-center w-full pl-5 justify-between pr-3">
-        <div className="col w-[20%]">
-          <h4 className='font-[600] text-[13px] mb-2' >Category By</h4>
-            <Select
-          labelId="demo-simple-select-standard-label"
-          id="demo-simple-select-standard"
-          value={categoryFilterVal}
-          onChange={handleChangeCatFilter}
-          label="Category"
-          className='w-full '
-          size='small'
-        >
-          <MenuItem value="">
-            <em>None</em>
-          </MenuItem>
-          <MenuItem value={10}>Men</MenuItem>
-          <MenuItem value={20}>Women</MenuItem>
-          <MenuItem value={30}>Kids</MenuItem>
-        </Select>
-        
-        </div>
-        <div className="col w-[25%] ml-auto flex items-center justify-end gap-3">
-          <Button className='btn !bg-green-600 !text-white btn-sm'>Export</Button>
-          <Button className='btn-blue btn-sm' 
-                 onClick={()=>context.setIsAddProductModalOpen({open:true,modal:'Add Product'})}
-
-          >Add Product</Button>
-
-        </div>
-      </div>
-
-     <div className="relative overflow-x-auto mt-5 pb-5">
-            <table className="w-full text-sm text-left text-gray-500 rtl:text-right">
-  {/* order related heading */}
-  <thead className="text-xs text-gray-700 bg-gray-50">
-    <tr>
-      <th scope="col" className="py-3 px-6 width-[10%] pr-0">
-        <div className='w-[60px]'>
-
-              <Checkbox {...label} size='small' />
-        </div>
-
-      </th>
-      <th scope="col" className="py-3 px-0 whitespace-nowrap">PRODUCT</th>
-      <th scope="col" className="py-3 px-6 whitespace-nowrap">CATEGORY</th>
-      <th scope="col" className="py-3 px-6 whitespace-nowrap">SUB CATEGORY</th>
-      <th scope="col" className="py-3 px-6">PRICE</th>
-      <th scope="col" className="py-3 px-6">SALES</th>
-      <th scope="col" className="py-3 px-6 whitespace-nowrap">ACTION</th>
-      
-    </tr>
-  </thead>
-
-  <tbody>
- <tr className="odd:bg-white even:bg-gray-50 border-b border-gray-200">
-  <td className='px-6 py-2 pr-0'>
-    <div className="w-[60px]">
-      <Checkbox {...label} size="small" />
-    </div>
-  </td>
-  <td className='px-0 py-2'>
-    <div className="flex items-center gap-4 w-[300px]">
-      <div className="img w-[65px] h-[65px] rounded-md overflow-hidden group" >
-        <Link to='/product/123' >
-
-        <img src="https://serviceapi.spicezgold.com/download/1751861347253_shikha-store-gold-plated-alloy-earring-and-necklace-set-yellow-product-images-rvabwqrupy-0-202309131552.jpg" 
-        alt="" className='w-full group-hover:scale-105 transition-transform' />
-        </Link>
-
-      </div>
-      <div className="info w-[75%]">
-        <Link to='/product/123' >
-        <h3 className='font-[700] text-[13px] leading-4 hover:text-secondary'>Shikha Store Gold Plated Alloy Earring and Necklac</h3>
-        </Link>
-        <span className='text-[12px]'>Shikha store</span>
-      </div>
-    </div>
-    
-  </td>
-  <td className="px-6 py-2">
-    Jewellery
-    
-  </td>
-  <td className="px-6 py-2">
-    <FcCancel className='mx-auto text-[18px]'/>
-
-  </td>
-
-  <td className="px-6 py-2">
-     <div className="flex  gap-1 flex-col">
-                <span className='oldPrice line-through text-gray-500 text-[13px] font-[500]'>₹ 1,999</span>
-                <span className="price text-primary font-[600] text-[14px]">1444</span>
-                
-            </div>
-
-  </td>
-  <td className="px-6 py-2">
-    <p className='text-[14px] w-[100px]'>
-      <span className='font-[800] mr-1'>
-
-    3232
-      </span>
-       sale
-
-    </p>
-    <ProgressBar value={40} type={'warning'} />
-  </td>
-
-  <td className="px-6 py-2">
-    <div className="flex items-center gap-1">
-      <TooltipMUI placement='top' title='Edit Product'>
-
-      <Button className='!w-[35px] !h-[35px]  bg-[#f1f1f1] !min-w-[35px]  !border !border-[rgba(0,0,0,0.1)] !rounded-full hover:!bg-[#f1f1f1] hover:!shadow-sm hover:scale-110'>
-
-        <AiFillEdit className='text-[rgba(0,0,0,0.7)] text-[20px] '/>
-      </Button>
-
-      
-      </TooltipMUI>
-      <TooltipMUI placement='top' title='View Product details'>
-
-      <Button className='!w-[35px] !h-[35px]  bg-[#f1f1f1] !min-w-[35px]  !border !border-[rgba(0,0,0,0.1)] !rounded-full hover:!bg-[#f1f1f1] hover:!shadow-sm hover:scale-110'>
-
-        <FaEye className='text-[rgba(0,0,0,0.7)] text-[20px] '/>
-      </Button>
-      </TooltipMUI>
-      <TooltipMUI placement='top' title='Remove Product'>
-
-      <Button className='!w-[35px] !h-[35px]  bg-[#f1f1f1] !min-w-[35px]  !border !border-[rgba(0,0,0,0.1)] !rounded-full hover:!bg-[#f1f1f1] hover:!shadow-sm hover:scale-110'>
-
-        <MdDelete className='text-[rgba(0,0,0,0.7)] text-[20px] '/>
-      </Button>
-      </TooltipMUI>
-    </div>
-
-  </td>
-</tr>
- <tr className="odd:bg-white even:bg-gray-50 border-b border-gray-200">
-  <td className='px-6 py-2 pr-0'>
-    <div className="w-[60px]">
-      <Checkbox {...label} size="small" />
-    </div>
-  </td>
-  <td className='px-0 py-2'>
-    <div className="flex items-center gap-4 w-[300px]">
-      <div className="img w-[65px] h-[65px] rounded-md overflow-hidden group" >
-        <Link to='/product/123' >
-
-        <img src="https://serviceapi.spicezgold.com/download/1751861347253_shikha-store-gold-plated-alloy-earring-and-necklace-set-yellow-product-images-rvabwqrupy-0-202309131552.jpg" 
-        alt="" className='w-full group-hover:scale-105 transition-transform' />
-        </Link>
-
-      </div>
-      <div className="info w-[75%]">
-        <Link to='/product/123' >
-        <h3 className='font-[700] text-[13px] leading-4 hover:text-secondary'>Shikha Store Gold Plated Alloy Earring and Necklac</h3>
-        </Link>
-        <span className='text-[12px]'>Shikha store</span>
-      </div>
-    </div>
-    
-  </td>
-  <td className="px-6 py-2">
-    Jewellery
-    
-  </td>
-  <td className="px-6 py-2">
-    <FcCancel className='mx-auto text-[18px]'/>
-
-  </td>
-
-  <td className="px-6 py-2">
-     <div className="flex  gap-1 flex-col">
-                <span className='oldPrice line-through text-gray-500 text-[13px] font-[500]'>₹ 1,999</span>
-                <span className="price text-primary font-[600] text-[14px]">1444</span>
-                
-            </div>
-
-  </td>
-  <td className="px-6 py-2">
-    <p className='text-[14px] w-[100px]'>
-      <span className='font-[800] mr-1'>
-
-    3232
-      </span>
-       sale
-
-    </p>
-    <ProgressBar value={40} type={'warning'} />
-  </td>
-
-  <td className="px-6 py-2">
-    <div className="flex items-center gap-1">
-      <TooltipMUI placement='top' title='Edit Product'>
-
-      <Button className='!w-[35px] !h-[35px]  bg-[#f1f1f1] !min-w-[35px]  !border !border-[rgba(0,0,0,0.1)] !rounded-full hover:!bg-[#f1f1f1] hover:!shadow-sm hover:scale-110'>
-
-        <AiFillEdit className='text-[rgba(0,0,0,0.7)] text-[20px] '/>
-      </Button>
-
-      
-      </TooltipMUI>
-      <TooltipMUI placement='top' title='View Product details'>
-
-      <Button className='!w-[35px] !h-[35px]  bg-[#f1f1f1] !min-w-[35px]  !border !border-[rgba(0,0,0,0.1)] !rounded-full hover:!bg-[#f1f1f1] hover:!shadow-sm hover:scale-110'>
-
-        <FaEye className='text-[rgba(0,0,0,0.7)] text-[20px] '/>
-      </Button>
-      </TooltipMUI>
-      <TooltipMUI placement='top' title='Remove Product'>
-
-      <Button className='!w-[35px] !h-[35px]  bg-[#f1f1f1] !min-w-[35px]  !border !border-[rgba(0,0,0,0.1)] !rounded-full hover:!bg-[#f1f1f1] hover:!shadow-sm hover:scale-110'>
-
-        <MdDelete className='text-[rgba(0,0,0,0.7)] text-[20px] '/>
-      </Button>
-      </TooltipMUI>
-    </div>
-
-  </td>
-</tr>
- <tr className="odd:bg-white even:bg-gray-50 border-b border-gray-200">
-  <td className='px-6 py-2 pr-0'>
-    <div className="w-[60px]">
-      <Checkbox {...label} size="small" />
-    </div>
-  </td>
-  <td className='px-0 py-2'>
-    <div className="flex items-center gap-4 w-[300px]">
-      <div className="img w-[65px] h-[65px] rounded-md overflow-hidden group" >
-        <Link to='/product/123' >
-
-        <img src="https://serviceapi.spicezgold.com/download/1751861347253_shikha-store-gold-plated-alloy-earring-and-necklace-set-yellow-product-images-rvabwqrupy-0-202309131552.jpg" 
-        alt="" className='w-full group-hover:scale-105 transition-transform' />
-        </Link>
-
-      </div>
-      <div className="info w-[75%]">
-        <Link to='/product/123' >
-        <h3 className='font-[700] text-[13px] leading-4 hover:text-secondary'>Shikha Store Gold Plated Alloy Earring and Necklac</h3>
-        </Link>
-        <span className='text-[12px]'>Shikha store</span>
-      </div>
-    </div>
-    
-  </td>
-  <td className="px-6 py-2">
-    Jewellery
-    
-  </td>
-  <td className="px-6 py-2">
-    <FcCancel className='mx-auto text-[18px]'/>
-
-  </td>
-
-  <td className="px-6 py-2">
-     <div className="flex  gap-1 flex-col">
-                <span className='oldPrice line-through text-gray-500 text-[13px] font-[500]'>₹ 1,999</span>
-                <span className="price text-primary font-[600] text-[14px]">1444</span>
-                
-            </div>
-
-  </td>
-  <td className="px-6 py-2">
-    <p className='text-[14px] w-[100px]'>
-      <span className='font-[800] mr-1'>
-
-    3232
-      </span>
-       sale
-
-    </p>
-    <ProgressBar value={40} type={'warning'} />
-  </td>
-
-  <td className="px-6 py-2">
-    <div className="flex items-center gap-1">
-      <TooltipMUI placement='top' title='Edit Product'>
-
-      <Button className='!w-[35px] !h-[35px]  bg-[#f1f1f1] !min-w-[35px]  !border !border-[rgba(0,0,0,0.1)] !rounded-full hover:!bg-[#f1f1f1] hover:!shadow-sm hover:scale-110'>
-
-        <AiFillEdit className='text-[rgba(0,0,0,0.7)] text-[20px] '/>
-      </Button>
-
-      
-      </TooltipMUI>
-      <TooltipMUI placement='top' title='View Product details'>
-
-      <Button className='!w-[35px] !h-[35px]  bg-[#f1f1f1] !min-w-[35px]  !border !border-[rgba(0,0,0,0.1)] !rounded-full hover:!bg-[#f1f1f1] hover:!shadow-sm hover:scale-110'>
-
-        <FaEye className='text-[rgba(0,0,0,0.7)] text-[20px] '/>
-      </Button>
-      </TooltipMUI>
-      <TooltipMUI placement='top' title='Remove Product'>
-
-      <Button className='!w-[35px] !h-[35px]  bg-[#f1f1f1] !min-w-[35px]  !border !border-[rgba(0,0,0,0.1)] !rounded-full hover:!bg-[#f1f1f1] hover:!shadow-sm hover:scale-110'>
-
-        <MdDelete className='text-[rgba(0,0,0,0.7)] text-[20px] '/>
-      </Button>
-      </TooltipMUI>
-    </div>
-
-  </td>
-</tr>
- <tr className="odd:bg-white even:bg-gray-50 border-b border-gray-200">
-  <td className='px-6 py-2 pr-0'>
-    <div className="w-[60px]">
-      <Checkbox {...label} size="small" />
-    </div>
-  </td>
-  <td className='px-0 py-2'>
-    <div className="flex items-center gap-4 w-[300px]">
-      <div className="img w-[65px] h-[65px] rounded-md overflow-hidden group" >
-        <Link to='/product/123' >
-
-        <img src="https://serviceapi.spicezgold.com/download/1751861347253_shikha-store-gold-plated-alloy-earring-and-necklace-set-yellow-product-images-rvabwqrupy-0-202309131552.jpg" 
-        alt="" className='w-full group-hover:scale-105 transition-transform' />
-        </Link>
-
-      </div>
-      <div className="info w-[75%]">
-        <Link to='/product/123' >
-        <h3 className='font-[700] text-[13px] leading-4 hover:text-secondary'>Shikha Store Gold Plated Alloy Earring and Necklac</h3>
-        </Link>
-        <span className='text-[12px]'>Shikha store</span>
-      </div>
-    </div>
-    
-  </td>
-  <td className="px-6 py-2">
-    Jewellery
-    
-  </td>
-  <td className="px-6 py-2">
-    <FcCancel className='mx-auto text-[18px]'/>
-
-  </td>
-
-  <td className="px-6 py-2">
-     <div className="flex  gap-1 flex-col">
-                <span className='oldPrice line-through text-gray-500 text-[13px] font-[500]'>₹ 1,999</span>
-                <span className="price text-primary font-[600] text-[14px]">1444</span>
-                
-            </div>
-
-  </td>
-  <td className="px-6 py-2">
-    <p className='text-[14px] w-[100px]'>
-      <span className='font-[800] mr-1'>
-
-    3232
-      </span>
-       sale
-
-    </p>
-    <ProgressBar value={40} type={'warning'} />
-  </td>
-
-  <td className="px-6 py-2">
-    <div className="flex items-center gap-1">
-      <TooltipMUI placement='top' title='Edit Product'>
-
-      <Button className='!w-[35px] !h-[35px]  bg-[#f1f1f1] !min-w-[35px]  !border !border-[rgba(0,0,0,0.1)] !rounded-full hover:!bg-[#f1f1f1] hover:!shadow-sm hover:scale-110'>
-
-        <AiFillEdit className='text-[rgba(0,0,0,0.7)] text-[20px] '/>
-      </Button>
-
-      
-      </TooltipMUI>
-      <TooltipMUI placement='top' title='View Product details'>
-
-      <Button className='!w-[35px] !h-[35px]  bg-[#f1f1f1] !min-w-[35px]  !border !border-[rgba(0,0,0,0.1)] !rounded-full hover:!bg-[#f1f1f1] hover:!shadow-sm hover:scale-110'>
-
-        <FaEye className='text-[rgba(0,0,0,0.7)] text-[20px] '/>
-      </Button>
-      </TooltipMUI>
-      <TooltipMUI placement='top' title='Remove Product'>
-
-      <Button className='!w-[35px] !h-[35px]  bg-[#f1f1f1] !min-w-[35px]  !border !border-[rgba(0,0,0,0.1)] !rounded-full hover:!bg-[#f1f1f1] hover:!shadow-sm hover:scale-110'>
-
-        <MdDelete className='text-[rgba(0,0,0,0.7)] text-[20px] '/>
-      </Button>
-      </TooltipMUI>
-    </div>
-
-  </td>
-</tr>
- <tr className="odd:bg-white even:bg-gray-50 border-b border-gray-200">
-  <td className='px-6 py-2 pr-0'>
-    <div className="w-[60px]">
-      <Checkbox {...label} size="small" />
-    </div>
-  </td>
-  <td className='px-0 py-2'>
-    <div className="flex items-center gap-4 w-[300px]">
-      <div className="img w-[65px] h-[65px] rounded-md overflow-hidden group" >
-        <Link to='/product/123' >
-
-        <img src="https://serviceapi.spicezgold.com/download/1751861347253_shikha-store-gold-plated-alloy-earring-and-necklace-set-yellow-product-images-rvabwqrupy-0-202309131552.jpg" 
-        alt="" className='w-full group-hover:scale-105 transition-transform' />
-        </Link>
-
-      </div>
-      <div className="info w-[75%]">
-        <Link to='/product/123' >
-        <h3 className='font-[700] text-[13px] leading-4 hover:text-secondary'>Shikha Store Gold Plated Alloy Earring and Necklac</h3>
-        </Link>
-        <span className='text-[12px]'>Shikha store</span>
-      </div>
-    </div>
-    
-  </td>
-  <td className="px-6 py-2">
-    Jewellery
-    
-  </td>
-  <td className="px-6 py-2">
-    <FcCancel className='mx-auto text-[18px]'/>
-
-  </td>
-
-  <td className="px-6 py-2">
-     <div className="flex  gap-1 flex-col">
-                <span className='oldPrice line-through text-gray-500 text-[13px] font-[500]'>₹ 1,999</span>
-                <span className="price text-primary font-[600] text-[14px]">1444</span>
-                
-            </div>
-
-  </td>
-  <td className="px-6 py-2">
-    <p className='text-[14px] w-[100px]'>
-      <span className='font-[800] mr-1'>
-
-    3232
-      </span>
-       sale
-
-    </p>
-    <ProgressBar value={40} type={'warning'} />
-  </td>
-
-  <td className="px-6 py-2">
-    <div className="flex items-center gap-1">
-      <TooltipMUI placement='top' title='Edit Product'>
-
-      <Button className='!w-[35px] !h-[35px]  bg-[#f1f1f1] !min-w-[35px]  !border !border-[rgba(0,0,0,0.1)] !rounded-full hover:!bg-[#f1f1f1] hover:!shadow-sm hover:scale-110'>
-
-        <AiFillEdit className='text-[rgba(0,0,0,0.7)] text-[20px] '/>
-      </Button>
-
-      
-      </TooltipMUI>
-      <TooltipMUI placement='top' title='View Product details'>
-
-      <Button className='!w-[35px] !h-[35px]  bg-[#f1f1f1] !min-w-[35px]  !border !border-[rgba(0,0,0,0.1)] !rounded-full hover:!bg-[#f1f1f1] hover:!shadow-sm hover:scale-110'>
-
-        <FaEye className='text-[rgba(0,0,0,0.7)] text-[20px] '/>
-      </Button>
-      </TooltipMUI>
-      <TooltipMUI placement='top' title='Remove Product'>
-
-      <Button className='!w-[35px] !h-[35px]  bg-[#f1f1f1] !min-w-[35px]  !border !border-[rgba(0,0,0,0.1)] !rounded-full hover:!bg-[#f1f1f1] hover:!shadow-sm hover:scale-110'>
-
-        <MdDelete className='text-[rgba(0,0,0,0.7)] text-[20px] '/>
-      </Button>
-      </TooltipMUI>
-    </div>
-
-  </td>
-</tr>
-
-
-  </tbody>
-</table>
-
-          </div>
-          {/* pagination */}
-          <div className="flex items-center justify-end py-4 px-4">
-          <Pagination count={10} color="primary" />
-             </div>
-
-   </div>
+ 
 
 
 {/* testing - products mui table*/}
-   <div className="card my-4 shadow-md sm:rounded-lg bg-white">
-    <div className="flex items-center justify-between px-3 py-5">
+   <>
+   {/* welcome banner */}
+     <div className="flex items-center justify-between px-2 py-0 mt-3">
       <h2 className='text-[18px] font-[600]'>Products(Material ui  table)</h2>
+        <div className="col w-[25%] ml-auto flex items-center justify-end gap-3">
+          {
+         
+            deleteArray.length>0 &&   <Button  onClick={confirmDeleteMultiple} className='btn !bg-red-600 !text-white btn-sm'>Delete</Button>
+          }
+          <Button className='btn-blue btn-sm '
+                onClick={()=>context.setIsAddProductModalOpen({open:true,modal:'Add Product'})}
+
+          > Add Product</Button>
+
+        </div>
     </div>
-      <div className="flex items-center w-full pl-5 justify-between pr-3">
-        <div className="col w-[20%]">
-          <h4 className='font-[600] text-[13px] mb-2' >Category By</h4>
+   <div className="card my-4 shadow-md sm:rounded-lg bg-white pt-5">
+  
+      <div className="flex items-center w-full px-5 justify-between gap-4">
+        
+                    <div className="col w-[15%]">
+          <h4 className='font-[600] text-[13px] mb-2' >Category</h4>
             <Select
+            disabled={categories.length===0}
+            style={{zoom:'80%'}}
           labelId="demo-simple-select-standard-label"
           id="demo-simple-select-standard"
-          value={categoryFilterVal}
-          onChange={handleChangeCatFilter}
+          value={formFields.category}
+          label="Category"
+          className='w-full '
+          size='small'
+          onChange={handleChangeProductCat}
+
+        >
+          <MenuItem value=''>None</MenuItem>
+
+
+          {
+            categories.map((category)=>(
+          <MenuItem value={category._id}>{category.name}</MenuItem>
+
+
+            ))
+          }
+    
+        </Select>
+        
+        </div>
+      
+
+        <div className="col w-[15%]">
+          <h4 className='font-[600] text-[13px] mb-2' >Sub Category</h4>
+            <Select
+            disabled={formFields.category==='' || subCategories.length===0}
+            style={{zoom:'80%'}}
+          labelId="demo-simple-select-standard-label"
+          id="demo-simple-select-standard"
+          value={formFields.subCatId}
+          onChange={handleChangeProductSubCat}
           label="Category"
           className='w-full '
           size='small'
         >
-          <MenuItem value="">
-            <em>None</em>
-          </MenuItem>
-          <MenuItem value={10}>Men</MenuItem>
-          <MenuItem value={20}>Women</MenuItem>
-          <MenuItem value={30}>Kids</MenuItem>
+          <MenuItem value=''>None</MenuItem>
+
+          {
+            subCategories.length>0 && subCategories.map((subCategory)=>(
+
+              <MenuItem value={subCategory._id}>{subCategory.name}</MenuItem>
+            ))
+          }
+       
+          
         </Select>
         
         </div>
-        <div className="col w-[25%] ml-auto flex items-center justify-end gap-3">
-          <Button className='btn !bg-green-600 !text-white btn-sm'>Export</Button>
-          <Button className='btn-blue btn-sm'>Add Product</Button>
+        <div className="col w-[15%]">
+          <h4 className='font-[600] text-[13px] mb-2' >Third level Category</h4>
+            <Select
+            disabled={formFields.category==='' || formFields.subCat==='' || thirdLevelCategories.length===0}
+            style={{zoom:'80%'}}
+          labelId="demo-simple-select-standard-label"
+          id="demo-simple-select-standard"
+          value={formFields.thirdSubCatId}
+          onChange={handleChangeThirdLevelSubCat}
+          label="Category"
+          className='w-full '
+          size='small'
+        >
+          <MenuItem value=''>None</MenuItem>
+
+          {
+            thirdLevelCategories?.length>0 && thirdLevelCategories.map((thirdLevelCategory)=>(
+              
+              <MenuItem value={thirdLevelCategory._id}>{thirdLevelCategory.name}</MenuItem>
+            ))
+          }
+      
+     
+        </Select>
+        
+        </div>
+<div className="col w-[15%]">
+  <h4 className='font-[600] text-[13px] mb-2'>Min Rating</h4>
+  <Rating
+    value={ratingFilter}
+    precision={1}
+    onChange={(event, newValue) => setRatingFilter(newValue)}
+  />
+</div>
+
+        <div className="col w-[20%] ml-auto flex gap-3">
+              <SearchBox value={searchTerm} onChange={handleSearchChange}/>
+               <Button 
+               className='!min-w-[150px]'
+    variant="outlined"
+    color="error"
+    size="small"
+    onClick={handleClearAllFilters}
+  >
+    Clear Filters
+  </Button>
+
 
         </div>
+  
+
+      
       </div>
       <br />
 
@@ -752,7 +600,10 @@ const Dashboard = () => {
           <TableHead className='bg-[#f1f1f1]'>
             <TableRow>
               <TableCell>
-                <Checkbox {...label} size='small'/>
+                <Checkbox checked={products.length>0 && deleteArray.length===products.length}
+                onChange={(e)=>handleSelectAllDelete(e.target.checked)}
+                {...label} size='small'/>
+                  
                 
               </TableCell>
               {columns.map((column) => (
@@ -780,32 +631,75 @@ const Dashboard = () => {
               }
 
             </TableRow> */}
-            <TableRow >
+            {
+              loading && 
+              <TableRow>
+                <TableCell colSpan={7}>
+              <div className='flex items-center justify-center w-full min-h-[400px]'>
+
+
+                <CircularProgress/>
+                </div>
+
+                </TableCell>
+              </TableRow>
+
+              
+            }
+            {
+              products.length===0 &&    <TableRow>
+                <TableCell colSpan={7}>
+              <div className='flex items-center justify-center w-full min-h-[200px]'>
+
+
+                <h2 className='text-secondary font-bold text-[25px] text-center'>No Products Found!</h2>
+                </div>
+
+                </TableCell>
+              </TableRow>
+
+            }
+            {
+              // products.slice(page*rowsPerPage,page*rowsPerPage+rowsPerPage)
+         !loading &&  products.length>0 &&  products?.map((product)=>(
+
+                <TableRow className={`${isDeleting.includes(product._id) && 'uploading-gradient-delete'}`} key={product._id} >
               <TableCell style={{minWidth:columns.minWidth}}>
-                <Checkbox {...label} size='small'/>
+                <Checkbox checked={deleteArray.includes(product._id)} onChange={(e)=>handleSelectMultipleDelete(product._id,e.target.checked)} {...label} size='small'/>
 
               </TableCell>
               <TableCell style={{minWidth:columns.minWidth}}>
                 <div className="flex items-center gap-4 w-[300px]"><div className="img w-[65px] h-[65px] rounded-md overflow-hidden group">
-                  <Link to='/'>
-                <img alt="" className="w-full group-hover:scale-105 transition-transform" src="https://serviceapi.spicezgold.com/download/1751861347253_shikha-store-gold-plated-alloy-earring-and-necklace-set-yellow-product-images-rvabwqrupy-0-202309131552.jpg"/>
+                  <Link to={`/product/${product._id}`}>
+                       <LazyLoadImage
+                                    className="w-full h-full object-cover  group-hover:scale-105 transition-transform"
+                                    effect="blur"
+                                    wrapperProps={{
+                                      style: { transitionDelay: "1s" },
+                                    }}
+                                    alt={"preview"}
+                                    src={product?.images && product?.images[0]?.url}
+                                  />
                   </Link>
               
-                </div><div className="info w-[75%]"><a href="/product/123" data-discover="true"><h3 className="font-[700] text-[13px] leading-4 hover:text-secondary">Shikha Store Gold Plated Alloy Earring and Necklac</h3>
-                </a><span className="text-[12px]">Shikha store</span>
+                </div><div className="info w-[75%]">
+                  <Link href={`/product/${product._id}`} data-discover="true"
+                  ><h3 className="font-[700] text-[13px] leading-4 hover:text-secondary">{product.name}</h3>
+                </Link>
+                <span className="text-[12px]">{product?.brand}</span>
                 </div></div>
 
               </TableCell>
               <TableCell style={{minWidth:columns.minWidth}}>
-                 Jewellery
+                 {product.catName}
               </TableCell>
               <TableCell style={{minWidth:columns.minWidth}}>
-                  no sub category
+                  {product?.subCat}
               </TableCell>
               <TableCell style={{minWidth:columns.minWidth}}>
                     <div className="flex  gap-1 flex-col">
-                <span className='oldPrice line-through text-gray-500 text-[13px] font-[500]'>₹ 1,999</span>
-                <span className="price text-primary font-[600] text-[14px]">1444</span>
+                <span className='oldPrice line-through text-gray-500 text-[13px] font-[500]'> &#x20b9;{product.oldPrice}</span>
+                <span className="price text-primary font-[600] text-[14px]">&#x20b9;{product.price}</span>
                 
             </div>
               </TableCell>
@@ -813,35 +707,50 @@ const Dashboard = () => {
                   <p className='text-[14px] w-[100px]'>
       <span className='font-[800] mr-1'>
 
-    3232
+    {product?.sale}
       </span>
        sale
 
     </p>
-    <ProgressBar value={40} type={'success'} />
+
+              </TableCell>
+              <TableCell style={{minWidth:columns.minWidth}}>
+                  <p className='text-[14px] w-[100px]'>
+      
+       <Rating defaultValue={product.rating} size='small' readOnly  />
+
+    </p>
 
               </TableCell>
               <TableCell style={{minWidth:columns.minWidth}}>
                    <div className="flex items-center gap-1">
       <TooltipMUI placement='top' title='Edit Product'>
 
-      <Button className='!w-[35px] !h-[35px]  bg-[#f1f1f1] !min-w-[35px]  !border !border-[rgba(0,0,0,0.1)] !rounded-full hover:!bg-[#f1f1f1] hover:!shadow-sm hover:scale-110'>
+      <Button 
+                    onClick={()=>context.setIsAddProductModalOpen({open:true,modal:'Edit Product',id:product._id})}
 
-        <AiFillEdit className='text-[rgba(0,0,0,0.7)] text-[20px] '/>
+      className='!w-[35px] !h-[35px]  bg-[#f1f1f1] !min-w-[35px]  !border !border-[rgba(0,0,0,0.1)] !rounded-full hover:!bg-[#f1f1f1] hover:!shadow-sm hover:scale-110'>
+
+        <AiFillEdit  className='text-[rgba(0,0,0,0.7)] text-[20px] '/>
       </Button>
 
       
       </TooltipMUI>
       <TooltipMUI placement='top' title='View Product details'>
 
+      <Link to={`/product/${product._id}`}>
       <Button className='!w-[35px] !h-[35px]  bg-[#f1f1f1] !min-w-[35px]  !border !border-[rgba(0,0,0,0.1)] !rounded-full hover:!bg-[#f1f1f1] hover:!shadow-sm hover:scale-110'>
 
         <FaEye className='text-[rgba(0,0,0,0.7)] text-[20px] '/>
       </Button>
+      </Link>
       </TooltipMUI>
       <TooltipMUI placement='top' title='Remove Product'>
 
-      <Button className='!w-[35px] !h-[35px]  bg-[#f1f1f1] !min-w-[35px]  !border !border-[rgba(0,0,0,0.1)] !rounded-full hover:!bg-[#f1f1f1] hover:!shadow-sm hover:scale-110'>
+      <Button 
+      // onClick={()=>handleDeleteProduct(product._id)}
+      onClick={()=>confirmDeleteProduct(product._id)}
+      className='!w-[35px] !h-[35px]  bg-[#f1f1f1] !min-w-[35px]  !border !border-[rgba(0,0,0,0.1)] !rounded-full hover:!bg-[#f1f1f1] hover:!shadow-sm hover:scale-110'>
 
         <MdDelete className='text-[rgba(0,0,0,0.7)] text-[20px] '/>
       </Button>
@@ -850,286 +759,12 @@ const Dashboard = () => {
               </TableCell>
         
             </TableRow>
-            <TableRow >
-              <TableCell style={{minWidth:columns.minWidth}}>
-                <Checkbox {...label} size='small'/>
+            ))
 
-              </TableCell>
-              <TableCell style={{minWidth:columns.minWidth}}>
-                <div className="flex items-center gap-4 w-[300px]"><div className="img w-[65px] h-[65px] rounded-md overflow-hidden group">
-                  <Link to='/'>
-                <img alt="" className="w-full group-hover:scale-105 transition-transform" src="https://serviceapi.spicezgold.com/download/1751861347253_shikha-store-gold-plated-alloy-earring-and-necklace-set-yellow-product-images-rvabwqrupy-0-202309131552.jpg"/>
-                  </Link>
-              
-                </div><div className="info w-[75%]"><a href="/product/123" data-discover="true"><h3 className="font-[700] text-[13px] leading-4 hover:text-secondary">Shikha Store Gold Plated Alloy Earring and Necklac</h3>
-                </a><span className="text-[12px]">Shikha store</span>
-                </div></div>
+            }
 
-              </TableCell>
-              <TableCell style={{minWidth:columns.minWidth}}>
-                 Jewellery
-              </TableCell>
-              <TableCell style={{minWidth:columns.minWidth}}>
-                  no sub category
-              </TableCell>
-              <TableCell style={{minWidth:columns.minWidth}}>
-                    <div className="flex  gap-1 flex-col">
-                <span className='oldPrice line-through text-gray-500 text-[13px] font-[500]'>₹ 1,999</span>
-                <span className="price text-primary font-[600] text-[14px]">1444</span>
-                
-            </div>
-              </TableCell>
-              <TableCell style={{minWidth:columns.minWidth}}>
-                  <p className='text-[14px] w-[100px]'>
-      <span className='font-[800] mr-1'>
-
-    3232
-      </span>
-       sale
-
-    </p>
-    <ProgressBar value={40} type={'success'} />
-
-              </TableCell>
-              <TableCell style={{minWidth:columns.minWidth}}>
-                   <div className="flex items-center gap-1">
-      <TooltipMUI placement='top' title='Edit Product'>
-
-      <Button className='!w-[35px] !h-[35px]  bg-[#f1f1f1] !min-w-[35px]  !border !border-[rgba(0,0,0,0.1)] !rounded-full hover:!bg-[#f1f1f1] hover:!shadow-sm hover:scale-110'>
-
-        <AiFillEdit className='text-[rgba(0,0,0,0.7)] text-[20px] '/>
-      </Button>
-
-      
-      </TooltipMUI>
-      <TooltipMUI placement='top' title='View Product details'>
-
-      <Button className='!w-[35px] !h-[35px]  bg-[#f1f1f1] !min-w-[35px]  !border !border-[rgba(0,0,0,0.1)] !rounded-full hover:!bg-[#f1f1f1] hover:!shadow-sm hover:scale-110'>
-
-        <FaEye className='text-[rgba(0,0,0,0.7)] text-[20px] '/>
-      </Button>
-      </TooltipMUI>
-      <TooltipMUI placement='top' title='Remove Product'>
-
-      <Button className='!w-[35px] !h-[35px]  bg-[#f1f1f1] !min-w-[35px]  !border !border-[rgba(0,0,0,0.1)] !rounded-full hover:!bg-[#f1f1f1] hover:!shadow-sm hover:scale-110'>
-
-        <MdDelete className='text-[rgba(0,0,0,0.7)] text-[20px] '/>
-      </Button>
-      </TooltipMUI>
-    </div>
-              </TableCell>
-        
-            </TableRow>
-            <TableRow >
-              <TableCell style={{minWidth:columns.minWidth}}>
-                <Checkbox {...label} size='small'/>
-
-              </TableCell>
-              <TableCell style={{minWidth:columns.minWidth}}>
-                <div className="flex items-center gap-4 w-[300px]"><div className="img w-[65px] h-[65px] rounded-md overflow-hidden group">
-                  <Link to='/'>
-                <img alt="" className="w-full group-hover:scale-105 transition-transform" src="https://serviceapi.spicezgold.com/download/1751861347253_shikha-store-gold-plated-alloy-earring-and-necklace-set-yellow-product-images-rvabwqrupy-0-202309131552.jpg"/>
-                  </Link>
-              
-                </div><div className="info w-[75%]"><a href="/product/123" data-discover="true"><h3 className="font-[700] text-[13px] leading-4 hover:text-secondary">Shikha Store Gold Plated Alloy Earring and Necklac</h3>
-                </a><span className="text-[12px]">Shikha store</span>
-                </div></div>
-
-              </TableCell>
-              <TableCell style={{minWidth:columns.minWidth}}>
-                 Jewellery
-              </TableCell>
-              <TableCell style={{minWidth:columns.minWidth}}>
-                  no sub category
-              </TableCell>
-              <TableCell style={{minWidth:columns.minWidth}}>
-                    <div className="flex  gap-1 flex-col">
-                <span className='oldPrice line-through text-gray-500 text-[13px] font-[500]'>₹ 1,999</span>
-                <span className="price text-primary font-[600] text-[14px]">1444</span>
-                
-            </div>
-              </TableCell>
-              <TableCell style={{minWidth:columns.minWidth}}>
-                  <p className='text-[14px] w-[100px]'>
-      <span className='font-[800] mr-1'>
-
-    3232
-      </span>
-       sale
-
-    </p>
-    <ProgressBar value={40} type={'success'} />
-
-              </TableCell>
-              <TableCell style={{minWidth:columns.minWidth}}>
-                   <div className="flex items-center gap-1">
-      <TooltipMUI placement='top' title='Edit Product'>
-
-      <Button className='!w-[35px] !h-[35px]  bg-[#f1f1f1] !min-w-[35px]  !border !border-[rgba(0,0,0,0.1)] !rounded-full hover:!bg-[#f1f1f1] hover:!shadow-sm hover:scale-110'>
-
-        <AiFillEdit className='text-[rgba(0,0,0,0.7)] text-[20px] '/>
-      </Button>
-
-      
-      </TooltipMUI>
-      <TooltipMUI placement='top' title='View Product details'>
-
-      <Button className='!w-[35px] !h-[35px]  bg-[#f1f1f1] !min-w-[35px]  !border !border-[rgba(0,0,0,0.1)] !rounded-full hover:!bg-[#f1f1f1] hover:!shadow-sm hover:scale-110'>
-
-        <FaEye className='text-[rgba(0,0,0,0.7)] text-[20px] '/>
-      </Button>
-      </TooltipMUI>
-      <TooltipMUI placement='top' title='Remove Product'>
-
-      <Button className='!w-[35px] !h-[35px]  bg-[#f1f1f1] !min-w-[35px]  !border !border-[rgba(0,0,0,0.1)] !rounded-full hover:!bg-[#f1f1f1] hover:!shadow-sm hover:scale-110'>
-
-        <MdDelete className='text-[rgba(0,0,0,0.7)] text-[20px] '/>
-      </Button>
-      </TooltipMUI>
-    </div>
-              </TableCell>
-        
-            </TableRow>
-            <TableRow >
-              <TableCell style={{minWidth:columns.minWidth}}>
-                <Checkbox {...label} size='small'/>
-
-              </TableCell>
-              <TableCell style={{minWidth:columns.minWidth}}>
-                <div className="flex items-center gap-4 w-[300px]"><div className="img w-[65px] h-[65px] rounded-md overflow-hidden group">
-                  <Link to='/'>
-                <img alt="" className="w-full group-hover:scale-105 transition-transform" src="https://serviceapi.spicezgold.com/download/1751861347253_shikha-store-gold-plated-alloy-earring-and-necklace-set-yellow-product-images-rvabwqrupy-0-202309131552.jpg"/>
-                  </Link>
-              
-                </div><div className="info w-[75%]"><a href="/product/123" data-discover="true"><h3 className="font-[700] text-[13px] leading-4 hover:text-secondary">Shikha Store Gold Plated Alloy Earring and Necklac</h3>
-                </a><span className="text-[12px]">Shikha store</span>
-                </div></div>
-
-              </TableCell>
-              <TableCell style={{minWidth:columns.minWidth}}>
-                 Jewellery
-              </TableCell>
-              <TableCell style={{minWidth:columns.minWidth}}>
-                  no sub category
-              </TableCell>
-              <TableCell style={{minWidth:columns.minWidth}}>
-                    <div className="flex  gap-1 flex-col">
-                <span className='oldPrice line-through text-gray-500 text-[13px] font-[500]'>₹ 1,999</span>
-                <span className="price text-primary font-[600] text-[14px]">1444</span>
-                
-            </div>
-              </TableCell>
-              <TableCell style={{minWidth:columns.minWidth}}>
-                  <p className='text-[14px] w-[100px]'>
-      <span className='font-[800] mr-1'>
-
-    3232
-      </span>
-       sale
-
-    </p>
-    <ProgressBar value={40} type={'success'} />
-
-              </TableCell>
-              <TableCell style={{minWidth:columns.minWidth}}>
-                   <div className="flex items-center gap-1">
-      <TooltipMUI placement='top' title='Edit Product'>
-
-      <Button className='!w-[35px] !h-[35px]  bg-[#f1f1f1] !min-w-[35px]  !border !border-[rgba(0,0,0,0.1)] !rounded-full hover:!bg-[#f1f1f1] hover:!shadow-sm hover:scale-110'>
-
-        <AiFillEdit className='text-[rgba(0,0,0,0.7)] text-[20px] '/>
-      </Button>
-
-      
-      </TooltipMUI>
-      <TooltipMUI placement='top' title='View Product details'>
-
-      <Button className='!w-[35px] !h-[35px]  bg-[#f1f1f1] !min-w-[35px]  !border !border-[rgba(0,0,0,0.1)] !rounded-full hover:!bg-[#f1f1f1] hover:!shadow-sm hover:scale-110'>
-
-        <FaEye className='text-[rgba(0,0,0,0.7)] text-[20px] '/>
-      </Button>
-      </TooltipMUI>
-      <TooltipMUI placement='top' title='Remove Product'>
-
-      <Button className='!w-[35px] !h-[35px]  bg-[#f1f1f1] !min-w-[35px]  !border !border-[rgba(0,0,0,0.1)] !rounded-full hover:!bg-[#f1f1f1] hover:!shadow-sm hover:scale-110'>
-
-        <MdDelete className='text-[rgba(0,0,0,0.7)] text-[20px] '/>
-      </Button>
-      </TooltipMUI>
-    </div>
-              </TableCell>
-        
-            </TableRow>
-            <TableRow >
-              <TableCell style={{minWidth:columns.minWidth}}>
-                <Checkbox {...label} size='small'/>
-
-              </TableCell>
-              <TableCell style={{minWidth:columns.minWidth}}>
-                <div className="flex items-center gap-4 w-[300px]"><div className="img w-[65px] h-[65px] rounded-md overflow-hidden group">
-                  <Link to='/'>
-                <img alt="" className="w-full group-hover:scale-105 transition-transform" src="https://serviceapi.spicezgold.com/download/1751861347253_shikha-store-gold-plated-alloy-earring-and-necklace-set-yellow-product-images-rvabwqrupy-0-202309131552.jpg"/>
-                  </Link>
-              
-                </div><div className="info w-[75%]"><a href="/product/123" data-discover="true"><h3 className="font-[700] text-[13px] leading-4 hover:text-secondary">Shikha Store Gold Plated Alloy Earring and Necklac</h3>
-                </a><span className="text-[12px]">Shikha store</span>
-                </div></div>
-
-              </TableCell>
-              <TableCell style={{minWidth:columns.minWidth}}>
-                 Jewellery
-              </TableCell>
-              <TableCell style={{minWidth:columns.minWidth}}>
-                  no sub category
-              </TableCell>
-              <TableCell style={{minWidth:columns.minWidth}}>
-                    <div className="flex  gap-1 flex-col">
-                <span className='oldPrice line-through text-gray-500 text-[13px] font-[500]'>₹ 1,999</span>
-                <span className="price text-primary font-[600] text-[14px]">1444</span>
-                
-            </div>
-              </TableCell>
-              <TableCell style={{minWidth:columns.minWidth}}>
-                  <p className='text-[14px] w-[100px]'>
-      <span className='font-[800] mr-1'>
-
-    3232
-      </span>
-       sale
-
-    </p>
-    <ProgressBar value={40} type={'success'} />
-
-              </TableCell>
-              <TableCell style={{minWidth:columns.minWidth}}>
-                   <div className="flex items-center gap-1">
-      <TooltipMUI placement='top' title='Edit Product'>
-
-      <Button className='!w-[35px] !h-[35px]  bg-[#f1f1f1] !min-w-[35px]  !border !border-[rgba(0,0,0,0.1)] !rounded-full hover:!bg-[#f1f1f1] hover:!shadow-sm hover:scale-110'>
-
-        <AiFillEdit className='text-[rgba(0,0,0,0.7)] text-[20px] '/>
-      </Button>
-
-      
-      </TooltipMUI>
-      <TooltipMUI placement='top' title='View Product details'>
-
-      <Button className='!w-[35px] !h-[35px]  bg-[#f1f1f1] !min-w-[35px]  !border !border-[rgba(0,0,0,0.1)] !rounded-full hover:!bg-[#f1f1f1] hover:!shadow-sm hover:scale-110'>
-
-        <FaEye className='text-[rgba(0,0,0,0.7)] text-[20px] '/>
-      </Button>
-      </TooltipMUI>
-      <TooltipMUI placement='top' title='Remove Product'>
-
-      <Button className='!w-[35px] !h-[35px]  bg-[#f1f1f1] !min-w-[35px]  !border !border-[rgba(0,0,0,0.1)] !rounded-full hover:!bg-[#f1f1f1] hover:!shadow-sm hover:scale-110'>
-
-        <MdDelete className='text-[rgba(0,0,0,0.7)] text-[20px] '/>
-      </Button>
-      </TooltipMUI>
-    </div>
-              </TableCell>
-        
-            </TableRow>
+          
+    
           
           </TableBody>
         </Table>
@@ -1137,7 +772,7 @@ const Dashboard = () => {
        <TablePagination
         rowsPerPageOptions={[10, 25, 100]}
         component="div"
-        count={10}
+        count={totalProducts}
         rowsPerPage={rowsPerPage}
         page={page}
         onPageChange={handleChangePage}
@@ -1149,6 +784,26 @@ const Dashboard = () => {
         
 
    </div> 
+   <AlertBox
+  open={isAlertOpen}
+  onClose={() => {
+    setIsAlertOpen(false)
+    setDeleteArray([])
+    setDeleteTarget({type:'',ids:[]})
+  }}
+  onConfirm={handleConfirmDelete}
+  title={deleteTarget.type === "multiple" ? "Delete Multiple Products" : "Delete Product"}
+  description={
+    deleteTarget.type === "multiple"
+      ? `Are you sure you want to delete all selected (${deleteArray.length}) products? This action cannot be undone.`
+      : "Are you sure you want to delete this product? This action cannot be undone."
+  }
+/>
+
+   </>
+
+
+
  {/* recent orders section */}
    <div className="card my-4 shadow-md sm:rounded-lg bg-white">
     <div className="flex items-center justify-between px-3 py-5">

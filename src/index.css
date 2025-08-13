@@ -131,3 +131,78 @@ th.MuiTableCell-root{
   border:1px solid rgba(0, 0, 0, 0.1) !important;
 }
 
+.Mui-focused fieldset legend{
+  display: none !important;
+}
+
+
+/* productDetails page  */
+.zoomProductSliderThumbs  .swiper-slide{
+  height: auto !important;
+  /* height: 150px !important; */
+}
+
+
+
+.zoomProductSliderThumbs.space .swiper-wrapper{
+  padding-top: 38px !important;
+  
+}
+
+
+.zoomProductSliderThumbs .swiper-button-prev{
+ top: 20px !important;
+ left:0px  !important;
+  width: 100% !important;
+ height: 30px !important;
+ border-radius: 0px !important;
+}
+.zoomProductSliderThumbs .swiper-button-next{
+ bottom: 0px !important;
+ right: inherit !important;
+ top: inherit !important;
+ width: 100% !important;
+ height: 30px !important;
+ border-radius: 0px !important;
+
+}
+.zoomProductSliderThumbs .swiper-button-prev::after{
+  transform: rotate(90deg);
+}
+
+.zoomProductSliderThumbs .swiper-button-next::after{
+  transform: rotate(90deg) !important;
+}
+
+/* making main product image in productDetails rounded */
+.iiz div{
+  border-radius: 10px !important;
+  overflow: hidden !important;
+}
+.iiz__img{
+  border-radius: 10px !important;
+  overflow: hidden !important;
+
+
+}
+ .swiper-button-prev,.swiper-button-next{
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: #fff;
+  border-radius: 100%;
+  width: 45px;
+  height: 45px;
+  min-width: 45px;
+  box-shadow: 0 1px 3px #0000001f,0 1px 2px #0000003d !important;
+}
+
+
+.swiper-button-prev:after,.swiper-button-next:after{
+  font-size: 22px !important;
+  color:#000
+}
+
+.contentRight{
+  padding-top: 80px !important;
+}

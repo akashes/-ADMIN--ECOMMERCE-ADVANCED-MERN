@@ -88,7 +88,8 @@ const handleCloseAddProductModal = () => {
     <>
     
       <header
-    className={`w-full pr-7 shadow-md h-auto py-2 bg-[#fff]   ${context.isSidebarOpen===true?'pl-73':'pl-5'} flex items-center justify-between transition-all`}>
+    className={`w-full pr-7 shadow-md h-auto py-2 bg-[#fff]   ${context.isSidebarOpen===true?'pl-73':'pl-5'}
+     flex items-center justify-between transition-all fixed top-0 left-0 z-50 `}>
       <div className="part1">
         <Button className="!z-1000 !w-[50px] !h-[50px] !min-w-[40px] !rounded-md !text-black "
         onClick={()=>context.setIsSidebarOpen(!context.isSidebarOpen)}

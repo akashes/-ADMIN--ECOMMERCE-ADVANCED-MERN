@@ -32,7 +32,7 @@ const Sidebar = () => {
     }
   return (
    <>
-   <div className={`sidebar w-[18%] fixed top-0 left-0  h-full bg-[#fff]  border-r border-[rgba(0,0,0,0.1)] py-2 px-2 w-[${context.isSidebarOpen===true?'18%':'0px'}]`}>
+   <div className={`sidebar z-60 w-[18%] fixed top-0 left-0  h-full bg-[#fff]  border-r border-[rgba(0,0,0,0.1)] py-2 px-2 w-[${context.isSidebarOpen===true?'18%':'0px'}]`}>
     <div className="w-full py-2">
         <Link to='/'>
         <img src="http://localhost:5173/logo.jpg" alt=""
@@ -53,7 +53,7 @@ const Sidebar = () => {
             </Link>
         </li>
         <li>
-            <Button className='w-full !capitalize  !py-2 hover:!bg-[#f1f1f1] !text-[rgba(0,0,0,0.9)] !justify-start gap-3 !text-[14px] !font-[500] items-center'
+            <Button className={`w-full !capitalize  !py-2 hover:!bg-[#f1f1f1] !text-[rgba(0,0,0,0.9)] !justify-start gap-3 !text-[14px] !font-[500] items-center ${subMenuIndex===1 && '!bg-gray-300'}`}
               onClick={()=>isOpenSubMenu(1)}
 
             >
@@ -160,7 +160,7 @@ const Sidebar = () => {
                </span>
                 </Button>
                 <Collapse isOpened={subMenuIndex===3}>
-                <ul className='!w-full'> 
+                <ul className='!w-full ms-2 border-l-1 border-gray-500 '> 
                     <li className='!w-full'>
                     <Link to='/products'>
                         <Button className='!text-[rgba(0,0,0,0.7)] !justify-start   !capitalize !text-[13px] !font-[500] !pl-9 flex gap-3 w-full'>

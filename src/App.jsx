@@ -36,6 +36,7 @@ import ResetPassword from './pages/ResetPassword'
 import Profile from './pages/Profile'
 import AddAddress from './pages/Address/addAddress.jsx'
 import EditCategory from './pages/Category/EditCategory.jsx'
+import ProductDetails from './pages/Products/ProductDetails.jsx'
 
 
 
@@ -80,7 +81,7 @@ const router = createBrowserRouter([
       >
         <Sidebar/>
       </div>
-      <div className={`contentRight py-4 px-5  ${isSidebarOpen===false?'w-[100%]':'w-[82%]'} `} >
+      <div className={`contentRight py-4  px-5  ${isSidebarOpen===false?'w-[100%]':'w-[82%]'} `} >
         <PrivateRoute>
 
         <Dashboard />
@@ -287,6 +288,31 @@ const router = createBrowserRouter([
       </div>
       <div className={`contentRight py-4 px-5  ${isSidebarOpen===false?'w-[100%]':'w-[82%]'} `} >
         <Profile />
+      </div>
+    </div>
+    
+   </section>
+   </>
+  },
+
+   {
+    path:'/product/:id',
+   element: 
+   <>
+   <section className="main">
+    <Header/>
+    <div className="contentMain flex">
+      <div  
+
+      className={`sidebarWrapper overflow-hidden
+        ${isSidebarOpen===true?'w-[18%]':'w-[0px] opacity-0  '}
+        transition-all
+        `}
+      >
+        <Sidebar/>
+      </div>
+      <div className={`contentRight py-4 px-5  ${isSidebarOpen===false?'w-[100%]':'w-[82%]'} `} >
+        <ProductDetails />
       </div>
     </div>
     

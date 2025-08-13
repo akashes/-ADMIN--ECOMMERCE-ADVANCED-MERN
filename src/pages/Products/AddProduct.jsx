@@ -236,6 +236,10 @@ const handleAddProduct=async(e)=>{
     showWarning('Please enter product brand')
     return
   }
+  if(productImages.length===0){
+    showWarning('Atleast one product image is required')
+    return
+  }
   // if(!formFields.images.length){
   //   showWarning('Please upload at least one image')
   //   return

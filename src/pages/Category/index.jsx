@@ -30,6 +30,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { deleteCategory, getCategories, setEditSelectedCategory } from '../../features/category/categorySlice';
 import { Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle } from '@mui/material';
 import { showError, showSuccess } from '../../utils/toastUtils.js';
+import DeleteWarningDialog from '../../components/DeleteWarningDialog.jsx';
 
 
 const columns=[
@@ -43,6 +44,7 @@ const CategoryList = () => {
     const{categories}=useSelector(state=>state.category)
     const dispatch = useDispatch()
     const[deleteCategoryId,setDeleteCategoryId]=useState('')
+    const[deleteCategoryName,setDeleteCategoryName]=useState('')
 
      const [open, setOpen] = React.useState(false);
 
@@ -210,6 +212,7 @@ const CategoryList = () => {
       // onClick={()=>confirmDelete(item._id,item.name)}
       onClick={()=>{
         setDeleteCategoryId(item._id)
+        setDeleteCategoryName(item.name)
         handleClickOpen()
         
       }}
@@ -262,7 +265,7 @@ const CategoryList = () => {
         
 
    </div> 
-     <Dialog
+     {/* <Dialog
         open={open}
         onClose={handleClose}
         aria-labelledby="alert-dialog-title"
@@ -288,7 +291,15 @@ const CategoryList = () => {
             Delete
           </Button>
         </DialogActions>
-      </Dialog>
+      </Dialog> */}
+      <DeleteWarningDialog
+       open={open} handleClose={handleClose} 
+       setDeleteId={setDeleteCategoryId}
+        deleteFunction={handleDeleteCategory}
+        title={'Do you want to delete category'}
+        categoryName={deleteCategoryName}
+        content={'Deleting this category also deletes all the products under this category as well its subcategories'}
+        />
    </>
   )
 }

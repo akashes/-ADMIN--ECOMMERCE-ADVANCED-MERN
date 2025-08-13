@@ -17,7 +17,6 @@ import Select from '@mui/material/Select';
 import MenuItem from '@mui/material/MenuItem';
 import TooltipMUI from '@mui/material/Tooltip';
 
-import ProgressBar from '../../components/ProgressBar'
 
 import { LazyLoadImage } from "react-lazy-load-image-component";
 import "react-lazy-load-image-component/src/effects/blur.css";
@@ -31,12 +30,19 @@ import SearchBox from '../../components/SearchBox';
 
 
 
+
+
 import { MyContext } from '../../App';
 import { useDispatch, useSelector } from 'react-redux';
 import { deleteMultipleProducts, deleteProduct, getAllProducts, setProductAdded } from '../../features/product/productSlice';
 import { showError, showSuccess } from '../../utils/toastUtils';
 
 import './products.css'
+import { getCategories } from '../../features/category/categorySlice';
+import useDebounce from '../../hooks/useDebounce';
+import { CircularProgress, Rating } from '@mui/material';
+import AlertBox from '../../components/AlertBox';
+
 
 const columns=[
   {id:'product',label:'PRODUCT',minWidth:150},
@@ -44,16 +50,98 @@ const columns=[
   {id:'subcategory',label:'SUB CATEGORY',minWidth:150},
   {id:'price',label:'PRICE',minWidth:100},
   {id:"sales",label:'SALES',minWidth:130},
+  {id:"rating",label:'RATING',minWidth:130},
   {id:'action',label:'ACTION',minWidth:120}
 ]
 
 
 const Products = () => {
-  const{products,totalProducts,totalPages,currentPage,productAdded}=useSelector(state=>state.product)
+  const{products,totalProducts,totalPages,currentPage,productAdded,loading}=useSelector(state=>state.product)
+  const{categories}=useSelector(state=>state.category)
     const context = useContext(MyContext)
     const dispatch = useDispatch()
-    const[isDeleting,setIsDeleting]=useState(false)
-    const[deleteArray,setDeleteArray]=useState([])
+const [isAlertOpen, setIsAlertOpen] = useState(false);
+const [deleteTarget, setDeleteTarget] = useState({ type: "", ids: [] });
+
+const[isDeleting,setIsDeleting]=useState([])
+const[deleteArray,setDeleteArray]=useState([])
+
+
+  const handleDeleteProduct=async(id)=>{
+        setIsDeleting(prev=>[...prev,id])
+        const resultAction = await dispatch(deleteProduct(id))
+        console.log(resultAction)
+        if(deleteProduct.fulfilled.match(resultAction)){
+          setIsDeleting([])
+          showSuccess(resultAction.payload.message || 'Product deleted successfully')
+      }
+      if(deleteProduct.rejected.match(resultAction)){
+        setIsDeleting([])
+        showError(resultAction.payload || 'Failed to delete product')
+      }
+      }
+
+
+
+       const handleDeleteMultipleProducts=async(ids)=>{
+        setIsDeleting(prev=>[...prev,...ids])
+        console.log(`deleting multiple products`)
+        console.log(ids)
+      const resultAction  = await dispatch(deleteMultipleProducts(ids))
+      console.log(resultAction)
+        if(deleteMultipleProducts.fulfilled.match(resultAction)){
+          
+          showSuccess(resultAction.payload.message || 'Products deleted successfully')
+      }
+      if(deleteMultipleProducts.rejected.match(resultAction)){
+        showError(resultAction.payload || 'Failed to delete products')
+      }
+          setIsDeleting([])
+
+
+      }
+
+
+const handleConfirmDelete = async () => {
+  setIsAlertOpen(false);
+
+  if (deleteTarget.type === "single") {
+    await handleDeleteProduct(deleteTarget.ids[0]);
+  } else if (deleteTarget.type === "multiple") {
+    await handleDeleteMultipleProducts(deleteTarget.ids);
+    setDeleteArray([]); // Clear selection
+  }
+  setDeleteTarget({type:'',ids:[]})
+};
+const confirmDeleteProduct = (id) => {
+  setDeleteTarget({ type: "single", ids: [id] });
+  setIsAlertOpen(true);
+};
+
+
+const confirmDeleteMultiple = () => {
+  if (deleteArray.length === 0) return;
+  setDeleteTarget({ type: "multiple", ids: deleteArray });
+  setIsAlertOpen(true);
+};
+console.log(deleteArray)
+
+
+    const[searchTerm,setSearchTerm]=useState('')
+    const debouncedSearchTerm = useDebounce(searchTerm,500)
+    const [ratingFilter, setRatingFilter] = useState('');
+
+    console.log(deleteTarget)
+
+    const[formFields,setFormFields]=useState({
+    category: '',
+    catName: '',
+    subCat: '',
+    subCatId: '',
+    thirdSubCat: '',
+    thirdSubCatId: ''
+    })
+    console.log(formFields)
 
       const [rowsPerPage, setRowsPerPage] = React.useState(10);
       const [page, setPage] = React.useState(0);
@@ -72,53 +160,152 @@ const Products = () => {
       };
       const label = { inputProps: { 'aria-label': 'Checkbox demo' } };
 
-      const handleDeleteProduct=async(id)=>{
-        setIsDeleting(id)
-        const resultAction = await dispatch(deleteProduct(id))
-        console.log(resultAction)
-        if(deleteProduct.fulfilled.match(resultAction)){
-          setIsDeleting(false)
-          showSuccess(resultAction.payload.message || 'Product deleted successfully')
-      }
-      if(deleteProduct.rejected.match(resultAction)){
-        setIsDeleting(false)
-        showError(resultAction.payload || 'Failed to delete product')
-      }
-      }
-      const handleDeleteMultipleProducts=async(ids)=>{
-      const resultAction  = await dispatch(deleteMultipleProducts(ids))
-      console.log(resultAction)
-        if(deleteMultipleProducts.fulfilled.match(resultAction)){
-          showSuccess(resultAction.payload.message || 'Products deleted successfully')
-      }
-      if(deleteMultipleProducts.rejected.match(resultAction)){
-        showError(resultAction.payload || 'Failed to delete products')
-      }
+    
+     
 
-      }
+
+
+      const handleChangeProductCat = (event) => {
+  const selectedCategoryId = event.target.value;
+  const selectedCategoryObj = categories.find(cat => cat._id === selectedCategoryId);
+  const selectedCategoryName = selectedCategoryObj?.name?.toLowerCase() || '';
+
+  setFormFields(prev => ({
+    ...prev,
+    category: selectedCategoryId,
+    catName: selectedCategoryName,
+    subCat: '',
+    subCatId: '',
+    thirdSubCat: '',
+    thirdSubCatId: ''
+  }));
+
+
+};
+
+const handleChangeProductSubCat = (event) => {
+  const newSubCatId = event.target.value;
+
+  const subCatName =
+    selectedRootCategory?.children?.find(child => child._id === newSubCatId)?.name?.toLowerCase() || '';
+
+  setFormFields((prev) => ({
+    ...prev,
+    subCat: subCatName,
+    subCatId: newSubCatId,
+    thirdSubCat: '',
+    thirdSubCatId: ''
+  }));
+
+  
+};
+
+
+
+
+const handleChangeThirdLevelSubCat = (event) => {
+  const newThirdLevelSubCatId = event.target.value;
+  const thirdLevelSubCatName = thirdLevelCategories.find(cat => cat._id === newThirdLevelSubCatId)?.name?.toLowerCase() || '';
+
+  setFormFields(prev => ({
+    ...prev,
+    thirdSubCat: thirdLevelSubCatName,
+    thirdSubCatId: newThirdLevelSubCatId
+  }));
+
+
+};
+
+  const handleSearchChange = (e) => {
+    console.log('inside handlesearch chagne')
+    setSearchTerm(e.target.value);
+  };
+
+ const  handleSelectMultipleDelete=(id,checked)=>{
+   setDeleteArray((prev)=>{
+    if(checked){
+      return [...prev,id]
+    }else{
+      return prev.filter(pid=>pid!==id)
+    }
+   })
+  }
+  const handleSelectAllDelete = (checked) => {
+  if (checked) {
+    const ids = products.map(p => p._id);
+    setDeleteArray(ids);
+  } else {
+    setDeleteArray([]);
+  }
+};
+
+  const handleClearAllFilters = () => {
+  setFormFields({
+    category: '',
+    catName: '',
+    subCat: '',
+    subCatId: '',
+    thirdSubCat: '',
+    thirdSubCatId: ''
+
+  });
+  setRatingFilter('');
+  setSearchTerm('');
+  setDeleteArray([])
+  setPage(0);
+};
 
       useEffect(()=>{
+        const params={
+          page:page+1,
+          perPage:rowsPerPage
+        }
 
         if(productAdded){
-          dispatch(getAllProducts({page:page+1,perPage:rowsPerPage}))
+          dispatch(getAllProducts(params))
           setProductAdded(false)
         }
+
+  if (formFields.category) params.category = formFields.category;
+  if (formFields.subCatId) params.subCatId = formFields.subCatId;
+  if (formFields.thirdSubCatId) params.thirdSubCatId = formFields.thirdSubCatId;
+
+  //search filter
+  if(debouncedSearchTerm.trim() !=''){
+    params.search = debouncedSearchTerm.trim();
+  }
+    if (ratingFilter) params.minRating = ratingFilter;
+
   const fetchProductData=async()=>{
     console.log(page,rowsPerPage)
-    await dispatch(getAllProducts({page:page+1,perPage:rowsPerPage}))
+     dispatch(getAllProducts(params))
   }
   fetchProductData()
 
-},[dispatch,page,rowsPerPage,productAdded])
+},[dispatch,page,rowsPerPage,productAdded,formFields,debouncedSearchTerm,ratingFilter])
 
-console.log(deleteArray)
+useEffect(()=>{
+
+  dispatch(getCategories())
+},[])
+useEffect(() => {
+  setPage(0);
+}, [ratingFilter]);
+
+const selectedRootCategory = categories.find((category) => category._id === formFields.category);
+const subCategories = selectedRootCategory?.children || [];
+const selectedSubCategory = subCategories.find((category) => category._id === formFields.subCatId);
+const thirdLevelCategories = selectedSubCategory?.children || [];
   return (
    <>
    {/* welcome banner */}
      <div className="flex items-center justify-between px-2 py-0 mt-3">
       <h2 className='text-[18px] font-[600]'>Products(Material ui  table)</h2>
         <div className="col w-[25%] ml-auto flex items-center justify-end gap-3">
-          <Button className='btn !bg-green-600 !text-white btn-sm'>Export</Button>
+          {
+         
+            deleteArray.length>0 &&   <Button  onClick={confirmDeleteMultiple} className='btn !bg-red-600 !text-white btn-sm'>Delete</Button>
+          }
           <Button className='btn-blue btn-sm '
                 onClick={()=>context.setIsAddProductModalOpen({open:true,modal:'Add Product'})}
 
@@ -128,31 +315,115 @@ console.log(deleteArray)
     </div>
    <div className="card my-4 shadow-md sm:rounded-lg bg-white pt-5">
   
-      <div className="flex items-center w-full px-5 justify-between ">
-        <div className="col w-[20%]">
-          <h4 className='font-[600] text-[13px] mb-2' >Category By</h4>
+      <div className="flex items-center w-full px-5 justify-between gap-4">
+        
+                    <div className="col w-[15%]">
+          <h4 className='font-[600] text-[13px] mb-2' >Category</h4>
             <Select
+            disabled={categories.length===0}
+            style={{zoom:'80%'}}
           labelId="demo-simple-select-standard-label"
           id="demo-simple-select-standard"
-          value={categoryFilterVal}
-          onChange={handleChangeCatFilter}
+          value={formFields.category}
+          label="Category"
+          className='w-full '
+          size='small'
+          onChange={handleChangeProductCat}
+
+        >
+          <MenuItem value=''>None</MenuItem>
+
+
+          {
+            categories.map((category)=>(
+          <MenuItem value={category._id}>{category.name}</MenuItem>
+
+
+            ))
+          }
+    
+        </Select>
+        
+        </div>
+      
+
+        <div className="col w-[15%]">
+          <h4 className='font-[600] text-[13px] mb-2' >Sub Category</h4>
+            <Select
+            disabled={formFields.category==='' || subCategories.length===0}
+            style={{zoom:'80%'}}
+          labelId="demo-simple-select-standard-label"
+          id="demo-simple-select-standard"
+          value={formFields.subCatId}
+          onChange={handleChangeProductSubCat}
           label="Category"
           className='w-full '
           size='small'
         >
-          <MenuItem value="">
-            <em>None</em>
-          </MenuItem>
-          <MenuItem value={10}>Men</MenuItem>
-          <MenuItem value={20}>Women</MenuItem>
-          <MenuItem value={30}>Kids</MenuItem>
+          <MenuItem value=''>None</MenuItem>
+
+          {
+            subCategories.length>0 && subCategories.map((subCategory)=>(
+
+              <MenuItem value={subCategory._id}>{subCategory.name}</MenuItem>
+            ))
+          }
+       
+          
         </Select>
         
         </div>
-        <div className="col w-[20%] ml-auto">
-              <SearchBox/>
+        <div className="col w-[15%]">
+          <h4 className='font-[600] text-[13px] mb-2' >Third level Category</h4>
+            <Select
+            disabled={formFields.category==='' || formFields.subCat==='' || thirdLevelCategories.length===0}
+            style={{zoom:'80%'}}
+          labelId="demo-simple-select-standard-label"
+          id="demo-simple-select-standard"
+          value={formFields.thirdSubCatId}
+          onChange={handleChangeThirdLevelSubCat}
+          label="Category"
+          className='w-full '
+          size='small'
+        >
+          <MenuItem value=''>None</MenuItem>
+
+          {
+            thirdLevelCategories?.length>0 && thirdLevelCategories.map((thirdLevelCategory)=>(
+              
+              <MenuItem value={thirdLevelCategory._id}>{thirdLevelCategory.name}</MenuItem>
+            ))
+          }
+      
+     
+        </Select>
+        
+        </div>
+<div className="col w-[15%]">
+  <h4 className='font-[600] text-[13px] mb-2'>Min Rating</h4>
+  <Rating
+    value={ratingFilter}
+    precision={1}
+    onChange={(event, newValue) => setRatingFilter(newValue)}
+  />
+</div>
+
+        <div className="col w-[20%] ml-auto flex gap-3">
+              <SearchBox value={searchTerm} onChange={handleSearchChange}/>
+               <Button 
+               className='!min-w-[150px]'
+    variant="outlined"
+    color="error"
+    size="small"
+    onClick={handleClearAllFilters}
+  >
+    Clear Filters
+  </Button>
+
 
         </div>
+  
+
       
       </div>
       <br />
@@ -162,7 +433,10 @@ console.log(deleteArray)
           <TableHead className='bg-[#f1f1f1]'>
             <TableRow>
               <TableCell>
-                <Checkbox {...label} size='small'/>
+                <Checkbox checked={products.length>0 && deleteArray.length===products.length}
+                onChange={(e)=>handleSelectAllDelete(e.target.checked)}
+                {...label} size='small'/>
+                  
                 
               </TableCell>
               {columns.map((column) => (
@@ -191,12 +465,27 @@ console.log(deleteArray)
 
             </TableRow> */}
             {
-              // products.slice(page*rowsPerPage,page*rowsPerPage+rowsPerPage)
-           products.length>0 && products.map((product)=>(
+              loading && 
+              <TableRow>
+                <TableCell colSpan={7}>
+              <div className='flex items-center justify-center w-full min-h-[400px]'>
 
-                <TableRow className={`${isDeleting===product._id && 'uploading-gradient-delete'}`} key={product._id} >
+
+                <CircularProgress/>
+                </div>
+
+                </TableCell>
+              </TableRow>
+
+              
+            }
+            {
+              // products.slice(page*rowsPerPage,page*rowsPerPage+rowsPerPage)
+         !loading &&  products.length>0 &&  products?.map((product)=>(
+
+                <TableRow className={`${isDeleting.includes(product._id) && 'uploading-gradient-delete'}`} key={product._id} >
               <TableCell style={{minWidth:columns.minWidth}}>
-                <Checkbox onChange={()=>setDeleteArray(prev=>[...prev,product._id])} {...label} size='small'/>
+                <Checkbox checked={deleteArray.includes(product._id)} onChange={(e)=>handleSelectMultipleDelete(product._id,e.target.checked)} {...label} size='small'/>
 
               </TableCell>
               <TableCell style={{minWidth:columns.minWidth}}>
@@ -246,6 +535,14 @@ console.log(deleteArray)
 
               </TableCell>
               <TableCell style={{minWidth:columns.minWidth}}>
+                  <p className='text-[14px] w-[100px]'>
+      
+       <Rating size='small' defaultValue={product.rating} readOnly  />
+
+    </p>
+
+              </TableCell>
+              <TableCell style={{minWidth:columns.minWidth}}>
                    <div className="flex items-center gap-1">
       <TooltipMUI placement='top' title='Edit Product'>
 
@@ -261,15 +558,18 @@ console.log(deleteArray)
       </TooltipMUI>
       <TooltipMUI placement='top' title='View Product details'>
 
+      <Link to={`/product/${product._id}`}>
       <Button className='!w-[35px] !h-[35px]  bg-[#f1f1f1] !min-w-[35px]  !border !border-[rgba(0,0,0,0.1)] !rounded-full hover:!bg-[#f1f1f1] hover:!shadow-sm hover:scale-110'>
 
         <FaEye className='text-[rgba(0,0,0,0.7)] text-[20px] '/>
       </Button>
+      </Link>
       </TooltipMUI>
       <TooltipMUI placement='top' title='Remove Product'>
 
       <Button 
-      onClick={()=>handleDeleteProduct(product._id)}
+      // onClick={()=>handleDeleteProduct(product._id)}
+      onClick={()=>confirmDeleteProduct(product._id)}
       className='!w-[35px] !h-[35px]  bg-[#f1f1f1] !min-w-[35px]  !border !border-[rgba(0,0,0,0.1)] !rounded-full hover:!bg-[#f1f1f1] hover:!shadow-sm hover:scale-110'>
 
         <MdDelete className='text-[rgba(0,0,0,0.7)] text-[20px] '/>
@@ -292,7 +592,7 @@ console.log(deleteArray)
        <TablePagination
         rowsPerPageOptions={[10, 25, 100]}
         component="div"
-        count={11}
+        count={totalProducts}
         rowsPerPage={rowsPerPage}
         page={page}
         onPageChange={handleChangePage}
@@ -304,6 +604,22 @@ console.log(deleteArray)
         
 
    </div> 
+   <AlertBox
+  open={isAlertOpen}
+  onClose={() => {
+    setIsAlertOpen(false)
+    setDeleteArray([])
+    setDeleteTarget({type:'',ids:[]})
+  }}
+  onConfirm={handleConfirmDelete}
+  title={deleteTarget.type === "multiple" ? "Delete Multiple Products" : "Delete Product"}
+  description={
+    deleteTarget.type === "multiple"
+      ? `Are you sure you want to delete all selected (${deleteArray.length}) products? This action cannot be undone.`
+      : "Are you sure you want to delete this product? This action cannot be undone."
+  }
+/>
+
    </>
   )
 }

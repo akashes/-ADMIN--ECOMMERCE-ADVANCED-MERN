@@ -6,6 +6,7 @@ import { showSuccess, showWarning } from '../../utils/toastUtils'
 import { useDispatch } from 'react-redux'
 import { deleteCategory, getCategories, updateSubCategory } from '../../features/category/categorySlice'
 import { MyContext } from '../../App'
+import DeleteWarningDialog from '../../components/DeleteWarningDialog'
 
 const EditSubCatBox = (props) => {
     const dispatch = useDispatch()
@@ -13,6 +14,18 @@ const EditSubCatBox = (props) => {
     const [editMode,setEditMode]=useState(false)
     const[isLoading,setIsLoading]=useState(false)
     const [selectedVal,setSelectedVal]=useState('')
+        //   const[deleteCategoryId,setDeleteCategoryId]=useState('')
+      
+        //    const [deleteModalOpen, setDeleteModalOpen] = React.useState(false);
+      
+        // const handleClickOpen = () => {
+        //   setDeleteModalOpen(true);
+        // };
+      
+        // const handleClose = () => {
+        //   setDeleteModalOpen(false);
+        // };
+
     const[formFields,setFormFields]=useState({
         name:'',
         id:'',
@@ -102,7 +115,8 @@ const EditSubCatBox = (props) => {
 
       },[props?.name, props?.id, props?.selectedCat, props?.selectedCatName])
   return (
-   <form className='w-full flex items-center  gap-3 p-0 px-4' onSubmit={handleSubmit} >
+    <>
+       <form className='w-full flex items-center  gap-3 p-0 px-4' onSubmit={handleSubmit} >
     {
         editMode===true &&
          <>
@@ -179,6 +193,16 @@ const EditSubCatBox = (props) => {
     }
  
    </form>
+   {/* <DeleteWarningDialog
+       open={deleteModalOpen} handleClose={handleClose} 
+       setDeleteId={setDeleteCategoryId}
+        deleteFunction={handleDeleteCategory}
+        title={'Do you want to delete this category?'}
+        content={'Deleting this category also deletes all the products under this category as well its subcategories'}
+        /> */}
+    
+    </>
+
   )
 }
 
