@@ -81,11 +81,11 @@ const VerifyAccount = ({resetPassword}) => {
 
   return (
    <section className='  w-full  '>
-    <header className='w-full fixed top-0 left-0 z-100 px-4 py-3 flex items-center justify-between'>
+    <header className='w-full fixed top-0 left-0 z-100 px-4 py-3 flex items-center justify-center md:justify-between'>
         <Link to='/'>
         <img src="https://serviceapi.spicezgold.com/download/1750047766437_logo.jpg" alt="" className='w-[200px]' />
         </Link>
-        <div className="flex items-center ">
+        <div className="hidden md:flex items-center ">
             <NavLink to='/login' className={({isActive})=>isActive && '!bg-[#e8e8e8] rounded-full '}>
             <Button className='!rounded-full !text-[rgba(0,0,0,0.9)] !px-5 flex gap-1'>
                 <MdOutlineLogin className='text-[20px] '/>
@@ -105,15 +105,15 @@ const VerifyAccount = ({resetPassword}) => {
     {/* background image */}
 <div className="fixed top-0 left-0 w-full h-full opacity-7 bg-[url('https://res.cloudinary.com/dllelmzim/image/upload/v1753140814/patern_z0bmzz.webp')] bg-repeat z-[-1]"></div>
 
-    <div className="loginBox card w-[600px] h-auto pb-25 mx-auto mt-20 relative z-50 ">
+    <div className="loginBox card w-full md:w-[600px] h-auto pb-25 mx-auto mt-20 relative z-50 ">
         <div className="text-center">
 
-        <img src="/shield6.png" alt="" className='m-auto w-[200px]' />
+        <img src="/shield6.png" alt="" className='m-auto w-[100px] md:w-[200px]' />
         </div>
         {
             resetPassword ? (
-                 <h1 className='text-center text-[35px] font-[800] mt-4'>Welcome Back! <br />
-        <span className='text-nowrap'>Please enter your reset password OTP.</span>
+                 <h1 className='text-center text-[30px] md:text-[35px]  font-[500] md:font-[800] mt-4'>Welcome Back! <br />
+        <span className=''>Please enter your reset password OTP.</span>
         </h1>
             ):
             (

@@ -27,7 +27,6 @@ const AddCategory = () => {
     // images: [],
 
   });
-  console.log(previews.length)
   // const handleImageChange = (e)=>{
   //   console.log('inside handle image change')
   //   const files = Array.from(e.target.files)
@@ -154,12 +153,12 @@ const AddCategory = () => {
 console.log(formFields)
   return (
     <section className="p-5  bg-gray-50">
-      <form className="addProductForm  p-8 py-3 "
+      <form className="addProductForm p-3  md:p-8 py-3 "
       onSubmit={handleSubmit}
       >
-        <div className="scroll max-h-[72vh] overflow-y-scroll pr-4 pt-4">
+        <div className="scroll max-h-[72vh] overflow-y-scroll pr-4 pt-4 mb-5 md:mb-8">
           <div className="grid grid-cols-1 mb-3">
-            <div className="col w-[25%]">
+            <div className="col  w-[80%] md:w-[25%]">
               <h3 className="text-[14px] font-[500] mb-1 text-black">
                 Category Name
               </h3>
@@ -181,7 +180,7 @@ console.log(formFields)
             Category Image
           </h3>
 
-          <div className="grid grid-cols-7 gap-4 ">
+          <div className="grid grid-cols-2 md:grid-cols-7 gap-2 md:gap-4 ">
          {
           categoryImages.length>0 && categoryImages.map((item,index)=>(
                <div className="uploadBoxWrapper relative">
@@ -209,10 +208,9 @@ console.log(formFields)
             <UploadBox multiple={true} onChange={handleImageChange} isUploading={isUploading} />
           </div>
         </div>
-        <br />
-        <br />
+      
         <div className="w-[250px]">
-          <Button type="submit" className="btn-blue btn-lg mt-3 w-full gap ">
+          <Button type="submit" className="btn-blue md:btn-lg  md:mt-3 w-full  ">
             <IoMdCloudUpload className="text-[25px] text-white" />
             Publish and View
           </Button>

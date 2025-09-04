@@ -385,8 +385,8 @@ useEffect(()=>{
 
   return (
     <section className="p-5 bg-gray-50">
-      <form onSubmit={handleAddProduct} className="addProductForm  p-8 py-3 ">
-        <div className="scroll max-h-[72vh] overflow-y-scroll pr-4">
+      <form onSubmit={handleAddProduct} className="addProductForm p-3 md:p-8 py-2 md:py-3 ">
+        <div className="md:scroll md:max-h-[72vh] overflow-y-scroll md:pr-4">
 
         <div className="grid grid-cols-1 mb-3">
           <div className="col">
@@ -414,11 +414,11 @@ useEffect(()=>{
             />
           </div>
         </div>
-        <div className="grid grid-cols-4 mb-3 gap-4">
+        <div className="grid grid-cols-2 md:grid-cols-4 mb-3 gap-4">
           {
             categories.length!==0 && (
                <div className="col">
-            <h3 className="text-[14px] font-[500] mb-1 text-black">Product Category</h3>
+            <h3 className="text-[14px] font-[500] mb-1 text-black text-nowrap">Product Category</h3>
             <Select
             sx={{
               '& .MuiOutlinedInput-notchedOutline': {
@@ -457,7 +457,7 @@ useEffect(()=>{
          {
           subCategories.length!==0 && (
               <div className="col">
-            <h3 className="text-[14px] font-[500] mb-1 text-black">Product Sub Category</h3>
+            <h3 className="text-[14px] font-[500] mb-1 text-black text-nowrap">Product Sub Category</h3>
   <Select
   sx={{
     '& .MuiOutlinedInput-notchedOutline': {
@@ -493,7 +493,7 @@ useEffect(()=>{
          {
           thirdLevelCategories.length!==0 && (
                  <div className="col">
-            <h3 className="text-[14px] font-[500] mb-1 text-black">Third Sub Category</h3>
+            <h3 className="text-[14px] font-[500] mb-1 text-black text-nowrap">Third Sub Category</h3>
   <Select
   sx={{
     '& .MuiOutlinedInput-notchedOutline': {
@@ -610,35 +610,11 @@ useEffect(()=>{
                onChange={onChangeInput}
             />
           </div>
-          {/* discount */}
-            {/* <div className="col">
-            <h3 className="text-[14px] font-[500] mb-1 text-black">Product Discount</h3>
-            <input
-            
-              type="text"
-              name="price"
-              id="price"
-              className="w-full h-[40px] p-3 border border-[rgba(0,0,0,0.2)] focus:outline-none focus:border-[rgba(0,0,0,0.5)]
-               rounded-sm text-sm "
-            />
-          </div> */}
-
-      
-        </div>
-        <div className="grid grid-cols-4 mb-3 gap-4">
     
-          {/* rating */}
-          {/* <div className="col">
-            <h3 className="text-[14px] font-[500] mb-1 text-black">Product Rating</h3>
-                 <Rating name="half-rating" defaultValue={2.5} precision={0.5}
-                 
-                 />
-
-          </div>   */}
-       
 
       
         </div>
+
         <hr className="my-5 !text-gray-400" />
         {/* dynamic attributes */}
  {attributes && attributes.map((attr, i) => (
@@ -648,19 +624,19 @@ useEffect(()=>{
       readOnly={attr.locked}
       placeholder="Attribute Key"
       onChange={(e) => handleAttributeChange(i, 'key', e.target.value)}
-      className="border p-1 px-2 !bg-[#f1faff] rounded w-40 border-[rgba(0,0,0,0.3)] outline-none"
+      className="border p-1 px-2 !bg-[#f1faff] rounded  w-full md:w-40 border-[rgba(0,0,0,0.3)] outline-none"
     />
     <input
       value={attr.value}
       placeholder="Value"
       onChange={(e) => handleAttributeChange(i, 'value', e.target.value)}
-      className="border p-1 px-2 rounded w-40 !bg-[#f1faff] border-[rgba(0,0,0,0.3)] outline-none"
+      className="border p-1 px-2 rounded w-full  md:w-40 !bg-[#f1faff] border-[rgba(0,0,0,0.3)] outline-none"
     />
     {/* hiding remove button for locked values */}
     {
       !attr.locked && (
 
-        <button onClick={(e) => removeAttributeField(e,i)} className="cursor-pointer">
+        <button  onClick={(e) => removeAttributeField(e,i)} className="cursor-pointer min-w-[50px]">
           <img src="https://res.cloudinary.com/dllelmzim/image/upload/v1754588723/block_p6nqvy.png" alt="" width={23} />
         </button>
       )
@@ -678,7 +654,7 @@ useEffect(()=>{
         {/* media and image section */}
         <div className="col w-full p-5 px-0">
             <h3 className="font-[700] text-[18px] mb-3">Media and Images</h3>
-            <div className="grid grid-cols-7 gap-4 ">
+            <div className="grid grid-cols-2 md:grid-cols-7 gap-2 md:gap-4 ">
               {
                 productImages && productImages.length>0 && productImages.map((img,i)=>{
                   return(

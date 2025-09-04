@@ -160,13 +160,13 @@ const selectedSubCategory = subCategories.find((category) => category._id === su
 
 
   return (
-    <section className="p-5  bg-gray-50 grid grid-cols-2 gap-10">
+    <section className=" p-1  md:p-5 w-[100%]  md:w-[50%]  bg-gray-50 grid grid-cols-1  gap-5 md:gap-10">
       <form className="addProductForm  p-8 py-3 " onSubmit={handleSubmit}>
-        <h3>Add Sub Category</h3>
+        <h3 className='font-bold'>Add Sub Category</h3>
         <div className="scroll max-h-[72vh] overflow-y-scroll  pt-4">
             <div className="grid grid-cols-2 mb-3 gap-4">
                <div className="col  ">
-            <h3 className="text-[14px] font-[500] mb-1 text-black">Parent Category </h3>
+            <h3 className="text-[14px] font-[500] mb-1 text-black text-nowrap">Parent Category </h3>
   <Select
   sx={{
     '& .MuiOutlinedInput-notchedOutline': {
@@ -201,7 +201,7 @@ const selectedSubCategory = subCategories.find((category) => category._id === su
         </Select>
           </div>
                 <div className="col">
-            <h3 className="text-[14px] font-[500] mb-1 text-black">Sub Category Name</h3>
+            <h3 className="text-[14px] font-[500] mb-1 text-black text-nowrap">Sub Category Name</h3>
             <input
             
               type="text"
@@ -235,11 +235,11 @@ const selectedSubCategory = subCategories.find((category) => category._id === su
 
 
      <form className="addProductForm  p-8 py-3 " onSubmit={handleSubmitThirdLevelCategory}>
-      <h3>Add Third Level Category</h3>
+      <h3 className='font-bold'>Add Third Level Category</h3>
         <div className="scroll max-h-[72vh] overflow-y-scroll  pt-4">
             <div className="grid grid-cols-2 mb-3 gap-4">
                <div className="col  ">
-            <h3 className="text-[14px] font-[500] mb-1 text-black">Parent Sub Category </h3>
+            <h3 className="text-[14px] font-[500] mb-1 text-black text-nowrap">Parent Sub Category </h3>
   <Select
   sx={{
     '& .MuiOutlinedInput-notchedOutline': {
@@ -270,7 +270,7 @@ const selectedSubCategory = subCategories.find((category) => category._id === su
         </Select>
           </div>
                 <div className="col">
-            <h3 className="text-[14px] font-[500] mb-1 text-black">Third Level Category</h3>
+            <h3 className="text-[14px] font-[500] mb-1 text-black text-nowrap">Third Level Category</h3>
             <input
             
               type="text"
@@ -289,7 +289,7 @@ const selectedSubCategory = subCategories.find((category) => category._id === su
     
         <div className='w-full'>
 
-        <Button disabled={isLoading} type="submit" className="btn-blue btn-lg mt-3 w-full gap " >
+        <Button disabled={isLoading} type="submit" className="btn-blue btn-lg mt-3 w-full gap-1 text-nowrap  " >
             <IoMdCloudUpload className="text-[25px] text-white"/>
             {isLoading2 ? 'Adding..': 'Add Third Level Sub Category'}</Button>
         </div>

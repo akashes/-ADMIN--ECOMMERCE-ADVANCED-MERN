@@ -4,7 +4,7 @@ import { Button, Pagination } from '@mui/material'
 import { FaAngleDown } from 'react-icons/fa6'
 import Badge from '../../components/Badge'
 import Checkbox from '@mui/material/Checkbox';
-import { Link } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
 import { FcCancel } from "react-icons/fc";
 import ProgressBar from '../../components/ProgressBar'
 import { AiFillEdit } from "react-icons/ai";
@@ -29,7 +29,6 @@ import TableRow from '@mui/material/TableRow';
 import MenuItem from '@mui/material/MenuItem';
 import Select from '@mui/material/Select';
 
-import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
 import { MyContext } from '../../App'
 import { useDispatch, useSelector } from 'react-redux'
 import { getCategories } from '../../features/category/categorySlice'
@@ -38,6 +37,10 @@ import { CircularProgress, Rating } from '@mui/material';
 import useDebounce from '../../hooks/useDebounce'
 import { deleteMultipleProducts, deleteProduct, getAllProducts, setProductAdded } from '../../features/product/productSlice'
 import SearchBox from '../../components/SearchBox'
+import { getOrders } from '../../features/order/orderSlice'
+import RevenueChart from '../../components/Charts/RevenueChart'
+import OrderChart from '../../components/Charts/OrderChart'
+import ProductsSkeleton from '../../components/Skeltons/ProductsSkelton'
 
 
 
@@ -62,8 +65,10 @@ function createData(name, code, population, size) {
 
 const Dashboard = () => {
   // products table related 
-    const{products,totalProducts,totalPages,currentPage,productAdded,loading}=useSelector(state=>state.product)
+    const{products,totalProducts,totalPages,currentPage,productAdded,loading:productsLoading}=useSelector(state=>state.product)
   const{categories}=useSelector(state=>state.category)
+  const navigate = useNavigate()
+  const auth = useSelector(state=>state.auth)
     const context = useContext(MyContext)
     const dispatch = useDispatch()
 const [isAlertOpen, setIsAlertOpen] = useState(false);
@@ -130,6 +135,7 @@ const confirmDeleteMultiple = () => {
   setDeleteTarget({ type: "multiple", ids: deleteArray });
   setIsAlertOpen(true);
 };
+
 console.log(deleteArray)
 
 
@@ -301,52 +307,7 @@ const selectedSubCategory = subCategories.find((category) => category._id === fo
 const thirdLevelCategories = selectedSubCategory?.children || [];
 
 
-  const[chart1Data,setChart1Data]=useState(
-    [
-  {
-    name: 'JAN',
-    TotalSales: 4000,
-    TotalUsers: 2400,
-    amt: 2400,
-  },
-  {
-    name: 'FEB',
-    TotalSales: 3000,
-    TotalUsers: 1398,
-    amt: 2210,
-  },
-  {
-    name: 'MAR',
-    TotalSales: 2000,
-    TotalUsers: 9800,
-    amt: 2290,
-  },
-  {
-    name: 'APR',
-    TotalSales: 2780,
-    TotalUsers: 3908,
-    amt: 2000,
-  },
-  {
-    name: 'MAY',
-    TotalSales: 1890,
-    TotalUsers: 4800,
-    amt: 2181,
-  },
-  {
-    name: 'JUN',
-    TotalSales: 2390,
-    TotalUsers: 3800,
-    amt: 2500,
-  },
-  {
-    name: 'JUL',
-    TotalSales: 3490,
-    TotalUsers: 4300,
-    amt: 2100,
-  },
-]
-  )
+ 
 
     const [categoryFilterVal, setCategoryFilterVal] = React.useState('');
 
@@ -388,13 +349,36 @@ const thirdLevelCategories = selectedSubCategory?.children || [];
   
   
         },[])
+
+
+          const{orders}=useSelector(state=>state.order)
+          console.log(orders)
+        
+              //   const[showProducts,setShowProducts]=useState(null)
+              // const isShowOrderedProduct=(index)=>{
+              //   if(showProducts===index){
+              //     return setShowProducts(null)
+            
+            
+              //   }
+              //   setShowProducts(index)
+              
+            
+              // }
+        
+              useEffect(()=>{
+                dispatch(getOrders())
+        
+              },[])
   return (
    <>
    {/* gretting container with cta button */}
-   <div className='w-full border py-2 p-5 bg-[#f1faff] border-[rgba(0,0,0,0.1)] flex items-center gap-8 mb-5 justify-between rounded-md'>
+   <div className='w-full border  p-4 sm:p-6 md:p-8 bg-[#f1faff] border-[rgba(0,0,0,0.1)] flex flex-col-reverse md:flex-row items-center gap-4 sm:gap-5  md:gap-8 mb-5 justify-center md:justify-between rounded-md  '>
     <div className='info'>
-      <h1 className='text-[35px] font-bold leading-12 mb-3 '>Welcome, <br /> Akash   <svg
-          style={{ display: 'inline', verticalAlign: 'top' }} // This is important
+      <h1 className='text-2xl sm:text-3xl md:text-[35px]
+leading-snug sm:leading-normal font-bold  mb-3 '>Welcome, {context.windowWidth>992 && <br /> } <span className='text-secondary block   sm:inline'>{auth.user?.name}</span>  
+       <svg
+          style={{ display: 'inline', verticalAlign: 'top' }} 
 
                   width="36"
                   height="36"
@@ -446,16 +430,18 @@ const thirdLevelCategories = selectedSubCategory?.children || [];
                 </svg>
        
        </h1>
-      <p>Here’s What happening on your store today. See the statistics at once.</p>
+      <p className='text-gray-800 text-sm sm:text-base max-w-[500px] '>Here’s What happening on your store today. See the statistics at once.</p>
       <br />
-       <Button className='btn-blue flex gap-2 !capitalize group'
+       <Button className='btn-blue flex items-center gap-2 !capitalize  px-4 py-2 text-sm sm:text-base '
        onClick={()=>context.setIsAddProductModalOpen({open:true,modal:'Add Product'})}
        >
-        <img src="/ecommerce.png" alt="" className='w-[30px] group-hover:scale-105' />
+        <img src="/ecommerce.png" alt="" className='w-6 sm:w-7 ' />
         Add Product
        </Button>
     </div>
-    <img src="https://res.cloudinary.com/dllelmzim/image/upload/v1753076866/shop-illustration_lpdjyl.webp" alt="" className='w-[250px]' />
+
+    {/* welcome banner image */}
+    <img src="https://res.cloudinary.com/dllelmzim/image/upload/v1753076866/shop-illustration_lpdjyl.webp" alt="" className=' w-[220px]  md:w-[250px] max-w-full' />
 
    </div>
    <DashboardBoxes/>
@@ -463,132 +449,124 @@ const thirdLevelCategories = selectedSubCategory?.children || [];
  
 
 
-{/* testing - products mui table*/}
    <>
-   {/* welcome banner */}
-     <div className="flex items-center justify-between px-2 py-0 mt-3">
-      <h2 className='text-[18px] font-[600]'>Products(Material ui  table)</h2>
-        <div className="col w-[25%] ml-auto flex items-center justify-end gap-3">
-          {
-         
-            deleteArray.length>0 &&   <Button  onClick={confirmDeleteMultiple} className='btn !bg-red-600 !text-white btn-sm'>Delete</Button>
-          }
-          <Button className='btn-blue btn-sm '
-                onClick={()=>context.setIsAddProductModalOpen({open:true,modal:'Add Product'})}
+   <div className="flex  items-center justify-between px-2 py-0 mt-5 gap-3">
+  {/* title */}
+  <h2 className="text-[18px]  md:text-[22px] font-[600] text-nowrap"> Products</h2>
 
-          > Add Product</Button>
-
-        </div>
-    </div>
+  {/* Buttons Section */}
+  <div className="flex items-center gap-3 w-full sm:w-auto justify-end sm:justify-between">
+    {deleteArray.length > 0 && (
+      <Button
+        onClick={confirmDeleteMultiple}
+        className="btn !bg-red-600 !text-white btn-sm"
+      >
+        Delete
+      </Button>
+    )}
+    <Button
+      className="btn-blue btn-sm"
+      onClick={() =>
+        context.setIsAddProductModalOpen({ open: true, modal: "Add Product" })
+      }
+    >
+      Add Product
+    </Button>
+  </div>
+</div>
    <div className="card my-4 shadow-md sm:rounded-lg bg-white pt-5">
   
-      <div className="flex items-center w-full px-5 justify-between gap-4">
+      <div className="flex flex-wrap items-center w-full px-5 justify-between gap-4">
         
-                    <div className="col w-[15%]">
-          <h4 className='font-[600] text-[13px] mb-2' >Category</h4>
-            <Select
-            disabled={categories.length===0}
-            style={{zoom:'80%'}}
-          labelId="demo-simple-select-standard-label"
-          id="demo-simple-select-standard"
-          value={formFields.category}
-          label="Category"
-          className='w-full '
-          size='small'
-          onChange={handleChangeProductCat}
+             <div className="w-full sm:w-[48%] md:w-[23%] lg:w-[15%]">
+      <h4 className="font-[600] text-[13px] mb-2">Category</h4>
+      <Select
+        disabled={categories.length === 0}
+        style={{ zoom: "80%" }}
+        value={formFields.category}
+        onChange={handleChangeProductCat}
+        className="w-full"
+        size="small"
+      >
+        <MenuItem value="">None</MenuItem>
+        {categories.map((category) => (
+          <MenuItem key={category._id} value={category._id}>
+            {category.name}
+          </MenuItem>
+        ))}
+      </Select>
+             </div>
+                 {/* Sub Category */}
+    <div className="w-full sm:w-[48%] md:w-[23%] lg:w-[15%]">
+      <h4 className="font-[600] text-[13px] mb-2">Sub Category</h4>
+      <Select
+        disabled={formFields.category === "" || subCategories.length === 0}
+        style={{ zoom: "80%" }}
+        value={formFields.subCatId}
+        onChange={handleChangeProductSubCat}
+        className="w-full"
+        size="small"
+      >
+        <MenuItem value="">None</MenuItem>
+        {subCategories.map((subCategory) => (
+          <MenuItem key={subCategory._id} value={subCategory._id}>
+            {subCategory.name}
+          </MenuItem>
+        ))}
+      </Select>
+    </div>
 
-        >
-          <MenuItem value=''>None</MenuItem>
+    {/* Third Level Category */}
+    <div className="w-full sm:w-[48%] md:w-[23%] lg:w-[15%]">
+      <h4 className="font-[600] text-[13px] mb-2">Third level Category</h4>
+      <Select
+        disabled={
+          formFields.category === "" ||
+          formFields.subCat === "" ||
+          thirdLevelCategories.length === 0
+        }
+        style={{ zoom: "80%" }}
+        value={formFields.thirdSubCatId}
+        onChange={handleChangeThirdLevelSubCat}
+        className="w-full"
+        size="small"
+      >
+        <MenuItem value="">None</MenuItem>
+        {thirdLevelCategories.map((thirdLevelCategory) => (
+          <MenuItem key={thirdLevelCategory._id} value={thirdLevelCategory._id}>
+            {thirdLevelCategory.name}
+          </MenuItem>
+        ))}
+      </Select>
+    </div>
+
+    {/* Rating */}
+    <div className="w-full sm:w-[48%] md:w-[23%] lg:w-[15%]">
+      <h4 className="font-[600] text-[13px] mb-2">Min Rating</h4>
+      <Rating
+        value={ratingFilter}
+        precision={1}
+        onChange={(event, newValue) => setRatingFilter(newValue)}
+      />
+    </div>
+
+    {/* Search + Clear */}
+    <div className="w-full md:w-[48%] lg:w-[25%] flex gap-3 items-center">
+      <SearchBox value={searchTerm} onChange={handleSearchChange} />
+      <Button
+        className="!min-w-[120px]"
+        variant="outlined"
+        color="error"
+        size="small"
+        onClick={handleClearAllFilters}
+      >
+        Clear
+      </Button>
+    </div>
 
 
-          {
-            categories.map((category)=>(
-          <MenuItem value={category._id}>{category.name}</MenuItem>
-
-
-            ))
-          }
-    
-        </Select>
-        
-        </div>
-      
-
-        <div className="col w-[15%]">
-          <h4 className='font-[600] text-[13px] mb-2' >Sub Category</h4>
-            <Select
-            disabled={formFields.category==='' || subCategories.length===0}
-            style={{zoom:'80%'}}
-          labelId="demo-simple-select-standard-label"
-          id="demo-simple-select-standard"
-          value={formFields.subCatId}
-          onChange={handleChangeProductSubCat}
-          label="Category"
-          className='w-full '
-          size='small'
-        >
-          <MenuItem value=''>None</MenuItem>
-
-          {
-            subCategories.length>0 && subCategories.map((subCategory)=>(
-
-              <MenuItem value={subCategory._id}>{subCategory.name}</MenuItem>
-            ))
-          }
        
-          
-        </Select>
-        
-        </div>
-        <div className="col w-[15%]">
-          <h4 className='font-[600] text-[13px] mb-2' >Third level Category</h4>
-            <Select
-            disabled={formFields.category==='' || formFields.subCat==='' || thirdLevelCategories.length===0}
-            style={{zoom:'80%'}}
-          labelId="demo-simple-select-standard-label"
-          id="demo-simple-select-standard"
-          value={formFields.thirdSubCatId}
-          onChange={handleChangeThirdLevelSubCat}
-          label="Category"
-          className='w-full '
-          size='small'
-        >
-          <MenuItem value=''>None</MenuItem>
 
-          {
-            thirdLevelCategories?.length>0 && thirdLevelCategories.map((thirdLevelCategory)=>(
-              
-              <MenuItem value={thirdLevelCategory._id}>{thirdLevelCategory.name}</MenuItem>
-            ))
-          }
-      
-     
-        </Select>
-        
-        </div>
-<div className="col w-[15%]">
-  <h4 className='font-[600] text-[13px] mb-2'>Min Rating</h4>
-  <Rating
-    value={ratingFilter}
-    precision={1}
-    onChange={(event, newValue) => setRatingFilter(newValue)}
-  />
-</div>
-
-        <div className="col w-[20%] ml-auto flex gap-3">
-              <SearchBox value={searchTerm} onChange={handleSearchChange}/>
-               <Button 
-               className='!min-w-[150px]'
-    variant="outlined"
-    color="error"
-    size="small"
-    onClick={handleClearAllFilters}
-  >
-    Clear Filters
-  </Button>
-
-
-        </div>
   
 
       
@@ -596,7 +574,17 @@ const thirdLevelCategories = selectedSubCategory?.children || [];
       <br />
 
     <TableContainer sx={{ maxHeight: 440 }}>
-        <Table stickyHeader aria-label="sticky table">
+
+         {
+              productsLoading && 
+            <ProductsSkeleton/>
+
+              
+            }
+            {
+              !productsLoading && products.length>0 &&
+                <Table 
+        stickyHeader aria-label="sticky table">
           <TableHead className='bg-[#f1f1f1]'>
             <TableRow>
               <TableCell>
@@ -618,34 +606,8 @@ const thirdLevelCategories = selectedSubCategory?.children || [];
             </TableRow>
           </TableHead>
           <TableBody>
-            {/* <TableRow hover role='checkbox' tabIndex={-1} key={row.code}>
-              {
-                columns.map((column)=>{
-                  const value=row(column.id)
-                  return(
-                    <TableCell key={column.id} align={column.align} >
-                      {column.format && typeof value==='number' ? column.format(value):value}
-                    </TableCell>
-                  )
-                })
-              }
-
-            </TableRow> */}
-            {
-              loading && 
-              <TableRow>
-                <TableCell colSpan={7}>
-              <div className='flex items-center justify-center w-full min-h-[400px]'>
-
-
-                <CircularProgress/>
-                </div>
-
-                </TableCell>
-              </TableRow>
-
-              
-            }
+           
+         
             {
               products.length===0 &&    <TableRow>
                 <TableCell colSpan={7}>
@@ -661,7 +623,7 @@ const thirdLevelCategories = selectedSubCategory?.children || [];
             }
             {
               // products.slice(page*rowsPerPage,page*rowsPerPage+rowsPerPage)
-         !loading &&  products.length>0 &&  products?.map((product)=>(
+         !productsLoading &&  products.length>0 &&  products?.map((product)=>(
 
                 <TableRow className={`${isDeleting.includes(product._id) && 'uploading-gradient-delete'}`} key={product._id} >
               <TableCell style={{minWidth:columns.minWidth}}>
@@ -768,8 +730,12 @@ const thirdLevelCategories = selectedSubCategory?.children || [];
           
           </TableBody>
         </Table>
+            }
+      
       </TableContainer>
-       <TablePagination
+      {
+        !productsLoading && products?.length>0 &&
+           <TablePagination
         rowsPerPageOptions={[10, 25, 100]}
         component="div"
         count={totalProducts}
@@ -778,12 +744,16 @@ const thirdLevelCategories = selectedSubCategory?.children || [];
         onPageChange={handleChangePage}
         onRowsPerPageChange={handleChangeRowsPerPage}
       />
+      }
+    
 
 
 
         
 
    </div> 
+
+
    <AlertBox
   open={isAlertOpen}
   onClose={() => {
@@ -805,191 +775,248 @@ const thirdLevelCategories = selectedSubCategory?.children || [];
 
 
  {/* recent orders section */}
-   <div className="card my-4 shadow-md sm:rounded-lg bg-white">
-    <div className="flex items-center justify-between px-3 py-5">
-      <h2 className='text-[18px] font-[600]'>Recent Orders</h2>
+  <div className="flex items-center justify-between px-3 pt-10">
+      <h2 className='text-[18px] md:text-[22px] font-[600]'>Recent Orders</h2>
+      <Button onClick={()=>navigate('/orders')}>View All Orders</Button>
     </div>
+   <div className="card my-4 shadow-md sm:rounded-lg bg-white">
+   
 
      <div className="relative overflow-x-auto mt-5 pb-5">
-            <table className="w-full text-sm text-left text-gray-500 rtl:text-right">
-  {/* order related heading */}
-  <thead className="text-xs text-gray-700 bg-gray-50">
-    <tr>
-      <th scope="col" className="py-3 px-6">&nbsp;</th>
-      <th scope="col" className="py-3 px-6 whitespace-nowrap">Order Id</th>
-      <th scope="col" className="py-3 px-6 whitespace-nowrap">Payment Id</th>
-      <th scope="col" className="py-3 px-6">Name</th>
-      <th scope="col" className="py-3 px-6 whitespace-nowrap">Phone No.</th>
-      <th scope="col" className="py-3 px-6">Address</th>
-      <th scope="col" className="py-3 px-6">PinCode</th>
-      <th scope="col" className="py-3 px-6 whitespace-nowrap">Total Amount</th>
-      <th scope="col" className="py-3 px-6">Email</th>
-      <th scope="col" className="py-3 px-6 whitespace-nowrap">User Id</th>
-      <th scope="col" className="py-3 px-6 whitespace-nowrap">Order Status</th>
-      <th scope="col" className="py-3 px-6">Date</th>
-    </tr>
-  </thead>
-
-  <tbody>
-    {/* Order Row */}
-    <tr className="bg-white  border-[#f1f1f1] border-b border-[#f1f1f1]-[#f1f1f1]">
-      <td className="px-6 py-4 font-[500]">
-        <Button
-          className="!w-[35px] !h-[35px] !min-w-[35px] !rounded-full !bg-[#cfcdcd] !text-black"
-          onClick={() => isShowOrderedProduct(0)}
-        >
-          {showProducts === 0 ? (
-            <FaAngleDown className="text-[16px] rotate-180" />
-          ) : (
-            <FaAngleDown className="text-[16px]" />
-          )}
-        </Button>
-      </td>
-      <td className="px-6 py-4 font-[500] text-secondary">687cd457228db479bb93f3a6</td>
-      <td className="px-6 py-4 font-[500] text-secondary">pay_QvJ5dNv8zOsr68</td>
-      <td className="px-6 py-4 font-[500] whitespace-nowrap">Akash</td>
-      <td className="px-6 py-4 font-[500]">913434455676</td>
-      <td className="px-6 py-4 font-[500]"><span className="block w-[400px]">sdaf asdf erwt asdf asdfasdf</span></td>
-      <td className="px-6 py-4 font-[500]">344355</td>
-      <td className="px-6 py-4 font-[500]">1850</td>
-      <td className="px-6 py-4 font-[500]">akashes5753279@gmail.com</td>
-      <td className="px-6 py-4 font-[500]"><span className="text-secondary">6864d038228db479bb77c9a5</span></td>
-      <td className="px-6 py-4 font-[500]"><Badge status="confirm" /></td>
-      <td className="px-6 py-4 font-[500] whitespace-nowrap">2025-07-20</td>
-    </tr>
-
-    {/* Expandable Product Details */}
-    {showProducts === 0 && (
-      <tr>
-        <td colSpan="6" className="pl-20">
-          <div className="relative overflow-x-auto recentProductsTable ">
-            <table className="w-full  text-sm text-left text-gray-500 rtl:text-right">
-              <thead className="text-xs text-gray-700 bg-gray-50">
-                <tr>
-                  <th className="py-3 px-6 whitespace-nowrap">Product Id</th>
-                  <th className="py-3 px-6 whitespace-nowrap">Product Title</th>
-                  <th className="py-3 px-6">Image</th>
-                  <th className="py-3 px-6 whitespace-nowrap">Quantity</th>
-                  <th className="py-3 px-6">Price</th>
-                  <th className="py-3 px-6">Sub Total</th>
-                </tr>
-              </thead>
-              <tbody>
-                {/* to create two rows */}
-                {[1, 2].map((_, i) => (
-                  <tr key={i} className="bg-white border-b border-b-[#f1f1f1]">
-                    <td className="px-6 py-4 font-[500] text-gray-700">123456789</td>
-                    <td className="px-6 py-4 font-[500]">Product Title</td>
-                    <td className="px-6 py-4 font-[500]">
-                      <img
-                        src="https://serviceapi.spicezgold.com/download/1742452458052_gemini-refined-sunflower-oil-1-l-product-images-o490012719-p490012719-0-202308301722.webp"
-                        alt=""
-                        className="w-[40px] h-[40px] object-cover rounded-md"
-                      />
-                    </td>
-                    <td className="px-6 py-4 font-[500] whitespace-nowrap">2</td>
-                    <td className="px-6 py-4 font-[500]">133</td>
-                    <td className="px-6 py-4 font-[500]"><span className="block w-[400px]">675</span></td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        </td>
-      </tr>
-    )}
-
-    {/* Another Order (Duplicate Data Just for Structure) */}
-    <tr className="bg-white border-b border-b-[#f1f1f1]">
-      <td className="px-6 py-4 font-[500]">
-        <Button
-          className="!w-[35px] !h-[35px] !min-w-[35px] !rounded-full !bg-[#cfcdcd] !text-black"
-          onClick={() => isShowOrderedProduct(1)}
-        >
-          {showProducts === 1 ? (
-            <FaAngleDown className="text-[16px] rotate-180" />
-          ) : (
-            <FaAngleDown className="text-[16px]" />
-          )}
-        </Button>
-      </td>
-      <td className="px-6 py-4 font-[500] text-secondary">687cd457228db479bb93f3a6</td>
-      <td className="px-6 py-4 font-[500] text-secondary">pay_QvJ5dNv8zOsr68</td>
-      <td className="px-6 py-4 font-[500] whitespace-nowrap">Akash</td>
-      <td className="px-6 py-4 font-[500]">913434455676</td>
-      <td className="px-6 py-4 font-[500]"><span className="block w-[400px]">sdaf asdf erwt asdf asdfasdf</span></td>
-      <td className="px-6 py-4 font-[500]">344355</td>
-      <td className="px-6 py-4 font-[500]">1850</td>
-      <td className="px-6 py-4 font-[500]">akashes5753279@gmail.com</td>
-      <td className="px-6 py-4 font-[500]"><span className="text-secondary">6864d038228db479bb77c9a5</span></td>
-      <td className="px-6 py-4 font-[500]"><Badge status="confirm" /></td>
-      <td className="px-6 py-4 font-[500] whitespace-nowrap">2025-07-20</td>
-    </tr>
-
-    {showProducts === 1 && (
-      <tr>
-        <td colSpan="6" className="pl-20">
-          <div className="relative overflow-x-auto">
-            <table className="w-full text-sm text-left text-gray-500 rtl:text-right">
-              <thead className="text-xs text-gray-700 bg-gray-50">
-                <tr>
-                  <th className="py-3 px-6 whitespace-nowrap">Product Id</th>
-                  <th className="py-3 px-6 whitespace-nowrap">Product Title</th>
-                  <th className="py-3 px-6">Image</th>
-                  <th className="py-3 px-6 whitespace-nowrap">Quantity</th>
-                  <th className="py-3 px-6">Price</th>
-                  <th className="py-3 px-6">Sub Total</th>
-                </tr>
-              </thead>
-              <tbody>
-                {[1, 2].map((_, i) => (
-                  <tr key={i} className="bg-white border-b">
-                    <td className="px-6 py-4 font-[500] text-gray-700">123456789</td>
-                    <td className="px-6 py-4 font-[500]">Product Title</td>
-                    <td className="px-6 py-4 font-[500]">
-                      <img
-                        src="https://serviceapi.spicezgold.com/download/1742452458052_gemini-refined-sunflower-oil-1-l-product-images-o490012719-p490012719-0-202308301722.webp"
-                        alt=""
-                        className="w-[40px] h-[40px] object-cover rounded-md"
-                      />
-                    </td>
-                    <td className="px-6 py-4 font-[500] whitespace-nowrap">2</td>
-                    <td className="px-6 py-4 font-[500]">133</td>
-                    <td className="px-6 py-4 font-[500]"><span className="block w-[400px]">675</span></td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        </td>
-      </tr>
-    )}
-  </tbody>
-</table>
+          <table className="w-full text-sm text-left text-gray-500  rtl:text-right">
+                    {/* order related heading */}
+                      <thead className="text-xs text-gray-700 bg-gray-50 min-h-[120px]  ">
+                        <tr>
+                          <th scope="col" className="py-3 px-6">
+                            &nbsp;
+        
+                          </th>
+                          <th scope="col" className="py-3 px-6 whitespace-nowrap">
+                            Order Id 
+        
+                          </th>
+                          <th scope="col" className="py-3 px-6 whitespace-nowrap hidden md:table-cell">
+                            Payment Id
+        
+                          </th>
+                          <th scope="col" className="py-3 px-6">
+                            Name
+        
+                          </th>
+                         
+                          <th scope="col" className="py-3 px-6">
+                            Address
+        
+                          </th>
+            
+                          <th scope="col" className="py-3 px-6 whitespace-nowrap">
+                            Total Amount
+        
+                          </th>
+                          <th scope="col" className="py-3 px-6">
+                            Email
+        
+                          </th>
+                          <th scope="col" className="py-3 px-6 whitespace-nowrap">
+                            User Id
+        
+                          </th>
+                          <th scope="col" className="py-3 px-6 whitespace-nowrap">
+                            Order Status
+        
+                          </th>
+                          <th scope="col" className="py-3 px-6">
+                            Date
+        
+                          </th>
+                        </tr>
+                      </thead>
+        
+                      {/* order related table body */}
+                      <tbody>
+                        {
+                          orders?.length>0 && orders.map((order,index)=>{
+                            console.log(order)
+                            return(
+                              <>
+                                              <tr className="bg-white border-b ">
+                          <td className="px-6 py-4 font-[500]">
+                              <Button  className="!w-[35px] !h-[35px] !min-w-[35px] !rounded-full !bg-[#cfcdcd] !text-black"
+                            onClick={()=>isShowOrderedProduct(index)}
+                            >
+                              {
+                                showProducts ===index ? <FaAngleDown className="text-[16px] rotate-180 "/>: <FaAngleDown className="text-[16px] "/> 
+                              }
+                            </Button>
+        
+                          </td>
+                          <td className="px-6 py-4 font-[500] text-primary">
+                            {order._id}
+        
+                          </td>
+                          <td className="px-6 py-4 font-[500] text-primary hidden md:table-cell">
+                            {order.payment_id?order.payment_id:'CASH ON DELIVERY'} 
+        
+                          </td>
+                          <td className="px-6 py-4 font-[500] whitespace-nowrap">
+                            {order.name.toUpperCase()} 
+        
+                          </td>
+                        
+                          <td className="px-6 py-4 font-[500]">
+                            <span className="block w-[400px]">
+                              {order.delivery_address?.address_line} {order.delivery_address?.city}    {order.delivery_address?.pincode}  {order.delivery_address?.state}  {order.delivery_address?.country}  {order.delivery_address?.landmark}, {order.delivery_address?.mobile}
+        
+                            </span>
+         
+        
+                          </td>
+                         
+                          <td className="px-6 py-4 font-[500]">
+        {order.total.toLocaleString('en-IN', { style: 'currency', currency: 'INR' })}
+                          </td>
+                          <td className="px-6 py-4 font-[500]">
+                            {order.email}	 
+        
+                          </td>
+                          <td className="px-6 py-4 font-[500]">
+                            <span className="text-primary">
+        
+        
+                           {order.userId}
+                            </span>
+        
+                          </td>
+                          <td className="px-6 py-4 font-[500]">
+                            <Badge status={order.order_status} />
+        
+                          </td>
+                          <td className="px-6 py-4 font-[500] whitespace-nowrap">
+                        {new Date(order.createdAt).toLocaleDateString("en-GB", {
+                      day: "2-digit",
+                      month: "short",
+                      year: "numeric",
+                    })}
+         
+        
+                          </td>
+                   
+        
+                        </tr>
+        
+                        {
+                          showProducts===index && (
+                             <tr  >
+                          <td colSpan="6" className=" pl-20"  >
+                             <div className="relative overflow-x-auto">
+                    <table className="w-full text-sm text-left text-gray-500  rtl:text-right">
+                      <thead className="text-xs text-gray-700 bg-gray-50 ">
+                        <tr>
+                       
+                          <th scope="col" className="py-3 px-6 whitespace-nowrap">
+                            Product Id
+        
+                          </th>
+                          <th scope="col" className="py-3 px-6 whitespace-nowrap">
+                            Product Title
+        
+                          </th>
+                          <th scope="col" className="py-3 px-6">
+                            Image
+        
+                          </th>
+                          <th scope="col" className="py-3 px-6 whitespace-nowrap">
+                            Quantity
+        
+                          </th>
+                          <th scope="col" className="py-3 px-6">
+                            Price
+        
+                          </th>
+                          <th scope="col" className="py-3 px-6">
+                            Sub Total
+        
+                          </th>
+                        
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {
+                          order?.products?.length>0 && order.products.map((product)=>{
+                            return(
+                                 <tr key={product.productId} className="bg-white border-b ">
+                          <td className="px-6 py-4 font-[500] text-gray-700 ">
+                            {product.productId}
+        
+                          </td>
+                          <td className="px-6 py-4 font-[500]">
+                            <div className="w-[200px]">
+        
+                            {product.name}	 
+                            </div>
+        
+                          </td>
+                          <td className="px-6 py-4 font-[500]">
+                            <img src={product.image[0]} alt="" className="w-[40px] h-[40px] object-cover rounded-md" />
+        
+                          </td>
+                          <td className="px-6 py-4 font-[500] whitespace-nowrap">
+                            {product.quantity}
+        
+                          </td>
+                          <td className="px-6 py-4 font-[500]">
+        {product.price.toLocaleString('en-IN', { style: 'currency', currency: 'INR' })}
+                          </td>
+                          <td className="px-6 py-4 font-[500]">
+                            <span className="block w-[400px]">
+        
+        {product.subtotal.toLocaleString('en-IN', { style: 'currency', currency: 'INR' })}                    </span>
+         
+        
+                          </td>
+                        
+                   
+        
+                        </tr>
+                            )
+        
+                          })
+                        }
+                     
+                       
+                      
+                      </tbody>
+        
+                    </table>
+                  </div>
+                          </td>
+        
+                        </tr>
+        
+                          )
+                        }
+                   
+                              </>
+        
+                            )
+                          })
+                        }
+        
+        
+                       
+                      </tbody>
+        
+                    </table>
 
           </div>
    </div>
+
+
 {/* chart section */}
-      <div className="card my-4 shadow-md sm:rounded-lg bg-white">
-        <div className='flex items-center justify-between px-5 py-5 pb-0 '>
-          <h2 className='text-[18px] font-[700]'>
-            Total Users & Total Sales
+      <div className="card my-4 px-4 py-4 shadow-md sm:rounded-lg bg-white">
 
-             </h2>
-
-        </div>
-        <div className='flex items-center justify-start px-5 py-5 pt-0 gap-3 '>
-          <span className='flex items-center gap-1 text-[15px]'>
-            <span className='block bg-green-500 rounded-full w-[10px] h-[10px] '></span>
-            Total Users
-          </span>
-          <span className='flex items-center gap-1 text-[15px]'>
-            <span className='block bg-secondary rounded-full w-[10px] h-[10px] '></span>
-            Total Sales
-          </span>
-
-        </div>
-      <LineChart
+     
+      {/* <LineChart
         width={1000}
         height={500}
         data={chart1Data}
@@ -1009,7 +1036,10 @@ const thirdLevelCategories = selectedSubCategory?.children || [];
         <Legend />
         <Line type="monotone" dataKey="TotalSales" stroke="#8884d8" activeDot={{ r: 8 }} strokeWidth={3} />
         <Line type="monotone" dataKey="TotalUsers" stroke="#82ca9d" strokeWidth={3} />
-      </LineChart>
+      </LineChart> */}
+
+<RevenueChart/>
+
         </div>
 
    </> 

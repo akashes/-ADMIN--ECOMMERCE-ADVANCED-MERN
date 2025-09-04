@@ -95,22 +95,7 @@ export const deleteProduct= createAsyncThunk('product/deleteProduct',async(produ
     }
 })
 
-export const getSingleProduct = createAsyncThunk('product/getSingleProduct',async(productId,{rejectWithValue})=>{
-    try {
-        const result = await axios.get(`/api/product/get-product/${productId}`)
-         console.log(result)
-        if(!result.data.success){
-            
-            throw new Error(result.data.message || 'Failed to get product')
-        }
-        return result.data
 
-        
-    } catch (error) {
-        return rejectWithValue(error.response?.data?.message || error.message || 'Failed to get product')
-        
-    }
-})
 export const deleteMultipleProducts=createAsyncThunk('product/deleteMultipleProducts',async(ids,{rejectWithValue})=>{
     try {
         console.log(ids)
@@ -127,6 +112,24 @@ export const deleteMultipleProducts=createAsyncThunk('product/deleteMultipleProd
     } catch (error) {
         return rejectWithValue(error.response?.data?.message || error.message || 'Failed to delete products')
 
+        
+    }
+})
+
+
+export const getSingleProduct = createAsyncThunk('product/getSingleProduct',async(productId,{rejectWithValue})=>{
+    try {
+        const result = await axios.get(`/api/product/get-product/${productId}`)
+         console.log(result)
+        if(!result.data.success){
+            
+            throw new Error(result.data.message || 'Failed to get product')
+        }
+        return result.data
+
+        
+    } catch (error) {
+        return rejectWithValue(error.response?.data?.message || error.message || 'Failed to get product')
         
     }
 })

@@ -18,6 +18,20 @@ export const addAddress = createAsyncThunk('user/addAddress',async(address,{reje
     }
 })
 
+export const getAllUsers = createAsyncThunk('user/getAllUsers',async({page=1,perPage=3},{rejectWithValue})=>{
+    console.log(page,perPage)
+    try {
+        const result = await axios.get(`/api/user/get-all-users?page=${page}&perPage=${perPage}`)
+        console.log(result)
+        if(!result.data.success){
+            throw new Error(result.data.message || 'Failed to get Users')
+        }
+        return result.data
+    } catch (error) {
+        return rejectWithValue(error.response?.data?.message || error.message || 'Failed to get Users')
+        
+    }
+})
 export const getAddress = createAsyncThunk('user/getAddress',async(userId,{rejectWithValue})=>{
     try {
         console.log('insdie get addres')
@@ -48,6 +62,42 @@ export const getAddress = createAsyncThunk('user/getAddress',async(userId,{rejec
 // })
 
 
+export const deleteUser= createAsyncThunk('product/deleteUser',async(userId,{rejectWithValue})=>{
+    try {
+        const result = await axios.delete(`/api/user/delete-user/${userId}`)
+        console.log(result)
+        if(!result.data.success){
+            
+            throw new Error(result.data.message || 'Failed to delete User')
+        }
+        return result.data
+    } catch (error) {
+        return rejectWithValue(error.response?.data?.message || error.message || 'Failed to delete User')
+        
+    }
+})
+
+
+export const deleteMultipleUsers=createAsyncThunk('product/deleteMultipleUsers',async(ids,{rejectWithValue})=>{
+    try {
+        console.log(ids)
+        const result = await axios.delete('/api/user/delete-multiple-users',{data:{ids}})
+          console.log(result)
+        if(!result.data.success){
+            
+            throw new Error(result.data.message || 'Failed to get product')
+        }
+        return result.data
+
+        
+        
+    } catch (error) {
+        return rejectWithValue(error.response?.data?.message || error.message || 'Failed to delete Users')
+
+        
+    }
+})
+
 const userSlice = createSlice({
     name:'user',
     initialState:{
@@ -55,8 +105,24 @@ const userSlice = createSlice({
         loading:false,
         error:null,
         categoryImages:[],
+        users:[],
+        allUsersLoading:false,
+        allUsersError:null,
+        pagination:{
+            page:1,
+            totalPages:1,
+            perPage:3,
+            totalUsers:0
+        }
     },
-    reducers:{},
+    reducers:{
+        setPaginationPage:(state,action)=>{
+            state.pagination.page=action.payload
+        },
+        setPaginationPerPage:(state,action)=>{
+            state.pagination.perPage=action.payload
+        }
+    },
     extraReducers:(builder)=>{
         builder
         .addCase(addAddress.pending,(state)=>{
@@ -90,6 +156,22 @@ const userSlice = createSlice({
             state.loading = false
             state.error = action.payload
         })
+        .addCase(getAllUsers.pending,(state)=>{
+            state.allUsersLoading = true
+            state.allUsersError = null
+        })
+        .addCase(getAllUsers.fulfilled,(state,action)=>{
+            console.log(action.payload)
+            state.allUsersLoading = false
+            state.allUsersError = null
+            state.users=action.payload.users
+            state.pagination=action.payload.pagination
+
+        })
+        .addCase(getAllUsers.rejected,(state,action)=>{
+            state.allUsersLoading = false
+            state.allUsersError = action.payload
+        })
         // .addCase(selectAddress.pending,(state)=>{
         //     state.loading = true
         //     state.error = null
@@ -105,8 +187,41 @@ const userSlice = createSlice({
         //     state.loading = false
         //     state.error = action.payload
         // })
+          .addCase(deleteUser.pending,(state)=>{
+                    // state.loading = true
+                    state.error = null
+                })
+                .addCase(deleteUser.fulfilled,(state,action)=>{
+                    // state.loading = false
+                    state.error = null
+                    state.pagination.totalUsers-=1
+                    state.users = state.users.filter(user=>user._id !== action.payload.id)
+                })
+                .addCase(deleteUser.rejected,(state,action)=>{
+                    // state.loading = false
+                    state.error = action.payload.error || 'Failed to delete user'
+                })
+         
+                .addCase(deleteMultipleUsers.pending,(state)=>{
+                    state.loading = true,
+                    state.error=false
+                })
+                .addCase(deleteMultipleUsers.fulfilled,(state,action)=>{
+                    state.loading=false,
+                    state.error=false,
+                    state.pagination.totalUsers-=action.payload.ids?.length
+                    state.users = state.users.filter(user=>!action.payload.ids.includes(user._id))
+                    
+                })
+                .addCase(deleteMultipleUsers.rejected,(state,action)=>{
+                        state.loading=false, 
+                    state.error=false
+                    state.error=action.payload.error || 'Failed to delete users'
+        
+        
+                })
     }
 })
 
-
+export const{setPaginationPage,setPaginationPerPage}=userSlice.actions
 export default userSlice.reducer

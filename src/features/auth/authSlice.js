@@ -365,11 +365,12 @@ const authSlice = createSlice({
         state.authChecked=true
       })
       .addCase(tryAutoLogin.rejected, (state) => {
-        state.isLogin = false;
-        state.user = null;
-        state.token = null;
-        state.loading = false;
+        // state.isLogin = false;
+        // state.user = null;
+        // state.token = null;
+        // state.loading = false;
         state.authChecked=true
+        state.loading=false
       })
       .addCase(loginUser.fulfilled, (state, action) => {
         state.isLogin = true;

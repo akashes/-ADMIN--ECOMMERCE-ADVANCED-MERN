@@ -120,8 +120,9 @@ const EditSubCatBox = (props) => {
     {
         editMode===true &&
          <>
-         <div className="flex itc justify-between py-2 gap-4">
-            <div className='w-[150px]'>
+         <div className="flex flex-col md:flex-row   justify-between py-2 gap-4">
+            <div className='flex gap-1 md:gap-3'>
+                <div className='w-[150px]'>
                 <Select 
                 className='w-full'
                 size='small'
@@ -150,6 +151,7 @@ const EditSubCatBox = (props) => {
             <input type="text" className='w-full h-[30px] border border-[rgba(0,0,0,0.3)] focus:outline-none focus:border-[rgba(0,0,0,0.5)] rounded-sm 
             p-3 text-sm 
             ' name='name' value={formFields.name} onChange={onChangeInput} />
+            </div>
 
             <div className='flex items-center gap-2'>
                 <Button size='small' className='btn-sml' type='submit' variant='contained' >

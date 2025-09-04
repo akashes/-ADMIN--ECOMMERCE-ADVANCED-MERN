@@ -42,6 +42,7 @@ import { getCategories } from '../../features/category/categorySlice';
 import useDebounce from '../../hooks/useDebounce';
 import { CircularProgress, Rating } from '@mui/material';
 import AlertBox from '../../components/AlertBox';
+import ProductsSkeleton from '../../components/Skeltons/ProductsSkelton';
 
 
 const columns=[
@@ -130,6 +131,7 @@ console.log(deleteArray)
     const[searchTerm,setSearchTerm]=useState('')
     const debouncedSearchTerm = useDebounce(searchTerm,500)
     const [ratingFilter, setRatingFilter] = useState('');
+    
 
     console.log(deleteTarget)
 
@@ -146,6 +148,9 @@ console.log(deleteArray)
       const [rowsPerPage, setRowsPerPage] = React.useState(10);
       const [page, setPage] = React.useState(0);
         const [categoryFilterVal, setCategoryFilterVal] = useState('');
+        const [isFeaturedFilter, setIsFeaturedFilter] = useState('');
+
+        console.log(isFeaturedFilter)
     
           const handleChangePage = (event, newPage) => {
     setPage(newPage);
@@ -250,6 +255,7 @@ const handleChangeThirdLevelSubCat = (event) => {
 
   });
   setRatingFilter('');
+  setIsFeaturedFilter('')
   setSearchTerm('');
   setDeleteArray([])
   setPage(0);
@@ -275,6 +281,10 @@ const handleChangeThirdLevelSubCat = (event) => {
     params.search = debouncedSearchTerm.trim();
   }
     if (ratingFilter) params.minRating = ratingFilter;
+    if (isFeaturedFilter !== '') {
+  params.isFeatured = isFeaturedFilter === 'true';
+}
+
 
   const fetchProductData=async()=>{
     console.log(page,rowsPerPage)
@@ -282,7 +292,7 @@ const handleChangeThirdLevelSubCat = (event) => {
   }
   fetchProductData()
 
-},[dispatch,page,rowsPerPage,productAdded,formFields,debouncedSearchTerm,ratingFilter])
+},[dispatch,page,rowsPerPage,productAdded,formFields,debouncedSearchTerm,ratingFilter,isFeaturedFilter])
 
 useEffect(()=>{
 
@@ -290,7 +300,7 @@ useEffect(()=>{
 },[])
 useEffect(() => {
   setPage(0);
-}, [ratingFilter]);
+}, [ratingFilter,isFeaturedFilter]);
 
 const selectedRootCategory = categories.find((category) => category._id === formFields.category);
 const subCategories = selectedRootCategory?.children || [];
@@ -299,137 +309,152 @@ const thirdLevelCategories = selectedSubCategory?.children || [];
   return (
    <>
    {/* welcome banner */}
-     <div className="flex items-center justify-between px-2 py-0 mt-3">
-      <h2 className='text-[18px] font-[600]'>Products(Material ui  table)</h2>
-        <div className="col w-[25%] ml-auto flex items-center justify-end gap-3">
-          {
-         
-            deleteArray.length>0 &&   <Button  onClick={confirmDeleteMultiple} className='btn !bg-red-600 !text-white btn-sm'>Delete</Button>
-          }
-          <Button className='btn-blue btn-sm '
-                onClick={()=>context.setIsAddProductModalOpen({open:true,modal:'Add Product'})}
-
-          > Add Product</Button>
-
-        </div>
-    </div>
-   <div className="card my-4 shadow-md sm:rounded-lg bg-white pt-5">
+ <div className="flex flex-wrap items-center justify-between gap-3 px-2 py-0 mt-3">
+  <h2 className="text-[18px] font-[600]">Products List</h2>
+  <div className="flex flex-wrap gap-2">
+    {deleteArray.length > 0 && (
+      <Button onClick={confirmDeleteMultiple} className="btn !bg-red-600 !text-white btn-sm">
+        Delete
+      </Button>
+    )}
+    <Button
+      className="btn-blue btn-sm"
+      onClick={() => context.setIsAddProductModalOpen({ open: true, modal: "Add Product" })}
+    >
+      Add Product
+    </Button>
+  </div>
+</div>
+   <div className="card my-4 shadow-md sm:rounded-lg bg-white pt-5 mb-10">
   
-      <div className="flex items-center w-full px-5 justify-between gap-4">
+      <div className="flex flex-wrap items-center w-full px-5 justify-between gap-3">
         
-                    <div className="col w-[15%]">
-          <h4 className='font-[600] text-[13px] mb-2' >Category</h4>
-            <Select
-            disabled={categories.length===0}
-            style={{zoom:'80%'}}
-          labelId="demo-simple-select-standard-label"
-          id="demo-simple-select-standard"
-          value={formFields.category}
-          label="Category"
-          className='w-full '
-          size='small'
-          onChange={handleChangeProductCat}
+             <div className="w-full sm:w-[48%] md:w-[23%] lg:w-[20%]">
+      <h4 className="font-[600] text-[13px] mb-2">Category</h4>
+      <Select
+        disabled={categories.length === 0}
+        style={{ zoom: "80%" }}
+        value={formFields.category}
+        onChange={handleChangeProductCat}
+        className="w-full"
+        size="small"
+      >
+        <MenuItem value="">None</MenuItem>
+        {categories.map((category) => (
+          <MenuItem key={category._id} value={category._id}>
+            {category.name}
+          </MenuItem>
+        ))}
+      </Select>
+             </div>
+                 {/* Sub Category */}
+    <div className="w-full sm:w-[48%] md:w-[23%] lg:w-[20%]">
+      <h4 className="font-[600] text-[13px] mb-2">Sub Category</h4>
+      <Select
+        disabled={formFields.category === "" || subCategories.length === 0}
+        style={{ zoom: "80%" }}
+        value={formFields.subCatId}
+        onChange={handleChangeProductSubCat}
+        className="w-full"
+        size="small"
+      >
+        <MenuItem value="">None</MenuItem>
+        {subCategories.map((subCategory) => (
+          <MenuItem key={subCategory._id} value={subCategory._id}>
+            {subCategory.name}
+          </MenuItem>
+        ))}
+      </Select>
+    </div>
 
-        >
-          <MenuItem value=''>None</MenuItem>
+    {/* Third Level Category */}
+    <div className="w-full sm:w-[48%] md:w-[23%] lg:w-[20%]">
+      <h4 className="font-[600] text-[13px] mb-2">Third level Category</h4>
+      <Select
+        disabled={
+          formFields.category === "" ||
+          formFields.subCat === "" ||
+          thirdLevelCategories.length === 0
+        }
+        style={{ zoom: "80%" }}
+        value={formFields.thirdSubCatId}
+        onChange={handleChangeThirdLevelSubCat}
+        className="w-full"
+        size="small"
+      >
+        <MenuItem value="">None</MenuItem>
+        {thirdLevelCategories.map((thirdLevelCategory) => (
+          <MenuItem key={thirdLevelCategory._id} value={thirdLevelCategory._id}>
+            {thirdLevelCategory.name}
+          </MenuItem>
+        ))}
+      </Select>
+    </div>
 
 
-          {
-            categories.map((category)=>(
-          <MenuItem value={category._id}>{category.name}</MenuItem>
 
 
-            ))
-          }
-    
-        </Select>
-        
-        </div>
-      
-
-        <div className="col w-[15%]">
-          <h4 className='font-[600] text-[13px] mb-2' >Sub Category</h4>
-            <Select
-            disabled={formFields.category==='' || subCategories.length===0}
-            style={{zoom:'80%'}}
-          labelId="demo-simple-select-standard-label"
-          id="demo-simple-select-standard"
-          value={formFields.subCatId}
-          onChange={handleChangeProductSubCat}
-          label="Category"
-          className='w-full '
-          size='small'
-        >
-          <MenuItem value=''>None</MenuItem>
-
-          {
-            subCategories.length>0 && subCategories.map((subCategory)=>(
-
-              <MenuItem value={subCategory._id}>{subCategory.name}</MenuItem>
-            ))
-          }
-       
-          
-        </Select>
-        
-        </div>
-        <div className="col w-[15%]">
-          <h4 className='font-[600] text-[13px] mb-2' >Third level Category</h4>
-            <Select
-            disabled={formFields.category==='' || formFields.subCat==='' || thirdLevelCategories.length===0}
-            style={{zoom:'80%'}}
-          labelId="demo-simple-select-standard-label"
-          id="demo-simple-select-standard"
-          value={formFields.thirdSubCatId}
-          onChange={handleChangeThirdLevelSubCat}
-          label="Category"
-          className='w-full '
-          size='small'
-        >
-          <MenuItem value=''>None</MenuItem>
-
-          {
-            thirdLevelCategories?.length>0 && thirdLevelCategories.map((thirdLevelCategory)=>(
-              
-              <MenuItem value={thirdLevelCategory._id}>{thirdLevelCategory.name}</MenuItem>
-            ))
-          }
-      
-     
-        </Select>
-        
-        </div>
-<div className="col w-[15%]">
-  <h4 className='font-[600] text-[13px] mb-2'>Min Rating</h4>
-  <Rating
-    value={ratingFilter}
-    precision={1}
-    onChange={(event, newValue) => setRatingFilter(newValue)}
-  />
+        <div className="w-full sm:w-[48%] md:w-[23%] lg:w-[20%]">
+  <h4 className='font-[600] text-[13px] mb-2'>Featured</h4>
+  <Select
+    value={isFeaturedFilter}
+    onChange={(e) => setIsFeaturedFilter(e.target.value)}
+    size="small"
+    style={{ zoom: '80%' }}
+    className="w-full"
+  >
+    <MenuItem value=''>All</MenuItem>
+    <MenuItem value='true'>Featured</MenuItem>
+    <MenuItem value='false'>Not Featured</MenuItem>
+  </Select>
 </div>
 
-        <div className="col w-[20%] ml-auto flex gap-3">
-              <SearchBox value={searchTerm} onChange={handleSearchChange}/>
-               <Button 
-               className='!min-w-[150px]'
-    variant="outlined"
-    color="error"
-    size="small"
-    onClick={handleClearAllFilters}
-  >
-    Clear Filters
-  </Button>
+    
 
 
-        </div>
+       
+
+           {/* Rating */}
+            <div className="w-full sm:w-[48%] md:w-[23%] lg:w-[20%]">
+              <h4 className="font-[600] text-[13px] mb-2">Min Rating</h4>
+              <Rating
+                value={ratingFilter}
+                precision={1}
+                onChange={(event, newValue) => setRatingFilter(newValue)}
+              />
+            </div>
+        
+            {/* Search + Clear */}
+            <div className="w-full md:w-[48%] lg:w-[25%] flex gap-3 items-center">
+              <SearchBox value={searchTerm} onChange={handleSearchChange} />
+              <Button
+                className="!min-w-[120px]"
+                variant="outlined"
+                color="error"
+                size="small"
+                onClick={handleClearAllFilters}
+              >
+                Clear
+              </Button>
+            </div>
   
 
       
       </div>
       <br />
 
-    <TableContainer sx={{ maxHeight: 440 }}>
-        <Table stickyHeader aria-label="sticky table">
+       <TableContainer sx={{ maxHeight: 440 }}>
+
+         {
+              loading && 
+            <ProductsSkeleton/>
+
+              
+            }
+            {
+              !loading && products.length>0 &&
+                <Table 
+        stickyHeader aria-label="sticky table">
           <TableHead className='bg-[#f1f1f1]'>
             <TableRow>
               <TableCell>
@@ -451,33 +476,20 @@ const thirdLevelCategories = selectedSubCategory?.children || [];
             </TableRow>
           </TableHead>
           <TableBody>
-            {/* <TableRow hover role='checkbox' tabIndex={-1} key={row.code}>
-              {
-                columns.map((column)=>{
-                  const value=row(column.id)
-                  return(
-                    <TableCell key={column.id} align={column.align} >
-                      {column.format && typeof value==='number' ? column.format(value):value}
-                    </TableCell>
-                  )
-                })
-              }
-
-            </TableRow> */}
+           
+         
             {
-              loading && 
-              <TableRow>
+              products.length===0 &&    <TableRow>
                 <TableCell colSpan={7}>
-              <div className='flex items-center justify-center w-full min-h-[400px]'>
+              <div className='flex items-center justify-center w-full min-h-[200px]'>
 
 
-                <CircularProgress/>
+                <h2 className='text-secondary font-bold text-[25px] text-center'>No Products Found!</h2>
                 </div>
 
                 </TableCell>
               </TableRow>
 
-              
             }
             {
               // products.slice(page*rowsPerPage,page*rowsPerPage+rowsPerPage)
@@ -537,7 +549,7 @@ const thirdLevelCategories = selectedSubCategory?.children || [];
               <TableCell style={{minWidth:columns.minWidth}}>
                   <p className='text-[14px] w-[100px]'>
       
-       <Rating size='small' defaultValue={product.rating} readOnly  />
+       <Rating defaultValue={product.rating} size='small' readOnly  />
 
     </p>
 
@@ -588,8 +600,12 @@ const thirdLevelCategories = selectedSubCategory?.children || [];
           
           </TableBody>
         </Table>
+            }
+      
       </TableContainer>
-       <TablePagination
+      {
+        !loading && products?.length>0 &&
+           <TablePagination
         rowsPerPageOptions={[10, 25, 100]}
         component="div"
         count={totalProducts}
@@ -598,6 +614,9 @@ const thirdLevelCategories = selectedSubCategory?.children || [];
         onPageChange={handleChangePage}
         onRowsPerPageChange={handleChangeRowsPerPage}
       />
+      }
+    
+      
 
 
 

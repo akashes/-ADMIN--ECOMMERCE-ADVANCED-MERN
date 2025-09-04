@@ -95,9 +95,9 @@ const AddAddress = () => {
   
   return (
     <section className="p-5  bg-gray-50">
-      <form className="addProductForm  p-8 py-3 " onSubmit={handleSubmit}>
-        <div className="scroll max-h-[72vh] overflow-y-scroll pr-4 pt-4">
-            <div className="grid grid-cols-2 mb-3 gap-4">
+      <form className="addProductForm  p-3  md:p-8 py-3 " onSubmit={handleSubmit}>
+        <div className="scroll max-h-[72vh] overflow-y-scroll md:pr-4 pt-4">
+            <div className="grid  grid-cols-1 mb-3 gap-4">
           <div className="col w-[100%]">
             <h3 className="text-[14px] font-[500] mb-1 text-black">Address Line </h3>
             <input
@@ -107,7 +107,10 @@ const AddAddress = () => {
               onChange={(e)=>setFormData({...formData,address_line:e.target.value})}
             />
           </div>
-          <div className="col w-[100%]">
+          
+        </div>
+            <div className="grid grid-cols-2 md:grid-cols-3 mb-3 gap-4">
+              <div className="col w-[100%]">
             <h3 className="text-[14px] font-[500] mb-1 text-black">City</h3>
             <input
               type="text"
@@ -116,8 +119,6 @@ const AddAddress = () => {
               onChange={(e)=>setFormData({...formData,city:e.target.value})}
             />
           </div>
-        </div>
-            <div className="grid grid-cols-3 mb-3 gap-4">
           <div className="col w-[100%]">
             <h3 className="text-[14px] font-[500] mb-1 text-black">State</h3>
             <input
@@ -180,11 +181,10 @@ const AddAddress = () => {
 
     
     </div>
-        <br /> 
-        <br /> 
-        <div className='w-[250px]'>
+     
+        <div className='w-full md:w-[250px] mt-1 md:mt-5'>
 
-        <Button disabled={loading} type="submit" className="btn-blue btn-lg mt-3 w-full gap " >            {loading ? 'Adding ...' : 'Add Address'}
+        <Button disabled={loading} type="submit" className="btn-blue btn-lg  w-full gap " >            {loading ? 'Adding ...' : 'Add Address'}
             </Button>
         </div>
 

@@ -1,0 +1,7 @@
+.dashboard-box .swiper {
+  overflow-y: hidden !important;
+}
+
+.dashboard-box .swiper::-webkit-scrollbar {
+  display: none !important;
+}

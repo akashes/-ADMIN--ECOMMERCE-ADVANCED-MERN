@@ -398,7 +398,7 @@ useEffect(()=>{
         price:currentProduct.price,
         oldPrice:currentProduct.oldPrice,
         brand:currentProduct.brand,
-        isFeatured:false,
+        isFeatured:currentProduct.isFeatured,
   }));
   if(currentProduct?.attributes){
 

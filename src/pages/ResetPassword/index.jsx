@@ -57,11 +57,11 @@ const navigate = useNavigate()
   }
    return (
    <section className='  w-full  '>
-    <header className='w-full fixed top-0 left-0 z-100 px-4 py-3 flex items-center justify-between'>
+    <header className='w-full fixed top-0 left-0 z-100 px-4 py-3 flex items-center justify-center  md:justify-between'>
         <Link to='/'>
         <img src="https://serviceapi.spicezgold.com/download/1750047766437_logo.jpg" alt="" className='w-[200px]' />
         </Link>
-        <div className="flex items-center ">
+        <div className="hidden md:flex items-center ">
             <NavLink to='/login' className={({isActive})=>isActive ? '!bg-[#e8e8e8] rounded-full ':''}>
             <Button className='!rounded-full !text-[rgba(0,0,0,0.9)] !px-5 flex gap-1'>
                 <MdOutlineLogin className='text-[20px] '/>
@@ -84,17 +84,16 @@ const navigate = useNavigate()
     {/* background image */}
 <div className="fixed top-0 left-0 w-full h-full opacity-7 bg-[url('https://res.cloudinary.com/dllelmzim/image/upload/v1753140814/patern_z0bmzz.webp')] bg-repeat z-[-1]"></div>
 
-    <div className="loginBox card w-[600px] h-auto pb-25 mx-auto mt-20 relative z-50 ">
+    <div className="loginBox card w-full md:w-[600px] h-auto pb-25 mx-auto mt-20 relative z-50 ">
         <div className="text-center">
 
         <img src="https://ecommerce-admin-view.netlify.app/icon.svg" alt="" className='m-auto' />
         </div>
-        <h1 className='text-center text-[35px] font-[800] mt-4'>Reset Your Password <br />
+        <h1 className='text-center text-[30px] md:text-[35px] font-[800] mt-2 md:mt-4'>Reset Your Password <br />
         <span className='text-nowrap'>from here!</span>
         </h1>
         {/* google signin button */}
       
-        <br />
  
           <br />
 
@@ -150,7 +149,7 @@ const navigate = useNavigate()
 
 
             </div>
-            <Button className='!capitalize btn-blue btn-lg w-full '
+            <Button className='!capitalize btn-blue md:btn-lg w-full '
             type='submit'
             >
                 {

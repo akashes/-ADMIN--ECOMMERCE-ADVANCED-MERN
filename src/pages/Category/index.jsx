@@ -108,7 +108,7 @@ const CategoryList = () => {
    {/* welcome banner */}
      <div className="flex items-center justify-between px-2 py-0 mt-3">
       <h2 className='text-[18px] font-[600]'>Category List  </h2>
-        <div className="col w-[30%] ml-auto flex items-center justify-end gap-3">
+        <div className="col w-[50%] ml-auto flex items-center justify-end gap-3">
           <Button className='btn-blue btn-sm '
                 onClick={()=>context.setIsAddProductModalOpen({open:true,modal:'Add New Category'})}
 
@@ -124,10 +124,7 @@ const CategoryList = () => {
         <Table stickyHeader aria-label="sticky table">
           <TableHead className='bg-[#f1f1f1]'>
             <TableRow>
-              <TableCell width={columns} >
-                <Checkbox {...label} size='small'/>
-                
-              </TableCell>
+          
               {columns.map((column) => (
                 <TableCell
                   key={column.id}
@@ -143,12 +140,7 @@ const CategoryList = () => {
             {
               paginatedCategories.length>0 && paginatedCategories.map((item)=>(
                   <TableRow >
-              <TableCell 
-              width={60}
-              >
-                <Checkbox {...label} size='small'/>
-
-              </TableCell>
+        
               <TableCell 
               width={100}
               

@@ -40,10 +40,10 @@ const SubCategoryList = () => {
   return (
    <>
    {/* welcome banner */}
-     <div className="flex items-center justify-between px-2 py-0 mt-3">
-      <h2 className='text-[18px] font-[600]'>Category List  </h2>
-        <div className="col w-[30%] ml-auto flex items-center justify-end gap-3">
-          <Button className='btn-blue btn-sm '
+     <div className="flex flex-col items-start md:items-center justify-between px-2 py-0 mt-3">
+      <h2 className='text-[18px] font-[600] mb-1 md:mb-0'>Category List  </h2>
+        <div className="col w-[60%] md:ml-auto flex items-center md:justify-end gap-3">
+          <Button className='btn-blue btn-sm text-nowrap '
                 onClick={()=>context.setIsAddProductModalOpen({open:true,modal:'Add New Sub Category'})}
 
           > Add New Sub-Category</Button>

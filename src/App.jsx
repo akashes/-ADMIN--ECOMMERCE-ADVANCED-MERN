@@ -37,9 +37,11 @@ import Profile from './pages/Profile'
 import AddAddress from './pages/Address/addAddress.jsx'
 import EditCategory from './pages/Category/EditCategory.jsx'
 import ProductDetails from './pages/Products/ProductDetails.jsx'
+import BannerV1 from './pages/Banners/index.jsx'
+import BlogList from './pages/Blog/index.jsx'
 
-
-
+import './App.css'
+import './responsive.css'
 
 export const MyContext = createContext()
 
@@ -47,6 +49,9 @@ function App() {
   const dispatch = useDispatch()
   const[isSidebarOpen,setIsSidebarOpen]=useState(true)
   const[isLogin,setIsLogin]=useState(false)
+  const[windowWidth,setWindowWidth]=useState(window.innerWidth)
+  const[sidebarWidth,setSidebarWidth]=useState(18)
+  console.log(windowWidth)
 
   const[isAddProductModalOpen,setIsAddProductModalOpen]=useState({
     open:false,
@@ -54,6 +59,9 @@ function App() {
     id:''
   })
   console.log(isAddProductModalOpen)
+
+  console.log('sidebaropen',isSidebarOpen)
+  console.log('windowWidth',windowWidth)
   
   const values={
     isSidebarOpen,
@@ -61,9 +69,12 @@ function App() {
     isLogin,
     setIsLogin,
     isAddProductModalOpen,
-    setIsAddProductModalOpen
+    setIsAddProductModalOpen,
+    windowWidth,
+    setSidebarWidth,
+    sidebarWidth
   }
-  
+
 const router = createBrowserRouter([
   {
     path:'/',
@@ -73,19 +84,25 @@ const router = createBrowserRouter([
     <Header/>
     <div className="contentMain flex">
       <div  
-
+ //
       className={`sidebarWrapper overflow-hidden
-        ${isSidebarOpen===true?'w-[18%]':'w-[0px] opacity-0  '}
+        ${isSidebarOpen===true  ? windowWidth<992? `  w-[${sidebarWidth/1.5}%]`:`w-[${sidebarWidth}%]`:'w-0 opacity-0  '}
         transition-all
         `}
       >
         <Sidebar/>
+     
+
       </div>
-      <div className={`contentRight py-4  px-5  ${isSidebarOpen===false?'w-[100%]':'w-[82%]'} `} >
-        <PrivateRoute>
+      <div className={`contentRight py-4  px-5 
+        //  ${isSidebarOpen===false?'w-[100%]':`w-[82%]`}
+        ${isSidebarOpen===true && windowWidth<992 && 'opacity-0' }
+        
+          `}
+          style={{width:`w-[${isSidebarOpen?100-sidebarWidth:100}%]`}}
+           >
 
         <Dashboard />
-        </PrivateRoute>
       </div>
     </div>
     
@@ -112,13 +129,15 @@ const router = createBrowserRouter([
       <div  
 
       className={`sidebarWrapper overflow-hidden
-        ${isSidebarOpen===true?'w-[18%]':'w-[0px] opacity-0  '}
+        ${isSidebarOpen===true?'w-[18%] ':'w-0 opacity-0  '}
         transition-all
         `}
       >
         <Sidebar/>
       </div>
-      <div className={`contentRight py-4 px-5  ${isSidebarOpen===false?'w-[100%]':'w-[82%]'} `} >
+      <div className={`contentRight py-4 px-5
+          ${isSidebarOpen===false?'w-[100%]':'w-[82%]'} `}
+           >
         <Products />
       </div>
     </div>
@@ -279,14 +298,18 @@ const router = createBrowserRouter([
     <div className="contentMain flex">
       <div  
 
-      className={`sidebarWrapper overflow-hidden
-        ${isSidebarOpen===true?'w-[18%]':'w-[0px] opacity-0  '}
-        transition-all
-        `}
+        className={`sidebarWrapper
+    transition-all duration-300
+    ${windowWidth < 992 
+        ? `fixed top-0 left-0 h-full z-110 bg-white 
+           ${isSidebarOpen ? 'w-[80%] opacity-100' : 'w-0 opacity-0'}`
+        : `${isSidebarOpen ? 'w-[18%]' : 'w-0 opacity-0'}`
+    }
+  `}
       >
         <Sidebar/>
       </div>
-      <div className={`contentRight py-4 px-5  ${isSidebarOpen===false?'w-[100%]':'w-[82%]'} `} >
+      <div className={`contentRight py-4 px-2  md:px-5  ${isSidebarOpen===false?`w-[100%]`:'w-[100%]'} `} >
         <Profile />
       </div>
     </div>
@@ -319,6 +342,54 @@ const router = createBrowserRouter([
    </section>
    </>
   },
+   {
+    path:'/bannerV1/list',
+   element: 
+   <>
+   <section className="main">
+    <Header/>
+    <div className="contentMain flex">
+      <div  
+
+      className={`sidebarWrapper overflow-hidden
+        ${isSidebarOpen===true?'w-[18%]':'w-[0px] opacity-0  '}
+        transition-all
+        `}
+      >
+        <Sidebar/>
+      </div>
+      <div className={`contentRight py-4 px-5  ${isSidebarOpen===false?'w-[100%]':'w-[82%]'} `} >
+        <BannerV1 />
+      </div>
+    </div>
+    
+   </section>
+   </>
+  },
+   {
+    path:'/blog/list',
+   element: 
+   <>
+   <section className="main">
+    <Header/>
+    <div className="contentMain flex">
+      <div  
+
+      className={`sidebarWrapper overflow-hidden
+        ${isSidebarOpen===true?'w-[18%]':'w-[0px] opacity-0  '}
+        transition-all
+        `}
+      >
+        <Sidebar/>
+      </div>
+      <div className={`contentRight py-4 px-5  ${isSidebarOpen===false?'w-[100%]':'w-[82%]'} `} >
+        <BlogList />
+      </div>
+    </div>
+    
+   </section>
+   </>
+  },
 
 
 
@@ -329,6 +400,31 @@ const router = createBrowserRouter([
   useEffect(() => {
     dispatch(tryAutoLogin());
   }, []);
+
+  useEffect(()=>{
+    const handleResize=()=>{
+      setWindowWidth(window.innerWidth)
+    }
+
+    window.addEventListener('resize',handleResize)
+
+    return()=>{
+      window.removeEventListener('resize',handleResize)
+    }
+
+  },[])
+
+  useEffect(()=>{
+    console.log('inside')
+    console.log(windowWidth)
+    if(windowWidth<992){
+      setIsSidebarOpen(false)
+      setSidebarWidth(90)
+    }else{
+      setSidebarWidth(18)
+    }
+
+  },[windowWidth])
   return (
     <>
     <MyContext.Provider value={values}>

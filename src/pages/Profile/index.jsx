@@ -193,15 +193,15 @@ useEffect(()=>{
 },[])
     
   return (
-    <div className='w-[65%] '>
-       <div className="card my-4  shadow-md sm:rounded-lg bg-white pt-5 px-5 pb-5">
+    <div className='w-[100%] md:w-[65%] '>
+       <div className="card my-4  shadow-md sm:rounded-lg bg-white pt-5 px-3 md:px-5 pb-5">
            <div className="flex items-center justify-between">
-               <h2 className='text-[18px] font-[600]'>Users List </h2>
+               <h2 className='text-[18px] font-[600]'>Profile </h2>
                           <Button className="!text-gray-700 gap-1" onClick={()=>setIsChangePasswordFormShow(prev=>!prev)} >Change Password <IoIosArrowDown className={` transition-transform duration-300 ${isChangePasswordFormShow && 'rotate-180'}`} />  </Button>
 
            </div>
               <br />
-                       <div className={`w-[110px] h-[110px] rounded-full overflow-hidden mb-4 relative group ${isUploading ? 'ring-4 ring-primary animate-pulse' : 'ring-4 ring-gray-300'}`}>
+                       <div className={` w-[70px] h-[70px]  md:w-[110px] md:h-[110px] rounded-full overflow-hidden mb-4 relative group ${isUploading ? 'ring-4 ring-primary animate-pulse' : 'ring-4 ring-gray-300'}`}>
                         <img src={avatar}  alt="avatar" className="w-full h-full object-cover" />
 
                         {/* Spinner Overlay when uploading */}
@@ -287,21 +287,22 @@ useEffect(()=>{
                
               </div>
               <br />
+              <hr className='py-3 text-gray-400' />
               {/* address section */}
               <div onClick={()=>context.setIsAddProductModalOpen({
                 open:true,
                 modal:'Add New Address'
-              })} className="flex items-center justify-center p-5 rounded-md border  border-dashed border-[rgba(0,0,0,0.3)] bg-[#f1faff] cursor-pointer hover:bg-[#e5f5ff]">
+              })} className="flex items-center justify-center p-3  md:p-5 rounded-md border  border-dashed border-[rgba(0,0,0,0.3)] bg-[#f1faff] cursor-pointer hover:bg-[#e5f5ff]">
                 <span className='text-[14px] font-[500]'>Add Address</span>
               </div>
               <div className="flex gap-2 flex-col mt-4 ">
 
               {
                 address?.length>0 && address.map((address)=>(
-                    <label className="addressBox w-full bg-[#f1f1f1] p-3 rounded-md cursor-pointer flex items-center justify-center
+                    <label className="addressBox w-full bg-[#f1f1f1]  p-1 md:p-3 rounded-md cursor-pointer flex items-center justify-center
                     border  border-dashed border-[rgba(0,0,0,0.3)]
                     ">
-                <Radio name='address' 
+                <Radio name='address' size='small'
                 // value={address._id} checked={address._id===selectedAddressId} onChange={handleSelectedAddressChange}
                  />
                       <span className='text-[12px] '>{address.address_line}</span>
@@ -319,7 +320,7 @@ useEffect(()=>{
                 <Button
                 type='submit'
                   className={`w-full px-4 py-2 rounded  font-semibold 
-                   btn-blue btn-lg  hover:bg-gradient-to-tr hover:from-[#535353] hover:to-[#030202] hover:!text-white bg-gradient-to-tr from-[#33aaff] to-[var(--secondary)] ${loading && 'pointer-events-none opacity-80'}`}
+                   btn-blue md:btn-lg  hover:bg-gradient-to-tr hover:from-[#535353] hover:to-[#030202] hover:!text-white bg-gradient-to-tr from-[#33aaff] to-[var(--secondary)] ${loading && 'pointer-events-none opacity-80'}`}
                    type="submit"
                    disabled={loading}
                 
@@ -338,16 +339,16 @@ useEffect(()=>{
         </div>
         
           <Collapse className='' in={isChangePasswordFormShow}>
-             <div className="card bg-white  p-5 shadow-md rounded-md relative">
-            <div className="flex items-center justify-between pb-2">
+             <div className="card bg-white p-2  md:p-5 shadow-md rounded-md relative">
+            <div className="flex items-center justify-between pb-2 pt-2">
 
-            <h2 className="text-[17px]">Change Password</h2>
+            <h2 className="text-[17px] font-[500]">Change Password</h2>
             </div>
             <hr className="text-gray-400" />
-              <form className="mt-5">
-              <div className="flex items-center gap-2 ">
+              <form className="mt-5 !py-3">
+              <div className="flex flex-col md:flex-row gap-2 ">
                 
-                <div className="w-[50%]">
+                <div className="md:w-[50%]">
                         <div className="form-group w-full  relative">
 
                 <TextField   sx={{
@@ -387,7 +388,7 @@ useEffect(()=>{
 
        
                 </div>
-                <div className="w-[50%]">
+                <div className="md:w-[50%]">
                     <div className="form-group w-full  relative">
 
                 <TextField   sx={{
@@ -427,7 +428,7 @@ useEffect(()=>{
                 </div>
               </div>
               <div className="flex items-center gap-5 mt-4 ">
-                <div className="w-[50%]">
+                <div className="w-full md:w-[50%]">
                     <div className="form-group w-full  relative">
 
                 <TextField   sx={{
@@ -472,8 +473,8 @@ useEffect(()=>{
 
               <div className="flex items-center gap-4">
                 <Button
-                  className={`w-[200px] px-4 py-2 rounded  font-semibold 
-                  !mx-auto !text-white  btn-lg  hover:bg-gradient-to-tr hover:from-[#535353] hover:to-[#030202]  bg-gradient-to-tr from-[#33aaff] to-[var(--secondary)] hover:!text-white ${passwordLoading   && 'pointer-events-none opacity-60'}`}
+                  className={ ` w-full md:w-[200px] px-4 py-2 rounded  font-semibold 
+                  !mx-auto !text-white  md:btn-lg  hover:bg-gradient-to-tr hover:from-[#535353] hover:to-[#030202]  bg-gradient-to-tr from-[#33aaff] to-[var(--secondary)] hover:!text-white ${passwordLoading   && 'pointer-events-none opacity-60'}`}
                    type="submit"
                    disabled={passwordLoading }
                    onClick={handlePasswordUpdate}

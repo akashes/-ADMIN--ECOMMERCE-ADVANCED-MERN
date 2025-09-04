@@ -48,11 +48,11 @@ useEffect(()=>{
 
   return (
 <section className="w-full h-screen flex  justify-center pt-[100px] relative">
-    <header className='w-full fixed top-0 left-0 z-100 px-4 py-3 flex items-center justify-between'>
+    <header className='w-full fixed top-0 left-0 z-100 px-4 py-3 flex items-center justify-center md:justify-between'>
         <Link to='/'>
         <img src="https://serviceapi.spicezgold.com/download/1750047766437_logo.jpg" alt="" className='w-[200px]' />
         </Link>
-        <div className="flex items-center ">
+        <div className="hidden md:flex items-center ">
             <NavLink to='/login' className={({isActive})=>isActive && '!bg-[#e8e8e8] rounded-full '}>
             <Button className='!rounded-full !text-[rgba(0,0,0,0.9)] !px-5 flex gap-1'>
                 <MdOutlineLogin className='text-[20px] '/>
@@ -78,7 +78,7 @@ useEffect(()=>{
 
         <img src="https://ecommerce-admin-view.netlify.app/icon.svg" alt="" className='m-auto' />
         </div>
-        <h1 className='text-center text-[35px] font-[800] mt-4'>Having trouble signing in? <br />
+        <h1 className='text-center text-[25px] md:text-[35px] font-[800] mt-4'>Having trouble signing in? <br />
         <span className='text-nowrap'>Reset your password.</span>
         </h1>
         
@@ -93,7 +93,7 @@ useEffect(()=>{
             <div className="form-group mb-4 w-full">
                 <h4 className='text-[14px] font-[500] mb-1'>Email</h4>
                 <input type="email" name="email" id="" placeholder='Enter your email'
-                className='w-full h-[45px] border-2 border-[rgba(0,0,0,0.2)] rounded-md  px-3 focus:border-[rgba(0,0,0,0.5)] focus:outline-none'
+                className='w-full h-[40px] md:h-[45px] border-2 border-[rgba(0,0,0,0.2)] rounded-md  px-3 focus:border-[rgba(0,0,0,0.5)] focus:outline-none'
                 autoFocus
                 value={email}
                 onChange={(e)=>setEmail(e.target.value)}
@@ -101,7 +101,7 @@ useEffect(()=>{
             </div>
          
         
-            <Button disabled={loading} type='submit' className='!capitalize btn-blue btn-lg w-full '>
+            <Button disabled={loading} type='submit' className='!capitalize btn-blue md:btn-lg w-full '>
                 {
                     loading ? 'Please wait...' : 'Get OTP'
                 }
