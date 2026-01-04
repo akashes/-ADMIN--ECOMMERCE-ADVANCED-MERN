@@ -1,30 +1,27 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
-import axios from "axios";
+import axiosInstance from "../../api/axiosInstance";
 
 
 export const addHomeSlide = createAsyncThunk('homeSlide/addHomeSlide',async(formData,{rejectWithValue})=>{
     try {
-        const result = await axios.post('/api/homeSlides/create',formData)
-        console.log(result)
+        const result = await axiosInstance.post('/api/homeSlides/create',formData)
         if(!result.data.success){
             
-            throw new Error(result.data.message || 'Product add failed')
+            throw new Error(result.data.message || 'Failed to add Home Slide')
         }
         return result.data
     } catch (error) {
-        return rejectWithValue(error.response?.data?.message || error.message || 'Product add failed')
+        return rejectWithValue(error.response?.data?.message || error.message || 'Failed to add Home Slide')
         
     }
 })
 
 export const getHomeSlides=createAsyncThunk('homeSlide/getHomeSlides',async(_,{rejectWithValue})=>{
     try {
-        console.log('inside gethome slides')
-        const result=await axios.get('/api/homeSlides')
-        console.log(result)
+        const result=await axiosInstance.get('/api/homeSlides')
         if(!result.data.success){
             
-            throw new Error(result.data.message || 'Products get failed')
+            throw new Error(result.data.message || 'Failed to fetch Home-slides')
         }
         return result.data
 
@@ -39,19 +36,17 @@ export const getHomeSlides=createAsyncThunk('homeSlide/getHomeSlides',async(_,{r
 export const deleteHomeSlide=createAsyncThunk('homeSlide/deleteHomeSlide',async(id,{rejectWithValue})=>{
 
     try {
-        console.log(id)
-        const result=await axios.delete(`/api/homeSlides?id=${id}`)
-        console.log(result)
+        const result=await axiosInstance.delete(`/api/homeSlides?id=${id}`)
         if(!result.data.success){
             
-            throw new Error(result.data.message || 'Products get failed')
+            throw new Error(result.data.message || 'Failed to delete Home Slide')
         }
         return result.data
 
         
     } catch (error) {
         console.log(error)
-        return rejectWithValue(error.response?.data?.message || error.message || 'Failed to fetch Home-slides')
+        return rejectWithValue(error.response?.data?.message || error.message || 'Failed to delete Home Slide')
 
         
     }
@@ -64,13 +59,7 @@ const homeSlideSlice = createSlice({
         currentHomeSlide:null
     },
     reducers:{
-        // addHomeSlideImage:(state,action)=>{
-        //     state.currentHomeSlide=action.payload
-
-        // },
-        // removeHomeSlideImage:(state,action)=>{
-        //     state.currentHomeSlide=null
-        // }
+     
     },
    extraReducers:(builder)=>{
               builder.addCase(addHomeSlide.pending,(state)=>{
@@ -82,7 +71,7 @@ const homeSlideSlice = createSlice({
               state.error = null
           }),
           builder.addCase(addHomeSlide.rejected,(state)=>{
-              state.loading = true
+              state.loading = false
               state.error = null
           })
           builder.addCase(getHomeSlides.pending,(state)=>{

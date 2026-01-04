@@ -1,17 +1,18 @@
-import React, { useContext, useState } from 'react'
+import  { useContext, useEffect, useState } from 'react'
 
-import Rating from '@mui/material/Rating';
-import UploadBox from "../../components/UploadBox";
 import { LazyLoadImage } from 'react-lazy-load-image-component';
 import 'react-lazy-load-image-component/src/effects/blur.css';
-import { IoIosClose, IoMdCloudUpload, IoMdInformationCircleOutline } from "react-icons/io";
-import { Alert, Button, Tooltip } from '@mui/material';
-import { showError, showSuccess, showWarning } from '../../utils/toastUtils';
+import { IoIosClose, IoMdInformationCircleOutline } from "react-icons/io";
+import { Alert, Button } from '@mui/material';
 import { useDispatch } from 'react-redux';
-import { addHomeSlide, getHomeSlides } from '../../features/homeSlide/homeSlide';
-import { MyContext } from '../../App';
 import { LiaImages } from "react-icons/lia";
 import { useNavigate } from 'react-router-dom';
+
+// Internal Imports
+import UploadBox from "../../components/UploadBox";
+import { MyContext } from '../../App';
+import { addHomeSlide, getHomeSlides } from '../../features/homeSlide/homeSlide';
+import { showError, showSuccess, showWarning } from '../../utils/toastUtils';
 
 
 
@@ -37,7 +38,6 @@ const AddHomeSlide = () => {
 }
 
     const handleImageChange = (e) => {
-      console.log(e.target.files)
     const selectedFile = e.target.files[0];
     if(!selectedFile) return
 
@@ -52,20 +52,24 @@ const AddHomeSlide = () => {
     return;
   }
 
+  //validating dimensions
     const img = new Image();
-  img.src = URL.createObjectURL(selectedFile);
+  const objectUrl = URL.createObjectURL(selectedFile);
   img.onload = () => {
     const width = img.width;
     const height = img.height;
    const valid = isBannerSizeValid(width,height)
-   if(!valid){
-    showWarning('Image ratio is not Valid, Please upload another Image')
-    return
-   }
+  if (!valid) {
+                showWarning(`Invalid Ratio/Size: ${width}x${height}. Please check requirements.`);
+                URL.revokeObjectURL(objectUrl); // Cleanup failed image
+                return;
+            }
+
+            //success
     setFile(selectedFile);
-    setImage(URL.createObjectURL(selectedFile));
+    setImage(objectUrl);
   };
-  
+  img.src=objectUrl
 
     
   };
@@ -84,7 +88,7 @@ const AddHomeSlide = () => {
 
     const formData = new FormData()
     formData.append('image',file)
-
+console.log(formData)
     setIsUploading(true)
    const resultAction = await dispatch(addHomeSlide(formData))
    console.log(resultAction)
@@ -118,112 +122,23 @@ const AddHomeSlide = () => {
   }
 
 
-  
-//        const handleImageChange=async(e)=>{
-
-//           const filesArray=Array.from(e.target.files)
-          
-//           if(filesArray.length===0) return;
-
-//        const validTypes = ['image/jpeg', 'image/png', 'image/jpg', 'image/webp'];
-
-//           const allValid = filesArray.every((file) =>
-//             validTypes.includes(file.type)
-//           );
-
-//           if (!allValid) {
-//             showError('Please select valid image files');
-//             return;
-//           }
-
-//           console.log('valid image types');
-//           setIsUploading(true)
-//           try {
-//                const formData = new FormData()
-//                filesArray.forEach((file)=>formData.append('categoryImages',file))
-  
-      
-//           console.log('calling with formdata',formData)
-//           const resultAction = await dispatch( addCategoryImage(formData))
-//           console.log(resultAction)
-//          if(addCategoryImage.fulfilled.match(resultAction)){
-//              showSuccess('image uploaded successfully')
-
-       
-//          }
-//          if(addCategoryImage.rejected.match(resultAction)){
-//              showError(resultAction.payload || 'Failed to upload image')
-//          }
-              
-//           } catch (error) {
-//               console.log('upload error',error.response?.data || error.message)
-//               showError(error.response?.data?.message || error.message)
-//           }finally{
-//               setIsUploading(false)
-//           }
-          
-         
-       
-//       }
-//   const handleRemoveImage=async(id)=>{
-//   const resultAction=  await dispatch(deleteCategoryImage(id))
-//   console.log(resultAction)
-//   if(deleteCategoryImage.fulfilled.match(resultAction)){
-//     showSuccess(resultAction.payload.message || 'Image deleted successfully')
-//   }
-//   if(deleteCategoryImage.rejected.match(resultAction)){
-//     showError(resultAction.payload || 'Failed to delete image')
-//   }
-  
-//   } 
-//   const handleSubmit=async(e)=>{
-//     e.preventDefault()
-//   setLoading(true)
-//   //input validation 
-//   if(!formFields.name){
-//     showWarning('Please enter category name')
-//     setLoading(false)
-//     return
-//   }
-//   if(categoryImages.length===0){
-//     showWarning('Please upload at least one image')
-//     setLoading(false)
-//     return
-//   }
-//   const resultAction = await dispatch(addCategory(formFields))
-//   console.log(resultAction)
-//   if(addCategory.fulfilled.match(resultAction)){
-//     showSuccess(resultAction.payload.message || 'Category added successfully')
-//     setLoading(false)
-//     setFormFields({name:''})
-//     dispatch(getCategories())
-//     setTimeout(() => {
-//         context.setIsAddProductModalOpen({
-//       open:false,
-//       modal:''
-//     })
-      
-//     }, 1000);
-//     navigate('/category/list')
-
-  
-//     return
-//   }
-//   if(addCategory.rejected.match(resultAction)){
-//     showError(resultAction.payload || 'Failed to add category')
-//     setLoading(false)
-//     return
-//   }
 
 
-// }
+  useEffect(() => {
+        return () => {
+            if (image) URL.revokeObjectURL(image);
+        };
+    }, [image]);
+
+
+
   return (
     <section className="p-5  bg-gray-50">
       <form className="addProductForm p-3 md:p-8 py-1 md:py-3 " onSubmit={handleSubmit}>
         <div className="scroll max-h-[72vh] overflow-y-scroll pr-4 pt-4">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4 ">
                 {
-                  image && 
+                  image ? 
                     <div className="uploadBoxWrapper relative">
                                 <span className="absolute w-[20px] h-[20px] opacity-90 rounded-full overflow-hidden bg-primary top-[-5px] right-[-5px] cursor-pointer flex items-center justify-center z-50">
                                     <IoIosClose onClick={handleRemoveImage} className="text-white text-[19px]" />
@@ -242,13 +157,13 @@ const AddHomeSlide = () => {
                                         src={image}
                                         />
                             </div>
-                             </div>
+                    </div>: 
+                            <UploadBox multiple={false} isUploading={isUploading} onChange={handleImageChange} />
                 }
                            
                           
             
 
-                            <UploadBox multiple={false} isUploading={isUploading} onChange={handleImageChange} />
                         </div>
     </div>
         <br /> 

@@ -39,7 +39,7 @@ const HomeSliderBanners = () => {
     const dispatch = useDispatch()
 
     //Redux State
-    const {homeSlides,loading}=useSelector(state=>state.homeSlide)
+    const {homeSlides}=useSelector(state=>state.homeSlide)
 
     //UI States
     const [previewOpen, setPreviewOpen] = useState(false);
@@ -85,7 +85,7 @@ const HomeSliderBanners = () => {
      <div className="  grid grid-cols-1 md:grid-cols-2 px-2 py-0 mt-3">
       <h2 className='text-[18px] font-[600]'>Home Slider Banners  </h2>
         <div className="col   flex items-center md:justify-end gap-3">
-          <Button className='btn-blue btn-sm '
+          <Button variant='contained' className='btn-blue btn-sm '
                 onClick={()=>context.setIsAddProductModalOpen({open:true,modal:'Add Home Slide'})}
 
           > Add Home Slide</Button>
@@ -105,10 +105,7 @@ const HomeSliderBanners = () => {
             {
               homeSlides?.length>0 && 
                    <TableRow>
-              {/* <TableCell>
-                <Checkbox {...label} size='small'/>
-                
-              </TableCell> */}
+             
               {columns.map((column) => (
                 <TableCell
                 className='!pl-4  md:!pl-12'
@@ -124,9 +121,9 @@ const HomeSliderBanners = () => {
             }
        
           </TableHead>
+
+
           <TableBody>
-          
-        
             {
               homeSlides?.length>0 && homeSlides.map((slide)=>(
                 <TableRow key={slide._id} className={`${deleteId ===slide._id && 'uploading-gradient-delete'}`} >
@@ -134,10 +131,10 @@ const HomeSliderBanners = () => {
               <TableCell 
               className=' !pl-2 md:!pl-10'
               >
-                <div className="flex items-center gap-2 w-[200px] md:w-[500px] ">
-                  <div className="img w-[full] h-auto rounded-md overflow-hidden group">
+                <div className="flex items-center gap-2 w-[200px] md:w-[500px] !rounded-md ">
+                  <div className="img w-[full] h-auto !rounded-md overflow-hidden group p-2">
                   <Link to='/'>
-                <img alt="" className=" w-[200px] md:w-full  group-hover:scale-105 transition-transform" src={slide.url}/>
+                <img alt="home banner image" className=" w-[200px] md:w-full !rounded-md  group-hover:scale-105 transition-transform" src={slide.url}/>
                   </Link>
               
                 </div>
@@ -150,24 +147,26 @@ const HomeSliderBanners = () => {
               <TableCell
               >
                    <div className="flex flex-col md:flex-row items-center gap-2 md:gap-5">
+                    {/* Buttons */}
 
-      <TooltipMUI placement='top' title='View Banner'>
+                <TooltipMUI placement='top' title='View Banner'>
 
-      <Button className='!w-[35px] !
-      [35px]  bg-[#f1f1f1] !min-w-[35px] md:!min-w-[45px] md:!w-[45px] md:!h-[45px]  !border !border-[rgba(0,0,0,0.1)] !rounded-full hover:!bg-[#f1f1f1] hover:!shadow-sm hover:scale-110'
-      onClick={()=>handlePreview(slide?.url)}
-      >
+                <Button className='!w-[35px] !
+                [35px]  bg-[#f1f1f1] !min-w-[35px] md:!min-w-[45px] md:!w-[45px] md:!h-[45px]  !border !border-[rgba(0,0,0,0.1)] !rounded-full hover:!bg-[#f1f1f1] hover:!shadow-sm hover:scale-110'
+                onClick={()=>handlePreview(slide?.url)}
+                >
 
-        <LuFullscreen className='text-[rgba(0,0,0,0.8)] text-[20px] '/>
-      </Button>
-      </TooltipMUI>
-      <TooltipMUI placement='top' title='Remove Banner'>
+                  <LuFullscreen className='text-[rgba(0,0,0,0.8)] text-[20px] '/>
+                </Button>
+                </TooltipMUI>
+                
+                <TooltipMUI placement='top' title='Remove Banner'>
 
-      <Button onClick={()=>handleDeleteHomeSlide(slide._id)} className='!w-[35px] !h-[35px]  bg-[#f1f1f1] !min-w-[35px] md:!min-w-[45px] md:!w-[45px]  md:!h-[45px] !border !border-[rgba(0,0,0,0.1)] !rounded-full hover:!bg-[#f1f1f1] hover:!shadow-sm hover:scale-110'>
+                <Button onClick={()=>handleDeleteHomeSlide(slide._id)} className='!w-[35px] !h-[35px]  bg-[#f1f1f1] !min-w-[35px] md:!min-w-[45px] md:!w-[45px]  md:!h-[45px] !border !border-[rgba(0,0,0,0.1)] !rounded-full hover:!bg-[#f1f1f1] hover:!shadow-sm hover:scale-110'>
 
-        <MdDelete className='text-[rgba(0,0,0,0.7)] text-[20px] '/>
-      </Button>
-      </TooltipMUI>
+                  <MdDelete className='text-[rgba(0,0,0,0.7)] text-[20px] '/>
+                </Button>
+                </TooltipMUI>
     </div>
               </TableCell>
         
@@ -189,6 +188,7 @@ const HomeSliderBanners = () => {
    </div> 
 
    
+   {/* image preview dialog */}
 <Dialog
   open={previewOpen}
   onClose={() => setPreviewOpen(false)}
