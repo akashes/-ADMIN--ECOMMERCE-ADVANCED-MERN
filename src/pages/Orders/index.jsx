@@ -3,32 +3,49 @@ import Badge from '../../components/Badge'
 import { FaAngleDown } from 'react-icons/fa'
 import  Button  from '@mui/material/Button'
 import { useDispatch, useSelector } from 'react-redux'
-import { getOrders, updateOrderStatus } from '../../features/order/orderSlice'
+import { approveCancelRequest, getOrders, markAsPaid, markAsRefunded, updateOrderStatus } from '../../features/order/orderSlice'
 import { Box, FormControl, InputLabel, MenuItem, Pagination, Select } from '@mui/material'
 import { showError, showSuccess } from '../../utils/toastUtils'
 import OrderSkelton from '../../components/Skeltons/OrderSkelton'
-import { useCallback } from 'react'
-import debounce from 'lodash.debounce';
+
 import SearchBox from '../../components/SearchBox'
 import useDebounce from '../../hooks/useDebounce'
+import { Chip } from "@mui/material";
+
+
+import * as XLSX from "xlsx";
+import jsPDF from "jspdf";
+import "jspdf-autotable";
+import { exportToExcel, exportToPDF } from '../../utils/exportOrder'
 
 const STATUS_FLOW = ["pending", "confirmed", "shipped", "on-the-way", "delivered"];
 
 
 
+const getStatusChip = (status) => {
+  const colorMap = {
+    pending: { label: "Pending", color: "warning" },
+    confirmed: { label: "Confirmed", color: "info" },
+    shipped: { label: "Shipped", color: "primary" },
+    "on-the-way": { label: "On the Way", color: "secondary" },
+    delivered: { label: "Delivered", color: "success" },
+    cancelled: { label: "cancelled", color: "error" },
+  };
+
+  const { label, color } = colorMap[status] || { label: status, color: "default" };
+  return <Chip label={label} color={color} size="small" className="font-bold" />;
+};
+
 const Orders = () => {
 
-  const [age, setAge] = React.useState('');
   
       const[searchTerm,setSearchTerm]=useState('')
       const debouncedSearchTerm = useDebounce(searchTerm,500)
   
-  const handleChange = (event) => {
-    setAge(event.target.value);
-  };
+
 
    const dispatch = useDispatch()
-  const{orders,pagination,loading}=useSelector(state=>state.order)
+  const{orders,pagination,loading,orderStatusLoading}=useSelector(state=>state.order)
   const[page,setPage]=useState(1)
   const limit =10
 
@@ -38,7 +55,9 @@ const Orders = () => {
   payment_status: "",
   order_status: "",
   search: "",
+  dateRange:""
 });
+console.log(filters)
 
         const[showProducts,setShowProducts]=useState(null)
       const isShowOrderedProduct=(index)=>{
@@ -98,6 +117,11 @@ const Orders = () => {
 // }
 
 async function validateOrderTransition(order,status){
+   if(order.payment_status==='pending' && status === 'delivered'){
+    showError('Cannot set Order Status to Delivered while payment is Pending')
+    return 
+          
+        }
 
   const resultAction = await dispatch(updateOrderStatus({orderId:order._id,status}))
 
@@ -137,13 +161,60 @@ useEffect(() => {
   setFilters(prev => ({ ...prev, search: debouncedSearchTerm }))
 }, [debouncedSearchTerm])
 
+const handleMarkAsRead=async(id)=>{
+  const resultAction = await  dispatch(markAsPaid(id))
+  console.log(resultAction)
+         if(markAsPaid.fulfilled.match(resultAction)){
+          showSuccess('Marked as Paid')
+          // dispatch(getOrders())
+         }
+         if(markAsPaid.rejected.match(resultAction)){
+          showError(resultAction.payload)
+         }
+  
+
+}
+
+const handleApproveCancel = async (id) => {
+  const resultAction = await dispatch(approveCancelRequest(id));
+  if (approveCancelRequest.fulfilled.match(resultAction)) {
+    showSuccess("Order cancelled successfully");
+  } else {
+    showError("Failed to cancel order");
+  }
+};
+
+const handleApproveRefund = async (id) => {
+  const resultAction = await dispatch(markAsRefunded(id));
+  if (markAsRefunded.fulfilled.match(resultAction)) {
+    showSuccess("Refund approved successfully");
+  } else {
+    showError("Failed to approve refund");
+  }
+};
+
+
+// const handleMarkAsRefunded=async(id)=>{
+//   const resultAction = await  dispatch(markAsRefunded(id))
+//          if(markAsRefunded.fulfilled.match(resultAction)){
+//           showSuccess('Refunded Successfully')
+//           // dispatch(getOrders())
+//          }
+//          if(markAsPaid.rejected.match(resultAction)){
+//           showError('Failed to Initiate Refund')
+//          }
+  
+
+// }
+
   return (
       <div className="card my-4 shadow-md sm:rounded-lg bg-white">
-  <div className="flex flex-wrap gap-4 items-end px-3 py-5">
-    <h1 className='mx-auto font-[500] text-[22px] md:text-[25px]'>Ordres</h1>
+    <h1 className='mx-auto font-[500] text-[22px] md:text-[25px] !p-3'>Orders</h1>
+    {/* filters */}
+  <div className="flex flex-wrap gap-2 md:gap-3 items-end px-3 py-5">
   {/* Payment Method */}
-  <div className="w-full sm:w-[48%] md:w-[20%]">
-    <h4 className="font-[600] text-[13px] mb-2">Payment Method</h4>
+  <div className="w-full sm:w-[48%] md:w-[23%]">
+    <h4 className="font-[600] text-[13px] mb-0 md:mb-2">Payment Method</h4>
     <Select
       fullWidth
       size="small"
@@ -159,8 +230,8 @@ useEffect(() => {
   </div>
 
   {/* Payment Status */}
-  <div className="w-full sm:w-[48%] md:w-[20%]">
-    <h4 className="font-[600] text-[13px] mb-2">Payment Status</h4>
+  <div className="w-full sm:w-[48%] md:w-[23%]">
+    <h4 className="font-[600] text-[13px] mb-0 md:mb-2">Payment Status</h4>
     <Select
       fullWidth
       size="small"
@@ -175,14 +246,17 @@ useEffect(() => {
   </div>
 
   {/* Order Status */}
-  <div className="w-full sm:w-[48%] md:w-[20%]">
-    <h4 className="font-[600] text-[13px] mb-2">Order Status</h4>
+  <div className="w-full sm:w-[48%] md:w-[23%]">
+    <h4 className="font-[600] text-[13px] mb-0 md:mb-2">Order Status</h4>
     <Select
       fullWidth
       size="small"
       value={filters.order_status}
-      onChange={(e) =>
+      onChange={(e) =>{
+       
+
         setFilters({ ...filters, order_status: e.target.value })
+      }
       }
     >
       <MenuItem value="pending">PENDING</MenuItem>
@@ -192,11 +266,48 @@ useEffect(() => {
       <MenuItem value="delivered">DELIVERED</MenuItem>
     </Select>
   </div>
+  {/* Date Range */}
+<div className="w-full sm:w-[48%] md:w-[23%]">
+  <h4 className="font-[600] text-[13px]  mb-0 md:mb-2">Date Range</h4>
+  <Select
+    fullWidth
+    size="small"
+    value={filters.dateRange}
+    onChange={(e) =>
+      setFilters({ ...filters, dateRange: e.target.value })
+    }
+  >
+    <MenuItem value="">ALL</MenuItem>
+    <MenuItem value="today">Today</MenuItem>
+    <MenuItem value="lastweek">Last 7 Days</MenuItem>
+    <MenuItem value="lastmonth">Last 30 Days</MenuItem>
+    <MenuItem value="thisyear">This Year</MenuItem>
+  </Select>
+</div>
 
-  {/* Search + Clear */}
-  <div className="w-full sm:w-[48%] md:w-[30%] flex gap-3 md:ml-auto">
-    <SearchBox value={searchTerm} onChange={handleSearchChange} />
+
+</div>
+
+<div className="flex flex-col-reverse sm:flex-row gap-5 justify-between md:gap-0  ml-auto px-3 py-2">
+  <div className='flex gap-3'>
+
+  <Button className='flex gap-1 items-center !py-1 !px-1 md:!px-2' variant="outlined" color="primary" size="small" onClick={()=>exportToExcel(orders)}>
+    <img className='w-[21px] md:w-[25px]' src="https://res.cloudinary.com/dllelmzim/image/upload/v1757935506/excel_hlj1y5.png" alt="" />
+    Export Excel
+  </Button>
+  <Button className='flex gap-1 items-center !py-1 !px-1  md:!px-2' variant="outlined" color="secondary" size="small" onClick={()=>exportToPDF(orders)}>
+    <img className='w-[21px] md:w-[25px]' src="https://res.cloudinary.com/dllelmzim/image/upload/v1757935506/pdf_1_fdwps0.png" alt="" />
+    Export PDF
+  </Button>
+  </div>
+    {/* Search + Clear */}
+  <div className="w-full sm:w-[48%] md:w-[30%] flex gap-3 ">
+    <SearchBox value={searchTerm} onChange={handleSearchChange} placeholder={'name/email/userId/PaymentId/Payment-Method'} />
     <Button
+      onClick={() => {
+    setFilters({ payment_method: "", payment_status: "", order_status: "", search: "" });
+    setSearchTerm("");
+  }}
       className="!min-w-[120px]"
       variant="outlined"
       color="error"
@@ -212,59 +323,65 @@ useEffect(() => {
             {/* order related heading */}
               <thead className="text-xs text-gray-700 bg-gray-50  ">
                 <tr>
-                  <th scope="col" className="py-3 px-6">
+                  <th scope="col" className="py-1 px-3 md:py-3 md:px-6">
                     &nbsp;
 
                   </th>
-                  <th scope="col" className="py-3 px-6 whitespace-nowrap">
+                  <th scope="col" className="py-1 px-3 md:py-3 md:px-6 whitespace-nowrap">
                     Order Id 
 
                   </th>
-                  <th scope="col" className="py-3 px-6 whitespace-nowrap hidden md:table-cell">
-                    Payment Id
+                    <th scope="col" className="py-1 px-3 md:py-3 md:px-6 whitespace-nowrap">
+                    payment method
 
                   </th>
-                  <th scope="col" className="py-3 px-6">
+                  <th scope="col" className="py-1 px-3 md:py-3 md:px-6 whitespace-nowrap">
+                    Payment status
+
+                  </th>
+                  <th scope="col" className="py-1 px-3 md:py-3 md:px-6 whitespace-nowrap">
+                    Order Status
+
+                  </th>
+                  <th scope="col" className="py-1 px-3 md:py-3 md:px-6 whitespace-nowrap">
+                    Update Order
+
+                  </th>
+                  <th scope="col" className="py-1 px-3 md:py-3 md:px-6">
+                    Date
+
+                  </th>
+                             <th scope="col" className="py-1 px-3 md:py-3 md:px-6">
                     Name
 
                   </th>
-                  <th scope="col" className="py-3 px-6 whitespace-nowrap hidden md:table-cell ">
+                  <th scope="col" className="py-1 px-3 md:py-3 md:px-6 whitespace-nowrap hidden md:table-cell ">
                     Phone No.
 
                   </th>
-                  <th scope="col" className="py-3 px-6">
+                  <th scope="col" className="py-1 px-3 md:py-3 md:px-6">
                     Address
 
                   </th>
                
-                  <th scope="col" className="py-3 px-6 whitespace-nowrap">
+                  <th scope="col" className="py-1 px-3 md:py-3 md:px-6 whitespace-nowrap">
                     Total Amount
 
                   </th>
-                  <th scope="col" className="py-3 px-6">
+                  <th scope="col" className="py-1 px-3 md:py-3 md:px-6">
                     Email
 
                   </th>
-                  <th scope="col" className="py-3 px-6 whitespace-nowrap">
+                  <th scope="col" className="py-1 px-3 md:py-3 md:px-6 whitespace-nowrap hidden md:table-cell">
+                    Payment Id
+
+                  </th>
+       
+                  <th scope="col" className="py-1 px-3 md:py-3 md:px-6 whitespace-nowrap">
                     User Id
 
                   </th>
-                  <th scope="col" className="py-3 px-6 whitespace-nowrap">
-                    payment method
-
-                  </th>
-                  <th scope="col" className="py-3 px-6 whitespace-nowrap">
-                    Payment status
-
-                  </th>
-                  <th scope="col" className="py-3 px-6 whitespace-nowrap">
-                    Order Status
-
-                  </th>
-                  <th scope="col" className="py-3 px-6">
-                    Date
-
-                  </th>
+                
                 </tr>
               </thead>
 
@@ -274,10 +391,11 @@ useEffect(() => {
                   loading ? <OrderSkelton/>:
                   orders?.length>0 && orders.map((order,index)=>{
                     let disableOrderStatus = order.order_status==='delivered'
+                    let isOrderStatusLoading = order._id == orderStatusLoading
                     console.log(order)
                     return(
                       <>
-                                      <tr className="bg-white border-b border-b-[rgba(0,0,0,0.2)] ">
+                                      <tr className={`bg-white border-b border-b-[rgba(0,0,0,0.2)] ${isOrderStatusLoading && 'uploading-gradient-delete'} ${order.order_status==='cancelled' && 'opacity-60'}`}>
                   <td className="px-6 py-4 font-[500]">
                       <Button  className="  !w-[25px] !h-[25px] !min-w-[25px] md:!w-[35px] md:!h-[35px] md:!min-w-[35px] !rounded-full !bg-[#cfcdcd] !text-black"
                     onClick={()=>isShowOrderedProduct(index)}
@@ -288,53 +406,17 @@ useEffect(() => {
                     </Button>
 
                   </td>
-                  <td className="px-6 py-4 font-[500] text-primary">
+                  
+                  <td className="px-2 md:px-2 py-1 md:py-4 font-[500] text-gray-600">
                     {order._id}
-
                   </td>
-                  <td className="px-6 py-4 font-[500] text-secondary hidden md:table-cell">
-                    {order.payment_id?order.payment_id:'CASH ON DELIVERY'} 
-
-                  </td>
-                  <td className="px-6 py-4 font-[500] whitespace-nowrap">
-                    {order.name.toUpperCase()} 
-
-                  </td>
-                  <td className="px-6 py-4 font-[500] hidden md:table-cell">
-                    {order.delivery_address?.mobile} 
-
-                  </td>
-                  <td className="px-6 py-4 font-[500]">
-                    <span className="block w-[400px]">
-                      {order.delivery_address?.address_line} {order.delivery_address?.city}    {order.delivery_address?.pincode}  {order.delivery_address?.state}  {order.delivery_address?.country}  {order.delivery_address?.landmark},
-
-                    </span>
- 
-
-                  </td>
-              
-                  <td className="px-6 py-4 font-[500]">
-{order.total.toLocaleString('en-IN', { style: 'currency', currency: 'INR' })}
-                  </td>
-                  <td className="px-6 py-4 font-[500]">
-                    {order.email}	 
-
-                  </td>
-                  <td className="px-6 py-4 font-[500]">
-                    <span className="text-primary">
-
-
-                   {order.userId}
-                    </span>
-
-                  </td>
-                  <td className="px-6 py-4 font-[500]">
+                     <td className="px-2 md:px-3 py-1 md:py-3 font-[500] text-center">
                     <span className="font-bold">
 
 
                   {
   order.payment_method === 'cod'
-    ? 'CASH ON DELIVERY'
+    ? 'COD'
     : order.payment_method === 'razorpay'
     ? 'RAZORPAY'
     : order.payment_method === 'paypal'
@@ -343,17 +425,70 @@ useEffect(() => {
 }
 
                     </span>
+{order.payment_method === "cod" 
+  && order.payment_status === "pending" 
+  && order.order_status !== "cancelled"
+  && order.order_status !== "cancel-requested" && (
+    <Button
+      variant="outlined"
+      size="small"
+      color="warning"
+      onClick={() => handleMarkAsRead(order._id)}
+    >
+      Mark as Paid
+    </Button>
+)}
+
+{order.order_status === "cancel-requested" && order.payment_status === "pending" && (
+  <Button
+    variant="outlined"
+    size="small"
+    color="error"
+    onClick={() => handleApproveCancel(order._id)}
+  >
+    Approve Cancel
+  </Button>
+)}
+
+{order.order_status === "cancel-requested" && order.payment_status === "paid" && (
+  <Button
+    variant="outlined"
+    size="small"
+    color="error"
+    onClick={() => handleApproveRefund(order._id)}
+  >
+    Approve Cancel + Refund
+  </Button>
+)}
+{/* {
+  order.order_status==='cancelled' && order.order_status !=='refunded' && <Button
+
+    variant="outlined"
+    size="small"
+    color="warning"
+    onClick={()=>handleMarkAsRefunded(order._id) }
+  >
+    Refund Order
+  </Button>
+} */}
 
                   </td>
-                  <td className="px-6 py-4 font-[500]">
-                    <span className="text-primary">
+                  <td className="px-2 md:px-3 py-1 md:py-3 font-[500] text-center">
+                    <span className={ `uppercase font-bold ${order.payment_status==='pending'&& 'text-primary'} ${order.payment_status==='paid' && 'text-green-600'} `}>
 
 
                    {order.payment_status}
                     </span>
 
                   </td>
-                  <td className="px-6 py-4 font-[500]">
+
+
+<td className="px-2  flex items-center justify-center py-3 md:py-5  ">
+  {getStatusChip(order.order_status)}
+</td>
+
+
+                  <td className="px-2 md:px-3 py-1 md:py-3 font-[500]">
   <Select
           labelId="demo-simple-select-helper-label"
           id="demo-simple-select-helper"
@@ -363,7 +498,7 @@ useEffect(() => {
           size='small'
           style={{zoom:'80%'}}
           className='w-full'
-          disabled={disableOrderStatus}
+          disabled={disableOrderStatus || order.order_status==='cancelled'}
       
         >
 <MenuItem 
@@ -404,7 +539,7 @@ useEffect(() => {
 
         </Select>
                   </td>
-                  <td className="px-6 py-4 font-[500] whitespace-nowrap">
+                  <td className="px-2 md:px-3 py-1 md:py-3 font-[500] whitespace-nowrap">
                 {new Date(order.createdAt).toLocaleDateString("en-GB", {
               day: "2-digit",
               month: "short",
@@ -414,6 +549,44 @@ useEffect(() => {
  
 
                   </td>
+               
+                  <td className="px-2 md:px-3 py-1 md:py-3 font-[500] whitespace-nowrap">
+                    {order.name.toUpperCase()} 
+
+                  </td>
+                  <td className="px-2 md:px-3 py-1 md:py-3 font-[500] hidden md:table-cell">
+                    {order.delivery_address?.mobile} 
+
+                  </td>
+                  <td className="px-2 md:px-3 py-1 md:py-3 font-[500] max-w-[300px] overflow-x-auto">
+                    <span className="block w-[400px] text-wrap">
+                      {order.delivery_address?.address_line} {order.delivery_address?.city}    {order.delivery_address?.pincode}  {order.delivery_address?.state}  {order.delivery_address?.country}  {order.delivery_address?.landmark},
+
+                    </span>
+ 
+
+                  </td>
+              
+                  <td className="px-2 md:px-3 py-1 md:py-3 font-[500]">
+{order.total.toLocaleString('en-IN', { style: 'currency', currency: 'INR' })}
+                  </td>
+                  <td className="px-2 md:px-3 py-1 md:py-3 font-[500]">
+                    {order.email}	 
+
+                  </td>
+                     <td className="px-2 md:px-3 py-1 md:py-3 font-[500] text-secondary hidden md:table-cell text-nowrap">
+                    {order.payment_id} 
+
+                  </td>
+                  <td className="px-2 md:px-3 py-1 md:py-3 font-[500]">
+                    <span className="text-primary">
+
+
+                   {order.userId}
+                    </span>
+
+                  </td>
+               
            
 
                 </tr>
@@ -459,29 +632,29 @@ useEffect(() => {
                   order?.products?.length>0 && order.products.map((product)=>{
                     return(
                          <tr key={product.productId} className="bg-white border-b ">
-                  <td className="px-6 py-4 font-[500] text-gray-700 ">
+                  <td className="px-2 md:px-3 py-1 md:py-3 font-[500] text-gray-700 ">
                     {product.productId}
 
                   </td>
-                  <td className="px-6 py-4 font-[500]">
+                  <td className="px-2 md:px-3 py-1 md:py-3 font-[500]">
                     <div className="w-[200px]">
 
                     {product.name}	 
                     </div>
 
                   </td>
-                  <td className="px-6 py-4 font-[500]">
+                  <td className="px-2 md:px-3 py-1 md:py-3 font-[500]">
                     <img src={product.image[0]} alt="" className="w-[40px] h-[40px] object-cover rounded-md" />
 
                   </td>
-                  <td className="px-6 py-4 font-[500] whitespace-nowrap">
+                  <td className="px-2 md:px-3 py-1 md:py-3 font-[500] whitespace-nowrap">
                     {product.quantity}
 
                   </td>
-                  <td className="px-6 py-4 font-[500]">
+                  <td className="px-2 md:px-3 py-1 md:py-3 font-[500]">
 {product.price.toLocaleString('en-IN', { style: 'currency', currency: 'INR' })}
                   </td>
-                  <td className="px-6 py-4 font-[500]">
+                  <td className="px-2 md:px-3 py-1 md:py-3 font-[500]">
                     <span className="block w-[400px]">
 
 {product.subtotal.toLocaleString('en-IN', { style: 'currency', currency: 'INR' })}                    </span>
@@ -515,12 +688,25 @@ useEffect(() => {
                     )
                   })
                 }
+                {
+                  !loading && orders.length===0 && 
+    <tr>
+      <td
+        colSpan={9} 
+        className="text-center py-6 text-gray-500 font-medium"
+      >
+        🚫 No Orders Found!
+      </td>
+    </tr>
+                }
 
 
                
               </tbody>
 
             </table>
+
+          </div>
             <div className="flex justify-center py-4">
   {pagination && (
     <Pagination
@@ -532,8 +718,6 @@ useEffect(() => {
     />
   )}
 </div>
-
-          </div>
    </div>
   )
 }

@@ -14,6 +14,15 @@ import { useDispatch, useSelector } from 'react-redux';
 import { showError, showSuccess, showWarning } from '../../utils/toastUtils';
 import {  loginUser, userLogin } from '../../features/auth/authSlice';
 
+import { getAuth, signInWithPopup, GoogleAuthProvider } from "firebase/auth";
+import { firebaseApp } from '../../utils/firebase';
+import axios from 'axios';
+const auth = getAuth(firebaseApp)
+const provider = new GoogleAuthProvider();
+provider.setCustomParameters({
+    prompt: 'select_account'
+})
+
 
 
 const Login = () => {
@@ -25,9 +34,65 @@ const[password,setPassword]=useState('');
 const dispatch = useDispatch()
 const navigate = useNavigate()
 const [loadingGoogle, setLoadingGoogle] = useState(false);
-  function handleClickGoogle() {
-    setLoadingGoogle(true);
-  }
+
+     const authWithGoogle=async()=>{
+        signInWithPopup(auth, provider)
+      .then(async(result) => {
+        // This gives you a Google Access Token. You can use it to access the Google API.
+        const credential = GoogleAuthProvider.credentialFromResult(result);
+        const token = credential.accessToken;
+        // The signed-in user info.
+        const user = result.user;
+        console.log(user)
+        // IdP data available using getAdditionalUserInfo(result)
+        // ...
+        const fields = {
+          name:user.providerData[0].displayName,
+          email:user.providerData[0].email,
+          password:null,
+          avatar:user.providerData[0].photoURL,
+          mobile:user.providerData[0].phoneNumber,
+          role:['USER','MODERATOR']
+          
+        }
+        console.log(fields)
+           setLoadingGoogle(true)
+        const res = await axios.post('/api/user/google-auth', fields)
+        console.log(res)
+        setLoadingGoogle(false)
+        if(!res.data.success){
+            showError(res.data.message || 'Registration failed')
+            return
+        }
+    
+    
+        //Registration success
+        //setting email to local storage
+        localStorage.setItem('verifyEmail',fields.email)
+               localStorage.setItem('admin_accessToken',res.data.data.accessToken)
+                // localStorage.setItem('refreshToken',result.data.refreshToken)
+                // authContext.login(res.data.accessToken,res.data.user)
+                 await dispatch(loginUser({token:res.data.data.accessToken,user:res.data.data.user}))
+    
+        showSuccess(res.data.message || 'Login successful',3000)
+        navigate('/')
+      
+    
+        
+    
+      }).catch((error) => {
+        console.log(error)
+        // Handle Errors here.
+        const errorCode = error.code;
+        const errorMessage = error.message;
+        // The email of the user's account used.
+        const email = error.customData.email;
+        // The AuthCredential type that was used.
+        const credential = GoogleAuthProvider.credentialFromError(error);
+        // ...
+      });
+    
+      }
   const navigateToForgot=()=>{
     navigate('/forgot-password',{state:{email}})
   }
@@ -113,7 +178,7 @@ const [loadingGoogle, setLoadingGoogle] = useState(false);
         <div className="flex items-center justify-center w-full mt-5">
              <Button
           size="small"
-          onClick={handleClickGoogle}
+          onClick={authWithGoogle}
           endIcon={<FcGoogle className='!text-[28px]' />}
           loading={loadingGoogle}
         //   loadingIndicator="Loading..."

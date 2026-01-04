@@ -8,7 +8,7 @@ const SearchBox = (props) => {
         <IoMdSearch className='absolute top-[50%] -translate-y-[50%] left-[10px] text-[18px] pointer-events-none opacity-80'/>
         <input type="text" className='w-full pl-8 border-1 border-[rgba(0,0,0,0.1)] rounded-md h-[40px] bg-[#f1f1f1]
          p-2 focus:outline-none focus:border-[rgba(0,0,0,0.5)] text-[13px]'
-         placeholder='Search here...'
+         placeholder={`${props.placeholder ? props.placeholder : 'Search here...' }`}  
          value={props?.value}
          onChange={props?.onChange}
          />

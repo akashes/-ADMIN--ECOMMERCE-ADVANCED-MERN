@@ -221,7 +221,7 @@ const AddHomeSlide = () => {
     <section className="p-5  bg-gray-50">
       <form className="addProductForm p-3 md:p-8 py-1 md:py-3 " onSubmit={handleSubmit}>
         <div className="scroll max-h-[72vh] overflow-y-scroll pr-4 pt-4">
-              <div className="grid grid-cols-2 md:grid-cols-7 gap-4 ">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 ">
                 {
                   image && 
                     <div className="uploadBoxWrapper relative">

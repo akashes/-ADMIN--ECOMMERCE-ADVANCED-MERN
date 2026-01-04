@@ -207,82 +207,34 @@ const{id}=useParams()
 
        <h2 className='text-[18px] font-[500]'>Customer Reviews</h2>
        <div className="reviewsWrap mt-3">
-        <div className="reviews rounded-sm mb-3 w-full h-auto p-4 bg-white shadow-md flex items-center justify-between">
+        {
+            currentProduct?.reviews?.length>0 ? (
+                currentProduct?.reviews?.map((review)=>(
+
+        <div key={review._id} className="reviews rounded-sm mb-3 w-full h-auto p-4 bg-white shadow-md flex items-center justify-between">
             <div className="flex items-center gap-8">
                 <div className="img w-[85px] h-[85px] overflow-hidden rounded-full  ">
-                    <img src="https://serviceapi.spicezgold.com/download/1742439142766_gespo-peach-solid-mandarin-collar-half-sleeve-casual-t-shirt-product-images-rvrtzhyumb-2-202304080900.jpg" className='w-full h-full object-cover' />
+                    <img src={review?.user?.avatar?.url} className='w-full h-full object-cover' />
                 </div>
                 <div className='info w-[80%]'>
                     <div className="flex items-center justify-between">
-                <h4 className='text-[16px]  font-[500]' >Naveen Kumar</h4>
-                      <Rating name="read-only" value={value} readOnly size='small' />
+                <h4 className='text-[16px]  font-[500]' >{review?.user?.name}</h4>
+                      <Rating name="read-only" value={review?.rating} readOnly size='small' />
 
                     </div>
 
-                <span className='text-[13px] ' >2025-34-23</span>
-                <p className='text-[13px] mt-2'>Lorem ipsum dolor sit amet consectetur adipisicing elit. Nobis hic provident vero quasi sit repudiandae optio neque laboriosam assumenda tempora.</p>
+                <span className='text-[13px] ' >{review.createdAt}</span>
+                <p className='text-[13px] mt-2'>{review?.comment}</p>
 
                 </div>
             </div>
 
         </div>
-        <div className="reviews rounded-sm mb-3 w-full h-auto p-4 bg-white shadow-md flex items-center justify-between">
-            <div className="flex items-center gap-8">
-                <div className="img w-[85px] h-[85px] overflow-hidden rounded-full  ">
-                    <img src="https://serviceapi.spicezgold.com/download/1742439142766_gespo-peach-solid-mandarin-collar-half-sleeve-casual-t-shirt-product-images-rvrtzhyumb-2-202304080900.jpg" className='w-full h-full object-cover' />
-                </div>
-                <div className='info w-[80%]'>
-                    <div className="flex items-center justify-between">
-                <h4 className='text-[16px]  font-[500]' >Naveen Kumar</h4>
-                      <Rating name="read-only" value={value} readOnly size='small' />
-
-                    </div>
-
-                <span className='text-[13px] ' >2025-34-23</span>
-                <p className='text-[13px] mt-2'>Lorem ipsum dolor sit amet consectetur adipisicing elit. Nobis hic provident vero quasi sit repudiandae optio neque laboriosam assumenda tempora.</p>
-
-                </div>
-            </div>
-
-        </div>
-        <div className="reviews rounded-sm mb-3 w-full h-auto p-4 bg-white shadow-md flex items-center justify-between">
-            <div className="flex items-center gap-8">
-                <div className="img w-[85px] h-[85px] overflow-hidden rounded-full  ">
-                    <img src="https://serviceapi.spicezgold.com/download/1742439142766_gespo-peach-solid-mandarin-collar-half-sleeve-casual-t-shirt-product-images-rvrtzhyumb-2-202304080900.jpg" className='w-full h-full object-cover' />
-                </div>
-                <div className='info w-[80%]'>
-                    <div className="flex items-center justify-between">
-                <h4 className='text-[16px]  font-[500]' >Naveen Kumar</h4>
-                      <Rating name="read-only" value={value} readOnly size='small' />
-
-                    </div>
-
-                <span className='text-[13px] ' >2025-34-23</span>
-                <p className='text-[13px] mt-2'>Lorem ipsum dolor sit amet consectetur adipisicing elit. Nobis hic provident vero quasi sit repudiandae optio neque laboriosam assumenda tempora.</p>
-
-                </div>
-            </div>
-
-        </div>
-        <div className="reviews rounded-sm mb-3 w-full h-auto p-4 bg-white shadow-md flex items-center justify-between">
-            <div className="flex items-center gap-8">
-                <div className="img w-[85px] h-[85px] overflow-hidden rounded-full  ">
-                    <img src="https://serviceapi.spicezgold.com/download/1742439142766_gespo-peach-solid-mandarin-collar-half-sleeve-casual-t-shirt-product-images-rvrtzhyumb-2-202304080900.jpg" className='w-full h-full object-cover' />
-                </div>
-                <div className='info w-[80%]'>
-                    <div className="flex items-center justify-between">
-                <h4 className='text-[16px]  font-[500]' >Naveen Kumar</h4>
-                      <Rating name="read-only" value={value} readOnly size='small' />
-
-                    </div>
-
-                <span className='text-[13px] ' >2025-34-23</span>
-                <p className='text-[13px] mt-2'>Lorem ipsum dolor sit amet consectetur adipisicing elit. Nobis hic provident vero quasi sit repudiandae optio neque laboriosam assumenda tempora.</p>
-
-                </div>
-            </div>
-
-        </div>
+                ))
+            ):
+            <p>No Reviews </p>
+        }
+     
        </div>
 
         </>

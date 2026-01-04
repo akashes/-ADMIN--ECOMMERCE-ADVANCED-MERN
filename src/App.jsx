@@ -8,21 +8,11 @@ import Login from './pages/Login'
 import SignUp from './pages/SignUp'
 import Products from './pages/Products'
 
-import Dialog from '@mui/material/Dialog';
 
-import AppBar from '@mui/material/AppBar';
-import Toolbar from '@mui/material/Toolbar';
-import IconButton from '@mui/material/IconButton';
-import Typography from '@mui/material/Typography';
-import Slide from '@mui/material/Slide';
-import { IoIosClose } from "react-icons/io";
-import AddProduct from './pages/Products/AddProduct'
+
 import HomeSliderBanners from './pages/HomeSliderBanners'
-import AddHomeSlide from './pages/HomeSliderBanners/AddHomeSlide'
 import CategoryList from './pages/Category'
-import AddCategory from './pages/Category/AddCategory'
 import SubCategoryList from './pages/Category/SubCatList'
-import AddSubCategory from './pages/Category/AddSubCategory'
 import Users from './pages/Users'
 import Orders from './pages/Orders'
 import ForgotPassword from './pages/ForgotPassword'
@@ -34,24 +24,28 @@ import { tryAutoLogin } from './features/auth/authSlice'
 import PrivateRoute from './routes/PrivateRoute'
 import ResetPassword from './pages/ResetPassword'
 import Profile from './pages/Profile'
-import AddAddress from './pages/Address/addAddress.jsx'
-import EditCategory from './pages/Category/EditCategory.jsx'
+
 import ProductDetails from './pages/Products/ProductDetails.jsx'
 import BannerV1 from './pages/Banners/index.jsx'
 import BlogList from './pages/Blog/index.jsx'
 
 import './App.css'
 import './responsive.css'
+import OrderTracking from './components/OrderTracking/index.jsx'
 
-export const MyContext = createContext()
+import AdminLayout from './components/AdminLayout.jsx'
+export const MyContext = createContext({
+  isSidebarOpen:window.innerWidth>=992,
+  windowWidth:window.innerWidth,
+  sidebarWidth:18 
+})
 
 function App() {
-  const dispatch = useDispatch()
-  const[isSidebarOpen,setIsSidebarOpen]=useState(true)
+  const dispatch = useDispatch() 
   const[isLogin,setIsLogin]=useState(false)
   const[windowWidth,setWindowWidth]=useState(window.innerWidth)
+  const[isSidebarOpen,setIsSidebarOpen]=useState(window.innerWidth>=992)
   const[sidebarWidth,setSidebarWidth]=useState(18)
-  console.log(windowWidth)
 
   const[isAddProductModalOpen,setIsAddProductModalOpen]=useState({
     open:false,
@@ -75,331 +69,394 @@ function App() {
     sidebarWidth
   }
 
-const router = createBrowserRouter([
-  {
-    path:'/',
-   element: 
-   <>
-   <section className="main">
-    <Header/>
-    <div className="contentMain flex">
-      <div  
- //
-      className={`sidebarWrapper overflow-hidden
-        ${isSidebarOpen===true  ? windowWidth<992? `  w-[${sidebarWidth/1.5}%]`:`w-[${sidebarWidth}%]`:'w-0 opacity-0  '}
-        transition-all
-        `}
-      >
-        <Sidebar/>
+// const router = createBrowserRouter([
+//   {
+//     path:'/',
+//    element: 
+//    <PrivateRoute>
+
+//    <>
+//    <section className="main">
+//     <Header/>
+//     <div className="contentMain flex">
+//       <div  
+//  //
+//       className={`sidebarWrapper overflow-hidden
+//         ${isSidebarOpen===true  ? windowWidth<992? `  w-[${sidebarWidth/1.5}%]`:`w-[${sidebarWidth}%]`:'w-0 opacity-0  '}
+//         transition-all
+//         `}
+//       >
+//         <Sidebar/>
      
 
-      </div>
-      <div className={`contentRight py-4  px-5 
-        //  ${isSidebarOpen===false?'w-[100%]':`w-[82%]`}
-        ${isSidebarOpen===true && windowWidth<992 && 'opacity-0' }
+//       </div>
+//       <div className={`contentRight py-4  px-5 
+//         //  ${isSidebarOpen===false?'w-[100%]':`w-[82%]`}
+//         ${isSidebarOpen===true && windowWidth<992 && 'opacity-0' }
         
-          `}
-          style={{width:`w-[${isSidebarOpen?100-sidebarWidth:100}%]`}}
-           >
+//           `}
+//           style={{width:`w-[${isSidebarOpen?100-sidebarWidth:100}%]`}}
+//            >
 
-        <Dashboard />
-      </div>
-    </div>
+//         <Dashboard />
+//       </div>
+//     </div>
     
-   </section>
-   </>
-  },
-  {
-    path:'/login',
-   element: 
-   <Login/>
-  },
-  {
-    path:'/sign-up',
-   element: 
-   <SignUp/>
-  },
+//    </section>
+//    </>
+//    </PrivateRoute>
+
+//   },
+//   {
+//     path:'/login',
+//    element: 
+//    <Login/>
+//   },
+//   {
+//     path:'/sign-up',
+//    element: 
+//    <SignUp/>
+//   },
+//     {
+//     path:'/products',
+//    element: 
+//    <>
+//    <section className="main">
+//     <Header/>
+//     <div className="contentMain flex">
+//       <div  
+
+//       className={`sidebarWrapper overflow-hidden
+//         ${isSidebarOpen===true?'w-[18%] ':'w-0 opacity-0  '}
+//         transition-all
+//         `}
+//       >
+//         <Sidebar/>
+//       </div>
+//       <div className={`contentRight py-4 px-2 md:px-5
+//           ${isSidebarOpen===false?'w-[100%]':'w-[82%]'} `}
+//            >
+//         <Products />
+//       </div>
+//     </div>
+    
+//    </section>
+//    </>
+//   },
+//     {
+//     path:'/homeSlider/list',
+//    element: 
+//    <>
+//    <section className="main">
+//     <Header/>
+//     <div className="contentMain flex">
+//       <div  
+
+//       className={`sidebarWrapper overflow-hidden
+//         ${isSidebarOpen===true?'w-[18%]':'w-[0px] opacity-0  '}
+//         transition-all
+//         `}
+//       >
+//         <Sidebar/>
+//       </div>
+//       <div className={`contentRight py-4 px-2  md:px-5  ${isSidebarOpen===false?'w-[100%]':'w-[82%]'} `} >
+//         <HomeSliderBanners />
+//       </div>
+//     </div>
+    
+//    </section>
+//    </>
+//   },
+//     {
+//     path:'/category/list',
+//    element: 
+//    <>
+//    <section className="main">
+//     <Header/>
+//     <div className="contentMain flex">
+//       <div  
+
+//       className={`sidebarWrapper overflow-hidden
+//         ${isSidebarOpen===true?'w-[18%]':'w-[0px] opacity-0  '}
+//         transition-all
+//         `}
+//       >
+//         <Sidebar/>
+//       </div>
+//       <div className={`contentRight py-4 px-5  ${isSidebarOpen===false?'w-[100%]':'w-[82%]'} `} >
+//         <CategoryList />
+//       </div>
+//     </div>
+    
+//    </section>
+//    </>
+//   },
+//     {
+//     path:'/subCategory/list',
+//    element: 
+//    <>
+//    <section className="main">
+//     <Header/>
+//     <div className="contentMain flex">
+//       <div  
+
+//       className={`sidebarWrapper overflow-hidden
+//         ${isSidebarOpen===true?'w-[18%]':'w-[0px] opacity-0  '}
+//         transition-all
+//         `}
+//       >
+//         <Sidebar/>
+//       </div>
+//       <div className={`contentRight py-4 px-5  ${isSidebarOpen===false?'w-[100%]':'w-[82%]'} `} >
+//         <SubCategoryList />
+//       </div>
+//     </div>
+    
+//    </section>
+//    </>
+//   },
+//     {
+//     path:'/users',
+//    element: 
+//    <>
+//    <section className="main">
+//     <Header/>
+//     <div className="contentMain flex">
+//       <div  
+
+//       className={`sidebarWrapper overflow-hidden
+//         ${isSidebarOpen===true?'w-[18%]':'w-[0px] opacity-0  '}
+//         transition-all
+//         `}
+//       >
+//         <Sidebar/>
+//       </div>
+//       <div className={`contentRight py-4 px-2 md:px-5  ${isSidebarOpen===false?'w-[100%]':'w-[82%]'} `} >
+//         <Users />
+//       </div>
+//     </div>
+    
+//    </section>
+//    </>
+//   },
+//     {
+//     path:'/orders',
+//    element: 
+//    <>
+//    <section className="main">
+//     <Header/>
+//     <div className="contentMain flex">
+//       <div  
+
+//       className={`sidebarWrapper overflow-hidden
+//         ${isSidebarOpen===true?'w-[18%]':'w-[0px] opacity-0  '}
+//         transition-all
+//         `}
+//       >
+//         <Sidebar/>
+//       </div>
+//       <div className={`contentRight py-4  px-2 md:px-5  ${isSidebarOpen===false?'w-[100%]':'w-[82%]'} `} >
+//         <Orders />
+//       </div>
+//     </div>
+    
+//    </section>
+//    </>
+//   },
+//     {
+//     path:'/order/:orderId',
+//    element: 
+//    <>
+//    <section className="main">
+//     <Header/>
+//     <div className="contentMain flex">
+//       <div  
+
+//       className={`sidebarWrapper overflow-hidden
+//         ${isSidebarOpen===true?'w-[18%]':'w-[0px] opacity-0  '}
+//         transition-all
+//         `}
+//       >
+//         <Sidebar/>
+//       </div>
+//       <div className={`contentRight py-4 px-5  ${isSidebarOpen===false?'w-[100%]':'w-[82%]'} `} >
+//         <OrderTracking />
+//       </div>
+//     </div>
+    
+//    </section>
+//    </>
+//   },
+//     {
+//     path:'/forgot-password',
+//    element: 
+//    <ForgotPassword/>
+//   },
+//     {
+//     path:'/verify',
+//    element: 
+//    <VerifyAccount resetPassword={false} />
+//   },
+//     {
+//     path:'/forgot-verify',
+//    element: 
+//    <VerifyAccount resetPassword={true} />
+//   },
+//       {
+//     path:'/change-password',
+//    element: 
+//    <ChangePassword/>
+//   },
+//   {
+//     path:"/reset-password",
+//     element:<ResetPassword/>
+//   },
+//    {
+//     path:'/profile',
+//    element: 
+//    <>
+//    <section className="main">
+//     <Header/>
+//     <div className="contentMain flex">
+//       <div  
+
+//         className={`sidebarWrapper
+//     transition-all duration-300
+//     ${windowWidth < 992 
+//         ? `fixed top-0 left-0 h-full z-110 bg-white 
+//            ${isSidebarOpen ? 'w-[80%] opacity-100' : 'w-0 opacity-0'}`
+//         : `${isSidebarOpen ? 'w-[18%]' : 'w-0 opacity-0'}`
+//     }
+//   `}
+//       >
+//         <Sidebar/>
+//       </div>
+//       <div className={`contentRight py-4 px-2  md:px-5  ${isSidebarOpen===false?`w-[100%]`:'w-[100%]'} `} >
+//         <Profile />
+//       </div>
+//     </div>
+    
+//    </section>
+//    </>
+//   },
+
+//    {
+//     path:'/product/:id',
+//    element: 
+//    <>
+//    <section className="main">
+//     <Header/>
+//     <div className="contentMain flex">
+//       <div  
+
+//       className={`sidebarWrapper overflow-hidden
+//         ${isSidebarOpen===true?'w-[18%]':'w-[0px] opacity-0  '}
+//         transition-all
+//         `}
+//       >
+//         <Sidebar/>
+//       </div>
+//       <div className={`contentRight py-4 px-5  ${isSidebarOpen===false?'w-[100%]':'w-[82%]'} `} >
+//         <ProductDetails />
+//       </div>
+//     </div>
+    
+//    </section>
+//    </>
+//   },
+//    {
+//     path:'/bannerV1/list',
+//    element: 
+//    <>
+//    <section className="main">
+//     <Header/>
+//     <div className="contentMain flex">
+//       <div  
+
+//       className={`sidebarWrapper overflow-hidden
+//         ${isSidebarOpen===true?'w-[18%]':'w-[0px] opacity-0  '}
+//         transition-all
+//         `}
+//       >
+//         <Sidebar/>
+//       </div>
+//       <div className={`contentRight py-4  px-1 md:px-5  ${isSidebarOpen===false?'w-[100%]':'w-[82%]'} `} >
+//         <BannerV1 />
+//       </div>
+//     </div>
+    
+//    </section>
+//    </>
+//   },
+//    {
+//     path:'/blog/list',
+//    element: 
+//    <>
+//    <section className="main">
+//     <Header/>
+//     <div className="contentMain flex">
+//       <div  
+
+//       className={`sidebarWrapper overflow-hidden
+//         ${isSidebarOpen===true?'w-[18%]':'w-[0px] opacity-0  '}
+//         transition-all
+//         `}
+//       >
+//         <Sidebar/>
+//       </div>
+//       <div className={`contentRight py-4 px-1  md:px-5  ${isSidebarOpen===false?'w-[100%]':'w-[82%]'} `} >
+//         <BlogList />
+//       </div>
+//     </div>
+    
+//    </section>
+//    </>
+//   },
+
+
+
+// ])  
+
+
+const router = createBrowserRouter([
     {
-    path:'/products',
-   element: 
-   <>
-   <section className="main">
-    <Header/>
-    <div className="contentMain flex">
-      <div  
-
-      className={`sidebarWrapper overflow-hidden
-        ${isSidebarOpen===true?'w-[18%] ':'w-0 opacity-0  '}
-        transition-all
-        `}
-      >
-        <Sidebar/>
-      </div>
-      <div className={`contentRight py-4 px-5
-          ${isSidebarOpen===false?'w-[100%]':'w-[82%]'} `}
-           >
-        <Products />
-      </div>
-    </div>
-    
-   </section>
-   </>
-  },
+      path: '/',
+      // Wrapping the layout in PrivateRoute
+      element: (
+        <PrivateRoute>
+           <AdminLayout />
+        </PrivateRoute>
+      ),
+      // All these pages will be rendered inside the <Outlet />
+      children: [
+        { path: '', element: <Dashboard /> },
+        { path: 'products', element: <Products /> },
+        { path: 'product/:id', element: <ProductDetails /> },
+        { path: 'users', element: <Users /> },
+        { path: 'orders', element: <Orders /> },
+        { path: 'order/:orderId', element: <OrderTracking /> },
+        { path: 'category/list', element: <CategoryList /> },
+        { path: 'homeSlider/list', element: <HomeSliderBanners /> },
+        // ... add the rest of your admin routes here
+      ]
+    },
+    // Public Routes (No Sidebar/Header)
     {
-    path:'/homeSlider/list',
-   element: 
-   <>
-   <section className="main">
-    <Header/>
-    <div className="contentMain flex">
-      <div  
-
-      className={`sidebarWrapper overflow-hidden
-        ${isSidebarOpen===true?'w-[18%]':'w-[0px] opacity-0  '}
-        transition-all
-        `}
-      >
-        <Sidebar/>
-      </div>
-      <div className={`contentRight py-4 px-5  ${isSidebarOpen===false?'w-[100%]':'w-[82%]'} `} >
-        <HomeSliderBanners />
-      </div>
-    </div>
-    
-   </section>
-   </>
-  },
+      path: '/login',
+      element: <Login />
+    },
     {
-    path:'/category/list',
-   element: 
-   <>
-   <section className="main">
-    <Header/>
-    <div className="contentMain flex">
-      <div  
-
-      className={`sidebarWrapper overflow-hidden
-        ${isSidebarOpen===true?'w-[18%]':'w-[0px] opacity-0  '}
-        transition-all
-        `}
-      >
-        <Sidebar/>
-      </div>
-      <div className={`contentRight py-4 px-5  ${isSidebarOpen===false?'w-[100%]':'w-[82%]'} `} >
-        <CategoryList />
-      </div>
-    </div>
-    
-   </section>
-   </>
-  },
-    {
-    path:'/subCategory/list',
-   element: 
-   <>
-   <section className="main">
-    <Header/>
-    <div className="contentMain flex">
-      <div  
-
-      className={`sidebarWrapper overflow-hidden
-        ${isSidebarOpen===true?'w-[18%]':'w-[0px] opacity-0  '}
-        transition-all
-        `}
-      >
-        <Sidebar/>
-      </div>
-      <div className={`contentRight py-4 px-5  ${isSidebarOpen===false?'w-[100%]':'w-[82%]'} `} >
-        <SubCategoryList />
-      </div>
-    </div>
-    
-   </section>
-   </>
-  },
-    {
-    path:'/users',
-   element: 
-   <>
-   <section className="main">
-    <Header/>
-    <div className="contentMain flex">
-      <div  
-
-      className={`sidebarWrapper overflow-hidden
-        ${isSidebarOpen===true?'w-[18%]':'w-[0px] opacity-0  '}
-        transition-all
-        `}
-      >
-        <Sidebar/>
-      </div>
-      <div className={`contentRight py-4 px-5  ${isSidebarOpen===false?'w-[100%]':'w-[82%]'} `} >
-        <Users />
-      </div>
-    </div>
-    
-   </section>
-   </>
-  },
-    {
-    path:'/orders',
-   element: 
-   <>
-   <section className="main">
-    <Header/>
-    <div className="contentMain flex">
-      <div  
-
-      className={`sidebarWrapper overflow-hidden
-        ${isSidebarOpen===true?'w-[18%]':'w-[0px] opacity-0  '}
-        transition-all
-        `}
-      >
-        <Sidebar/>
-      </div>
-      <div className={`contentRight py-4 px-5  ${isSidebarOpen===false?'w-[100%]':'w-[82%]'} `} >
-        <Orders />
-      </div>
-    </div>
-    
-   </section>
-   </>
-  },
-    {
-    path:'/forgot-password',
-   element: 
-   <ForgotPassword/>
-  },
-    {
-    path:'/verify',
-   element: 
-   <VerifyAccount resetPassword={false} />
-  },
-    {
-    path:'/forgot-verify',
-   element: 
-   <VerifyAccount resetPassword={true} />
-  },
-      {
-    path:'/change-password',
-   element: 
-   <ChangePassword/>
-  },
-  {
-    path:"/reset-password",
-    element:<ResetPassword/>
-  },
-   {
-    path:'/profile',
-   element: 
-   <>
-   <section className="main">
-    <Header/>
-    <div className="contentMain flex">
-      <div  
-
-        className={`sidebarWrapper
-    transition-all duration-300
-    ${windowWidth < 992 
-        ? `fixed top-0 left-0 h-full z-110 bg-white 
-           ${isSidebarOpen ? 'w-[80%] opacity-100' : 'w-0 opacity-0'}`
-        : `${isSidebarOpen ? 'w-[18%]' : 'w-0 opacity-0'}`
-    }
-  `}
-      >
-        <Sidebar/>
-      </div>
-      <div className={`contentRight py-4 px-2  md:px-5  ${isSidebarOpen===false?`w-[100%]`:'w-[100%]'} `} >
-        <Profile />
-      </div>
-    </div>
-    
-   </section>
-   </>
-  },
-
-   {
-    path:'/product/:id',
-   element: 
-   <>
-   <section className="main">
-    <Header/>
-    <div className="contentMain flex">
-      <div  
-
-      className={`sidebarWrapper overflow-hidden
-        ${isSidebarOpen===true?'w-[18%]':'w-[0px] opacity-0  '}
-        transition-all
-        `}
-      >
-        <Sidebar/>
-      </div>
-      <div className={`contentRight py-4 px-5  ${isSidebarOpen===false?'w-[100%]':'w-[82%]'} `} >
-        <ProductDetails />
-      </div>
-    </div>
-    
-   </section>
-   </>
-  },
-   {
-    path:'/bannerV1/list',
-   element: 
-   <>
-   <section className="main">
-    <Header/>
-    <div className="contentMain flex">
-      <div  
-
-      className={`sidebarWrapper overflow-hidden
-        ${isSidebarOpen===true?'w-[18%]':'w-[0px] opacity-0  '}
-        transition-all
-        `}
-      >
-        <Sidebar/>
-      </div>
-      <div className={`contentRight py-4 px-5  ${isSidebarOpen===false?'w-[100%]':'w-[82%]'} `} >
-        <BannerV1 />
-      </div>
-    </div>
-    
-   </section>
-   </>
-  },
-   {
-    path:'/blog/list',
-   element: 
-   <>
-   <section className="main">
-    <Header/>
-    <div className="contentMain flex">
-      <div  
-
-      className={`sidebarWrapper overflow-hidden
-        ${isSidebarOpen===true?'w-[18%]':'w-[0px] opacity-0  '}
-        transition-all
-        `}
-      >
-        <Sidebar/>
-      </div>
-      <div className={`contentRight py-4 px-5  ${isSidebarOpen===false?'w-[100%]':'w-[82%]'} `} >
-        <BlogList />
-      </div>
-    </div>
-    
-   </section>
-   </>
-  },
-
-
-
-])  
+      path: '/sign-up',
+      element: <SignUp />
+    },
+  ]);
 
 
 
   useEffect(() => {
     dispatch(tryAutoLogin());
   }, []);
+
 
   useEffect(()=>{
     const handleResize=()=>{
@@ -415,8 +472,7 @@ const router = createBrowserRouter([
   },[])
 
   useEffect(()=>{
-    console.log('inside')
-    console.log(windowWidth)
+
     if(windowWidth<992){
       setIsSidebarOpen(false)
       setSidebarWidth(90)

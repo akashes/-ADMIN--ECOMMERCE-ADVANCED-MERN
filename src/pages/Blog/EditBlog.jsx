@@ -169,8 +169,8 @@ useEffect(()=>{
 
 console.log(formFields)
   return (
-    <section className="p-5  bg-gray-50">
-      <form className="addProductForm  p-8 py-3 "
+    <section className=" p-0 md:p-5  bg-gray-50">
+      <form className="addProductForm p-3 md:p-8 py-3 "
       onSubmit={handleSubmit}
       >
         <div className="scroll max-h-[72vh] overflow-y-scroll pr-4 pt-4">
@@ -207,7 +207,7 @@ console.log(formFields)
             Blog Image
           </h3>
 
-          <div className="grid grid-cols-7 gap-4 ">
+          <div className="grid grid-cols-2 md:grid-cols-7 gap-4 ">
          {
             image && (
 

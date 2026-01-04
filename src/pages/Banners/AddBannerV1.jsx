@@ -265,9 +265,9 @@ const AddBannerV1 = () => {
   console.log(formFields);
 
   return (
-    <section className="p-5 md:px-48 bg-gray-50">
+    <section className=" p-1 md:p-5 lg:px-48 bg-gray-50">
       <form className="addProductForm  p-2 md:p-8 py-3 " onSubmit={handleSubmit}>
-        <div className=" overflow-y-scroll pr-4">
+        <div className=" overflow-y-scroll pr-0 md:pr-4">
           <div className="grid grid-cols-1 mb-3">
             <div className="col">
               <h3 className="text-[14px] font-[500] mb-1 text-black">
@@ -536,7 +536,7 @@ const AddBannerV1 = () => {
         <Button
           disabled={isUploading || loading}
           type="submit"
-          className="!border-1 !border-blue-700 btn-lg mt-3 w-full gap-1"
+          className="!border-1 !border-blue-700 md:btn-lg mt-3 w-full gap-1"
         >
           {loading ? (
             <>

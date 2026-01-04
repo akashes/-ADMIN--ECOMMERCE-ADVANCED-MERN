@@ -50,7 +50,7 @@ const columns=[
   {id:'category',label:'CATEGORY',minWidth:100},
   {id:'subcategory',label:'SUB CATEGORY',minWidth:150},
   {id:'price',label:'PRICE',minWidth:100},
-  {id:"sales",label:'SALES',minWidth:130},
+  {id:"stock left",label:'STOCK',minWidth:130},
   {id:"rating",label:'RATING',minWidth:130},
   {id:'action',label:'ACTION',minWidth:120}
 ]
@@ -539,19 +539,23 @@ const thirdLevelCategories = selectedSubCategory?.children || [];
                   <p className='text-[14px] w-[100px]'>
       <span className='font-[800] mr-1'>
 
-    {product?.sale}
+    {product?.countInStock}
       </span>
-       sale
+       left
 
     </p>
 
               </TableCell>
               <TableCell style={{minWidth:columns.minWidth}}>
-                  <p className='text-[14px] w-[100px]'>
-      
-       <Rating defaultValue={product.rating} size='small' readOnly  />
+                   
+      {
+        product?.rating===0 ? <p className='text-[14px] text-gray-600'>
+          No Ratings
 
-    </p>
+        </p>:
+       <Rating defaultValue={product.rating} size='small' readOnly  />
+      }
+
 
               </TableCell>
               <TableCell style={{minWidth:columns.minWidth}}>

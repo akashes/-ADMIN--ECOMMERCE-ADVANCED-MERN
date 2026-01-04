@@ -9,7 +9,6 @@ export const getDashboardDetails = createAsyncThunk('dashboard/getDashboardDetai
 
   
 
-        // const result = await axios.get(`/api/order/get-all-orders-admin?page=${page}&limit=${limit}`)
             if(!result.data.success){
             throw new Error(result.data.message || 'Failed to get dashboard details  ')
         }

@@ -1,5 +1,4 @@
 import React, { useEffect, useState } from "react";
-import axios from "axios";
 import { Swiper, SwiperSlide } from "swiper/react";
 import "swiper/css";
 import { FreeMode,Pagination } from "swiper/modules";
@@ -20,22 +19,10 @@ import './dashboardStyle.css'
 const ranges = ["today", "lastWeek", "lastMonth", "thisYear"];
 
 const DashboardBoxes = () => {
-  // const [stats, setStats] = useState(null);
   const [selectedRange, setSelectedRange] = useState("lastMonth");
   const{stats,loading}=useSelector(state=>state.dashboard)
   const dispatch = useDispatch()
 
-  // useEffect(() => {
-  //   const fetchStats = async () => {
-  //     try {
-  //       const { data } = await axios.get("/api/admin/dashboard-stats");
-  //       if (data.success) setStats(data.data);
-  //     } catch (error) {
-  //       console.error(error);
-  //     }
-  //   };
-  //   fetchStats();
-  // }, []);
 
 
   useEffect(()=>{

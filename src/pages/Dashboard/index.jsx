@@ -136,14 +136,12 @@ const confirmDeleteMultiple = () => {
   setIsAlertOpen(true);
 };
 
-console.log(deleteArray)
 
 
     const[searchTerm,setSearchTerm]=useState('')
     const debouncedSearchTerm = useDebounce(searchTerm,500)
     const [ratingFilter, setRatingFilter] = useState('');
 
-    console.log(deleteTarget)
 
     const[formFields,setFormFields]=useState({
     category: '',

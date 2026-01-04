@@ -100,12 +100,12 @@ const bannerV1Slice=createSlice({
                   state.error = null
               }),
               builder.addCase(getFilterProducts.fulfilled,(state,action)=>{
-                  state.loading = true
+                  state.loading = false
                   state.error = null
                   state.filterProducts=action.payload.products
               }),
               builder.addCase(getFilterProducts.rejected,(state)=>{
-                  state.loading = true
+                  state.loading = false
                   state.error = null
               })
                   builder.addCase(addBannerV1.pending,(state)=>{
@@ -113,13 +113,13 @@ const bannerV1Slice=createSlice({
                   state.error = null
               }),
               builder.addCase(addBannerV1.fulfilled,(state,action)=>{
-                  state.loading = true
+                  state.loading = false
                   state.error = null
                   state.filterProducts=[]
 
               }),
               builder.addCase(addBannerV1.rejected,(state)=>{
-                  state.loading = true
+                  state.loading = false
                   state.error = null
               })
                   builder.addCase(getBannersV1.pending,(state)=>{
@@ -127,27 +127,24 @@ const bannerV1Slice=createSlice({
                   state.error = null
               }),
               builder.addCase(getBannersV1.fulfilled,(state,action)=>{
-                  state.loading = true
+                  state.loading = false
                   state.error = null
                   state.banners=action.payload.banners
 
               }),
               builder.addCase(getBannersV1.rejected,(state)=>{
-                  state.loading = true
+                  state.loading = false
                   state.error = null
               })
                   builder.addCase(deleteAdBannerV1.pending,(state)=>{
-                  state.loading = true
                   state.error = null
               }),
               builder.addCase(deleteAdBannerV1.fulfilled,(state,action)=>{
-                  state.loading = true
                   state.error = null
                   state.banners = state.banners.filter((banner)=>banner._id!==action.payload.id)
 
               }),
               builder.addCase(deleteAdBannerV1.rejected,(state)=>{
-                  state.loading = true
                   state.error = null
               })
             }

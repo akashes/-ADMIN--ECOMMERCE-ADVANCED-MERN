@@ -18,10 +18,10 @@ export const addAddress = createAsyncThunk('user/addAddress',async(address,{reje
     }
 })
 
-export const getAllUsers = createAsyncThunk('user/getAllUsers',async({page=1,perPage=3},{rejectWithValue})=>{
+export const getAllUsers = createAsyncThunk('user/getAllUsers',async({page=1,perPage=3,search=''},{rejectWithValue})=>{
     console.log(page,perPage)
     try {
-        const result = await axios.get(`/api/user/get-all-users?page=${page}&perPage=${perPage}`)
+        const result = await axios.get(`/api/user/get-all-users?page=${page}&perPage=${perPage}&search=${search}`)
         console.log(result)
         if(!result.data.success){
             throw new Error(result.data.message || 'Failed to get Users')
@@ -98,6 +98,30 @@ export const deleteMultipleUsers=createAsyncThunk('product/deleteMultipleUsers',
     }
 })
 
+export const updateUserRoles = createAsyncThunk(
+  "user/updateUserRoles",
+  async ({ userId, role }, { rejectWithValue }) => {
+    try {
+      const response = await axios.put(`/api/user/roles/${userId}`, { role });
+      return response.data;
+    } catch (err) {
+      return rejectWithValue(err.response?.data?.message || "Error updating roles");
+    }
+  }
+);
+export const updateUserStatus = createAsyncThunk(
+  "user/updateUserStatus",
+  async ({ userId, status }, { rejectWithValue }) => {
+    try {
+      const response = await axios.put(`/api/user/status/${userId}`, { status });
+      return response.data;
+    } catch (err) {
+      return rejectWithValue(err.response?.data?.message || "Error updating status");
+    }
+  }
+);
+
+
 const userSlice = createSlice({
     name:'user',
     initialState:{
@@ -111,9 +135,10 @@ const userSlice = createSlice({
         pagination:{
             page:1,
             totalPages:1,
-            perPage:3,
+            perPage:10,
             totalUsers:0
-        }
+        },
+        updateLoading:false,
     },
     reducers:{
         setPaginationPage:(state,action)=>{
@@ -215,6 +240,48 @@ const userSlice = createSlice({
                 })
                 .addCase(deleteMultipleUsers.rejected,(state,action)=>{
                         state.loading=false, 
+                    state.error=false
+                    state.error=action.payload.error || 'Failed to delete users'
+        
+        
+                })
+                .addCase(updateUserRoles.pending,(state,action)=>{
+                    state.updateLoading = action.meta.arg.userId,
+                    state.error=false
+                })
+                .addCase(updateUserRoles.fulfilled,(state,action)=>{
+                    state.updateLoading=false,
+                    state.error=false
+
+                    const updatedUserIndex = state.users.findIndex(u=>u._id===action.payload.id)
+                    state.users[updatedUserIndex]=action.payload.user
+
+
+                    
+                })
+                .addCase(updateUserRoles.rejected,(state,action)=>{
+                        state.updateLoading=false, 
+                    state.error=false
+                    state.error=action.payload.error || 'Failed to delete users'
+        
+        
+                })
+                .addCase(updateUserStatus.pending,(state,action)=>{
+                    state.updateLoading = action.meta.arg.userId,
+                    state.error=false
+                })
+                .addCase(updateUserStatus.fulfilled,(state,action)=>{
+                    state.updateLoading=false,
+                    state.error=false
+
+                    const updatedUserIndex = state.users.findIndex(u=>u._id===action.payload.id)
+                    state.users[updatedUserIndex]=action.payload.user
+
+
+                    
+                })
+                .addCase(updateUserStatus.rejected,(state,action)=>{
+                        state.updateLoading=false, 
                     state.error=false
                     state.error=action.payload.error || 'Failed to delete users'
         

@@ -102,7 +102,7 @@ export const forgotPasswordOtp=createAsyncThunk(
 export const tryAutoLogin = createAsyncThunk(
   'auth/tryAutoLogin',
   async (_, { dispatch, rejectWithValue }) => {
-    let token = localStorage.getItem('accessToken');
+    let token = localStorage.getItem('admin_accessToken');
     console.log('token in localstorage for auto login',token)
 
     if (!token || isTokenExpired(token)) {
@@ -115,7 +115,7 @@ export const tryAutoLogin = createAsyncThunk(
         const newToken = res
         console.log('got new acess token',newToken)
         if (!newToken) throw new Error('Token refresh failed');
-        localStorage.setItem('accessToken', newToken);
+        localStorage.setItem('admin_accessToken', newToken);
         token = newToken;
       } catch (err) {
         return rejectWithValue('Token refresh failed');
@@ -142,8 +142,8 @@ export const tryAutoLogin = createAsyncThunk(
 export const loginUser = createAsyncThunk(
   'auth/loginUser',
   async ({ token, user }, { dispatch }) => {
-    localStorage.setItem('accessToken', token);
-    localStorage.setItem('user', JSON.stringify(user));
+    localStorage.setItem('admin_accessToken', token);
+    localStorage.setItem('admin_user', JSON.stringify(user));
     dispatch(scheduleTokenRefresh(token));
     return { token, user };
   }
@@ -162,8 +162,8 @@ export const logoutUser = createAsyncThunk(
       })
       console.log(res)
       //clear frontend auth data
-       localStorage.removeItem('accessToken');
-    localStorage.removeItem('user');
+       localStorage.removeItem('admin_accessToken');
+    localStorage.removeItem('admin_user');
     if (refreshTimer) clearTimeout(refreshTimer);
     if(res.data.success){
       return res.data.message
@@ -191,11 +191,11 @@ export const scheduleTokenRefresh = createAsyncThunk(
       const newToken = await refreshAccessToken();
       console.log(newToken)
       if (newToken) {
-        localStorage.setItem('accessToken', newToken);
+        localStorage.setItem('admin_accessToken', newToken);
         dispatch(scheduleTokenRefresh(newToken));
       } else {
         dispatch(logoutUser());
-    //         localStorage.removeItem('accessToken');
+    //         localStorage.removeItem('admin_accessToken');
     // localStorage.removeItem('user');
     // if (refreshTimer) clearTimeout(refreshTimer);
       }
@@ -320,7 +320,7 @@ const authSlice = createSlice({
         state.loading = false;
         state.error = null;
         state.isLogin = true;
-        state.token =action.payload.accessToken
+        state.token =action.payload.admin_accessToken
         state.user = action.payload.user;
         })
         .addCase(userLogin.rejected, (state, action) => {
@@ -376,6 +376,10 @@ const authSlice = createSlice({
         state.isLogin = true;
         state.user = action.payload.user;
         state.token = action.payload.token;
+            state.loading = false;
+        state.error = null;
+
+   
       })
       .addCase(logoutUser.fulfilled, (state) => {
         state.isLogin = false;

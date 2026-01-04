@@ -5,7 +5,7 @@ const PrivateRoute = ({ children }) => {
   const { isLogin, loading, authChecked } = useSelector((state) => state.auth);
   console.log(isLogin, loading, authChecked);
 
-  if(!localStorage.getItem('accessToken')){
+  if(!localStorage.getItem('admin_accessToken')){
     <Navigate to={'login'} />
   }
 

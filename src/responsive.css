@@ -3,4 +3,16 @@
     html,body{
         overflow-x: hidden;
     }
+  
+}
+
+
+@media (max-width:768px){
+ 
+        .home-slider::-webkit-scrollbar{
+        display: none !important;
+    }
+    .css-1dc80h3-MuiTableCell-root{
+        padding:3px !important
+    }
 }

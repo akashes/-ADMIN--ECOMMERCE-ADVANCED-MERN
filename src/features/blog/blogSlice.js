@@ -135,16 +135,13 @@ const blogSlice = createSlice({
                    state.error = null
                })
             builder.addCase(deleteBlog.pending,(state)=>{
-                   state.loading = true
                    state.error = null
                })
             builder.addCase(deleteBlog.fulfilled,(state,action)=>{
-                   state.loading = false
                    state.error = null
                    state.blogs = state.blogs.filter((blog)=>blog._id!==action.payload.id)
                })
             builder.addCase(deleteBlog.rejected,(state)=>{
-                   state.loading = true
                    state.error = null
                })
             builder.addCase(getSingleBlog.pending,(state)=>{
