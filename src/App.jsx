@@ -437,6 +437,11 @@ const router = createBrowserRouter([
         { path: 'order/:orderId', element: <OrderTracking /> },
         { path: 'category/list', element: <CategoryList /> },
         { path: 'homeSlider/list', element: <HomeSliderBanners /> },
+        { path: 'subCategory/list', element: <SubCategoryList /> },
+        { path: 'bannerV1/list', element: <BannerV1 /> },
+        { path: 'blog/list', element: <BlogList /> },
+        { path: 'profile', element: <Profile /> },
+
         // ... add the rest of your admin routes here
       ]
     },

@@ -42,6 +42,9 @@ import RevenueChart from '../../components/Charts/RevenueChart'
 import OrderChart from '../../components/Charts/OrderChart'
 import ProductsSkeleton from '../../components/Skeltons/ProductsSkelton'
 
+import {io} from 'socket.io-client'
+import { showSuccess } from '../../utils/toastUtils'
+
 
 
 const columns=[
@@ -367,6 +370,30 @@ const thirdLevelCategories = selectedSubCategory?.children || [];
               useEffect(()=>{
                 dispatch(getOrders())
         
+              },[])
+
+
+              useEffect(()=>{
+                const socket = io('http://localhost:8000',{
+                  withCredentials:true
+                })
+
+
+                const handleNotification = (data)=>{
+                  if(data && data.orderId){
+                  showSuccess(`New Order Received!, OrderId - ${data.orderId}`)
+                  }else{
+                    showSuccess('New Order Received!')
+                  }
+                }
+                socket.on('new-order-notification',handleNotification) 
+
+                return () => {
+    console.log("Cleaning up socket listener...");
+    socket.off('new-order-notification', handleNotification);
+    socket.disconnect();
+  };
+
               },[])
   return (
    <>

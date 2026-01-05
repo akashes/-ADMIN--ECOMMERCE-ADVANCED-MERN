@@ -2,7 +2,6 @@ import  Button  from '@mui/material/Button'
 import React, { useContext, useEffect, useState } from 'react'
 
 
-import Checkbox from '@mui/material/Checkbox';
 import { Link } from 'react-router-dom'
 
 import Table from '@mui/material/Table';
@@ -28,7 +27,6 @@ import { MdDelete } from "react-icons/md";
 import { MyContext } from '../../App';
 import { useDispatch, useSelector } from 'react-redux';
 import { deleteCategory, getCategories, setEditSelectedCategory } from '../../features/category/categorySlice';
-import { Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle } from '@mui/material';
 import { showError, showSuccess } from '../../utils/toastUtils.js';
 import DeleteWarningDialog from '../../components/DeleteWarningDialog.jsx';
 
@@ -54,11 +52,12 @@ const CategoryList = () => {
 
   const handleClose = () => {
     setOpen(false);
+    setDeleteCategoryId('')
+    setDeleteCategoryName('')
   };
 
       const [rowsPerPage, setRowsPerPage] = React.useState(10);
       const [page, setPage] = React.useState(0);
-        const [categoryFilterVal, setCategoryFilterVal] = useState('');
     
           const handleChangePage = (event, newPage) => {
     setPage(newPage);
@@ -68,17 +67,14 @@ const CategoryList = () => {
     setRowsPerPage(+event.target.value);
     setPage(0);
   };
-      const handleChangeCatFilter = (event) => {
-        setCategoryFilterVal(event.target.value);
-      };
+
       const label = { inputProps: { 'aria-label': 'Checkbox demo' } };
 
       const handleDeleteCategory=async()=>{
         handleClose()
         const resultAction = await dispatch(deleteCategory(deleteCategoryId))
-        console.log(resultAction)
         if(deleteCategory.fulfilled.match(resultAction)){
-          showSuccess(resultAction.payload.message || 'Category deleted successfully')
+          showSuccess( 'Category deleted successfully')
           dispatch(getCategories())
         }
         if(deleteCategory.rejected.match(resultAction)){
@@ -93,7 +89,6 @@ const CategoryList = () => {
         const fetchCategoriesFunction=async()=>{
 
           const resultAction = await dispatch(getCategories())
-          console.log(resultAction)
        
 
         }
@@ -101,7 +96,6 @@ const CategoryList = () => {
 
 
       },[])
-      console.log(categories)
       const paginatedCategories = categories.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage);
   return (
    <>
@@ -167,6 +161,7 @@ const CategoryList = () => {
 
               </TableCell>
                   <TableCell 
+                  className='!font-semibold'
               width={100}
               >
                {item.name}
@@ -177,7 +172,7 @@ const CategoryList = () => {
               width={100}
               >
                    <div className="flex items-center gap-1">
-      <TooltipMUI placement='top' title='Edit Product'>
+      <TooltipMUI placement='top' title='Edit Category'>
 
       <Button
       onClick={()=>{
@@ -198,7 +193,7 @@ const CategoryList = () => {
         <FaEye className='text-[rgba(0,0,0,0.7)] text-[20px] '/>
       </Button>
       </TooltipMUI>
-      <TooltipMUI placement='top' title='Remove Product'>
+      <TooltipMUI placement='top' title='Remove Category'>
 
       <Button
       // onClick={()=>confirmDelete(item._id,item.name)}
@@ -219,19 +214,7 @@ const CategoryList = () => {
             </TableRow>
               ))
             }
-            {/* <TableRow hover role='checkbox' tabIndex={-1} key={row.code}>
-              {
-                columns.map((column)=>{
-                  const value=row(column.id)
-                  return(
-                    <TableCell key={column.id} align={column.align} >
-                      {column.format && typeof value==='number' ? column.format(value):value}
-                    </TableCell>
-                  )
-                })
-              }
-
-            </TableRow> */}
+        
           
           
          
@@ -257,33 +240,7 @@ const CategoryList = () => {
         
 
    </div> 
-     {/* <Dialog
-        open={open}
-        onClose={handleClose}
-        aria-labelledby="alert-dialog-title"
-        aria-describedby="alert-dialog-description"
-      >
-        <DialogTitle id="alert-dialog-title">
-          {"Do you want to delete this category?"}
-        </DialogTitle>
-        <DialogContent>
-          <DialogContentText id="alert-dialog-description">
-            Deleting this category also deletes all the products under this category as well its subcategories
-
-          </DialogContentText>
-        </DialogContent>
-        <DialogActions>
-          <Button
-          className='!bg-black !text-white btn-md'
-          onClick={()=>{
-            handleClose()
-            setDeleteCategoryId(null)
-          }}>Close</Button>
-          <Button className='!bg-secondary !text-white !btn-sm' onClick={handleDeleteCategory} autoFocus>
-            Delete
-          </Button>
-        </DialogActions>
-      </Dialog> */}
+ 
       <DeleteWarningDialog
        open={open} handleClose={handleClose} 
        setDeleteId={setDeleteCategoryId}

@@ -262,7 +262,6 @@ const AddBannerV1 = () => {
     
   }, [formFields.category, formFields.subCatId, formFields.thirdSubCatId]);
 
-  console.log(formFields);
 
   return (
     <section className=" p-1 md:p-5 lg:px-48 bg-gray-50">

@@ -9,7 +9,6 @@ import { Button } from "@mui/material";
 import { addCategory, addCategoryImage, deleteCategoryImage, getCategories, setCategoryImages, setEditSelectedCategory } from "../../features/category/categorySlice";
 import {  showError, showSuccess, showWarning } from "../../utils/toastUtils";
 import { useDispatch, useSelector } from "react-redux";
-import { addAddress } from "../../features/user/userSlice";
 import { useContext } from "react";
 import { MyContext } from "../../App";
 import { updateCategory } from "../../features/category/categorySlice";
@@ -148,7 +147,6 @@ const EditCategory = () => {
 
 }
   useEffect(()=>{
-    console.log('initial setup useeffect')
     if(editSelectedCategory){
       setFormFields({name:editSelectedCategory.name})
     }
@@ -172,7 +170,6 @@ useEffect(() => {
     dispatch(setEditSelectedCategory(null));
   };
 }, []);
-console.log(formFields)
   return (
     <section className="p-5  bg-gray-50">
       <form className="addProductForm  p-8 py-3 "

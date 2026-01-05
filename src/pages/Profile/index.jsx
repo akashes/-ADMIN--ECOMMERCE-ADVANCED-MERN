@@ -1,13 +1,10 @@
 import React, { useContext, useEffect, useRef, useState } from 'react'
 import { IoIosArrowDown, IoMdCloudUpload, IoMdEyeOff } from 'react-icons/io'
-import { NavLink } from 'react-router-dom'
 import Button from '@mui/material/Button';
 
-import { FaUserCog } from "react-icons/fa";
-import { BiSolidMap } from "react-icons/bi";
+
 import { IoBagCheck, IoEye } from "react-icons/io5";
-import { IoHeartSharp } from "react-icons/io5";
-import { IoLogOut } from "react-icons/io5";
+
 import axios from 'axios';
 import { showError, showSuccess, showWarning } from '../../utils/toastUtils';
 import { uploadImage } from '../../utils/api';
@@ -102,16 +99,7 @@ const hasChangedMobile = phone !== user.mobile;
     
     }
 
-    // const handleSelectedAddressChange=async(e)=>{
-    //   setSelectedAddressId(e.target.value)
-    //   if(e.target.checked===true){
-    //     dispatch(selectAddress({addressId:e.target.value,selected:true}))
 
-    //   }else{
-    //     dispatch(selectAddress({addressId:e.target.value,selected:false}))
-    //   }
-
-    // }
 
 
     const[avatar,setAvatar]=useState(user?.avatar?.url || 'https://res.cloudinary.com/dllelmzim/image/upload/v1753808261/user_dhgqbt.png')

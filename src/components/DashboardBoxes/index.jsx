@@ -13,13 +13,16 @@ import "swiper/css/pagination";
 import "swiper/css/navigation";
 import "swiper/css/free-mode"
 import DashboardBoxesSkelton from "../Skeltons/DashboardBoxesSkelton";
-import { getDashboardDetails } from "../../features/dashboard/dashboardSlice";
+import { getDashboardDetails, updateOrderStats } from "../../features/dashboard/dashboardSlice";
 import { useDispatch, useSelector } from "react-redux";
 import './dashboardStyle.css'
+import { io } from "socket.io-client";
+import { showSuccess } from "../../utils/toastUtils";
 const ranges = ["today", "lastWeek", "lastMonth", "thisYear"];
 
 const DashboardBoxes = () => {
   const [selectedRange, setSelectedRange] = useState("lastMonth");
+  const[pulseOrder,setPulseOrder]=useState(false)
   const{stats,loading}=useSelector(state=>state.dashboard)
   const dispatch = useDispatch()
 
@@ -27,9 +30,24 @@ const DashboardBoxes = () => {
 
   useEffect(()=>{
     dispatch(getDashboardDetails())
+
+    const socket = io('http://localhost:8000',{
+      withCredentials:true
+    })
+
+    socket.on('new-order-notification',(data)=>{
+      dispatch(updateOrderStats())
+
+      setPulseOrder(true)
+      setTimeout(()=>setPulseOrder(false),1000)
+
+      return()=>{
+        socket.disconnect();
+      }
+    })
     
 
-  },[])
+  },[dispatch])
 
   return (
     <div >
@@ -79,17 +97,21 @@ const DashboardBoxes = () => {
 <IoStatsChart className="text-[80px] text-white/20 absolute bottom-2 right-2" />
           </div>
         </SwiperSlide>
-        <SwiperSlide>
-          <div className="hover:scale-101  box bg-gradient-to-r from-blue-500 to-blue-600 shadow-md p-5 min-h-[100px] rounded-2xl  flex items-center gap-4">
-            <HiOutlineGift className="text-[40px] text-white" />
-           <div className="info  
-">
-  <p className="text-sm text-white/80">Total Orders</p>
-  <p className="text-2xl font-bold text-white">{stats.orders[selectedRange]}</p>
-</div>
-<IoStatsChart className="text-[80px] text-white/20 absolute bottom-2 right-2" />
-          </div>
-        </SwiperSlide>
+      <SwiperSlide>
+    <div className={`hover:scale-101 box bg-gradient-to-r from-blue-500 to-blue-600 shadow-md p-5 min-h-[100px] rounded-2xl flex items-center gap-4 transition-all duration-500
+      ${pulseOrder ? "ring-4 ring-blue-300 scale-105" : ""}`}> 
+      
+      <HiOutlineGift className={`text-[40px] text-white ${pulseOrder ? "animate-bounce" : ""}`} />
+      
+      <div className="info">
+        <p className="text-sm text-white/80">Total Orders</p>
+        <p className={`text-2xl font-bold text-white transition-all ${pulseOrder ? "scale-125" : ""}`}>
+          {stats.orders[selectedRange]}
+        </p>
+      </div>
+      <IoStatsChart className="text-[80px] text-white/20 absolute bottom-2 right-2" />
+    </div>
+  </SwiperSlide>
         <SwiperSlide>
           <div className="hover:scale-101  box bg-gradient-to-r from-yellow-500 to-yellow-600 shadow-md p-5 min-h-[100px] rounded-2xl  flex items-center gap-4">
             <RiProductHuntLine className="text-[40px] text-white" />

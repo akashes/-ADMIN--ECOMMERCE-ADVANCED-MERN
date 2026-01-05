@@ -21,17 +21,29 @@ export const getDashboardDetails = createAsyncThunk('dashboard/getDashboardDetai
 
 })
 
+const INITIAL_STATE = {
+    loading:false,
+        error:null,
+        stats:null
 
+}
 
 
 const dashboardSlice = createSlice({
     name:"dashboard",
-    initialState:{
-        loading:false,
-        error:null,
-        stats:null
-    },
+    initialState:INITIAL_STATE,
     reducers:{
+
+        //to react to socket connection on orders
+        updateOrderStats:(state)=>{
+                if(state.stats){
+                Object.keys(state.stats.orders).forEach(range=>{
+                    state.stats.orders[range]+=1
+                })
+            }
+        }
+
+        
 
     },
     extraReducers:(builder)=>{
@@ -40,7 +52,7 @@ const dashboardSlice = createSlice({
             state.error=null
         })
         builder.addCase(getDashboardDetails.fulfilled,(state,action)=>{
-            state.loading=true,
+            state.loading=false,
             state.error=null
             state.stats = action.payload.data
         })
@@ -53,5 +65,5 @@ const dashboardSlice = createSlice({
 
 
 })
-
+export const {updateOrderStats}=dashboardSlice.actions
 export default dashboardSlice.reducer

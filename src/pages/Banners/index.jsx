@@ -53,7 +53,6 @@ const [previewImage, setPreviewImage] = useState('');
 
 
       const handleDeleteBanner=async(id)=>{
-        console.log('id is ',id)
         setDeleteId(id)
        const resultAction = await dispatch(deleteAdBannerV1(id))
         if(deleteAdBannerV1.fulfilled.match(resultAction)){

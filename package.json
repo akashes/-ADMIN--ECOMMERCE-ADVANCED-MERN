@@ -32,6 +32,7 @@
     "react-router-dom": "^7.7.0",
     "react-simple-wysiwyg": "^3.4.0",
     "recharts": "^3.1.0",
+    "socket.io-client": "^4.8.3",
     "swiper": "^11.2.10",
     "tailwindcss": "^4.1.11",
     "xlsx": "^0.18.5"
