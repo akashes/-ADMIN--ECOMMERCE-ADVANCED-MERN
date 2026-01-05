@@ -373,28 +373,28 @@ const thirdLevelCategories = selectedSubCategory?.children || [];
               },[])
 
 
-              useEffect(()=>{
-                const socket = io('http://localhost:8000',{
-                  withCredentials:true
-                })
+  //             useEffect(()=>{
+  //               const socket = io('http://localhost:8000',{
+  //                 withCredentials:true
+  //               })
 
 
-                const handleNotification = (data)=>{
-                  if(data && data.orderId){
-                  showSuccess(`New Order Received!, OrderId - ${data.orderId}`)
-                  }else{
-                    showSuccess('New Order Received!')
-                  }
-                }
-                socket.on('new-order-notification',handleNotification) 
+  //               const handleNotification = (data)=>{
+  //                 if(data && data.orderId){
+  //                 showSuccess(`New Order Received!, OrderId - ${data.orderId}`)
+  //                 }else{
+  //                   showSuccess('New Order Received!')
+  //                 }
+  //               }
+  //               socket.on('new-order-notification',handleNotification) 
 
-                return () => {
-    console.log("Cleaning up socket listener...");
-    socket.off('new-order-notification', handleNotification);
-    socket.disconnect();
-  };
+  //               return () => {
+  //   console.log("Cleaning up socket listener...");
+  //   socket.off('new-order-notification', handleNotification);
+  //   socket.disconnect();
+  // };
 
-              },[])
+  //             },[])
   return (
    <>
    {/* gretting container with cta button */}

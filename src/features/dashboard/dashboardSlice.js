@@ -24,7 +24,8 @@ export const getDashboardDetails = createAsyncThunk('dashboard/getDashboardDetai
 const INITIAL_STATE = {
     loading:false,
         error:null,
-        stats:null
+        stats:null,
+        notifications:[]
 
 }
 
@@ -41,6 +42,13 @@ const dashboardSlice = createSlice({
                     state.stats.orders[range]+=1
                 })
             }
+        },
+        addNotification:(state,action)=>{
+            state.notifications = [action.payload,...state.notifications].slice(0,10)
+        },
+
+        clearNotifications:(state)=>{
+            state.notifications=[]
         }
 
         
@@ -56,7 +64,7 @@ const dashboardSlice = createSlice({
             state.error=null
             state.stats = action.payload.data
         })
-        builder.addCase(getDashboardDetails.rejected,(state)=>{
+        builder.addCase(getDashboardDetails.rejected,(state,action)=>{
             state.loading=false,
             state.error=action.payload || 'Failed to get dashboard details'
             
@@ -65,5 +73,5 @@ const dashboardSlice = createSlice({
 
 
 })
-export const {updateOrderStats}=dashboardSlice.actions
+export const {updateOrderStats,addNotification,clearNotifications}=dashboardSlice.actions
 export default dashboardSlice.reducer

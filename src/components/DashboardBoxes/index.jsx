@@ -13,7 +13,7 @@ import "swiper/css/pagination";
 import "swiper/css/navigation";
 import "swiper/css/free-mode"
 import DashboardBoxesSkelton from "../Skeltons/DashboardBoxesSkelton";
-import { getDashboardDetails, updateOrderStats } from "../../features/dashboard/dashboardSlice";
+import { addNotification, getDashboardDetails, updateOrderStats } from "../../features/dashboard/dashboardSlice";
 import { useDispatch, useSelector } from "react-redux";
 import './dashboardStyle.css'
 import { io } from "socket.io-client";
@@ -21,6 +21,7 @@ import { showSuccess } from "../../utils/toastUtils";
 const ranges = ["today", "lastWeek", "lastMonth", "thisYear"];
 
 const DashboardBoxes = () => {
+  console.log('DASHBOARD BOXES')
   const [selectedRange, setSelectedRange] = useState("lastMonth");
   const[pulseOrder,setPulseOrder]=useState(false)
   const{stats,loading}=useSelector(state=>state.dashboard)
@@ -28,26 +29,47 @@ const DashboardBoxes = () => {
 
 
 
-  useEffect(()=>{
-    dispatch(getDashboardDetails())
+useEffect(() => {
+  dispatch(getDashboardDetails());
 
-    const socket = io('http://localhost:8000',{
-      withCredentials:true
-    })
+  // const socket = io('http://localhost:8000', {
+  //   withCredentials: true
+  // });
 
-    socket.on('new-order-notification',(data)=>{
-      dispatch(updateOrderStats())
-
-      setPulseOrder(true)
-      setTimeout(()=>setPulseOrder(false),1000)
-
-      return()=>{
-        socket.disconnect();
-      }
-    })
+  // const handleNewOrder = (data) => {
     
+  //   dispatch(updateOrderStats());
 
-  },[dispatch])
+  //   dispatch(addNotification({
+  //     id: data.orderId,
+  //     message: `New Order #${data.orderId.slice(-6)}`,
+  //     time: new Date().toLocaleTimeString(),
+  //     status: 'unread'
+  //   }));
+
+  //   setPulseOrder(true);
+  //   setTimeout(() => setPulseOrder(false), 1000);
+  // };
+
+  // //  listener
+  // socket.on('new-order-notification', handleNewOrder);
+
+  // // CLEANUP
+  // return () => {
+  //   console.log("Cleaning up socket...");
+  //   socket.off('new-order-notification', handleNewOrder); // Remove listener
+  //   socket.disconnect(); // Close connection
+  // };
+}, [dispatch]); 
+
+const notifications = useSelector(state=>state.dashboard.notifications)
+useEffect(()=>{
+  if(notifications.length>0){
+    setPulseOrder(true)
+    const timer = setTimeout(()=>setPulseOrder(false),2000)
+    return ()=>clearTimeout(timer)
+  }
+},[notifications.length])
 
   return (
     <div >

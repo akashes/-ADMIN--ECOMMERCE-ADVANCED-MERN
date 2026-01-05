@@ -1,10 +1,9 @@
 import React, { useEffect, useState } from 'react'
-import Badge from '../../components/Badge'
 import { FaAngleDown } from 'react-icons/fa'
 import  Button  from '@mui/material/Button'
 import { useDispatch, useSelector } from 'react-redux'
 import { approveCancelRequest, getOrders, markAsPaid, markAsRefunded, updateOrderStatus } from '../../features/order/orderSlice'
-import { Box, FormControl, InputLabel, MenuItem, Pagination, Select } from '@mui/material'
+import {  MenuItem, Pagination, Select } from '@mui/material'
 import { showError, showSuccess } from '../../utils/toastUtils'
 import OrderSkelton from '../../components/Skeltons/OrderSkelton'
 

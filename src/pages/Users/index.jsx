@@ -248,7 +248,7 @@ const SkeletonRow = ({ columns }) => {
             
       
               </div>
-              <SearchBox placeholder={'search by name or email'} value={search} onChange={handleSearchChange} />
+              <SearchBox placeholder={' name or email'} value={search} onChange={handleSearchChange} />
 
         </div>
       

@@ -309,6 +309,7 @@ import { IoLogOutSharp } from "react-icons/io5";
 import { MyContext } from "../../App"; // Adjust path
 import { logoutUser } from "../../features/auth/authSlice";
 import { showError, showSuccess } from '../../utils/toastUtils';
+import { NotificationDropdown } from "../NotificationDropdown";
 
 const StyledBadge = styled(Badge)(({ theme }) => ({
   "& .MuiBadge-badge": {
@@ -364,11 +365,8 @@ const Header = () => {
       </div>
 
       <div className="part2 w-[40%] flex items-center justify-end gap-5">
-        <StyledBadge badgeContent={4} color={"primary"}>
-          <Button className="!w-[40px] !h-[40px] !min-w-[40px] !rounded-md !text-black">
-            <img src="/notification-bell.png" alt="" className="w-full object-cover" />
-          </Button>
-        </StyledBadge>
+        <NotificationDropdown/>
+       
 
         {isLogin ? (
           <div className="rounded-full w-[35px] h-[35px] overflow-hidden cursor-pointer" onClick={handleClickMyProfile}>
