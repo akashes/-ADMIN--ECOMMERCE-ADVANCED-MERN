@@ -16,7 +16,7 @@ backgroundColor: "#ff5252",
 }));
 
 export const NotificationDropdown = () => {
-  const { notifications } = useSelector(state => state.dashboard);
+  const { notifications,lastUpdated } = useSelector(state => state.dashboard);
   const dispatch = useDispatch();
 
   const copyToClipboard = (id) => {
@@ -24,6 +24,7 @@ export const NotificationDropdown = () => {
     showSuccess('Order ID copied to clipboard');
   };
 
+  const lastSyncTime = lastUpdated? new Date(lastUpdated):null
   return (
     // Outer group
     <div className="relative group py-2"> 
@@ -48,6 +49,7 @@ export const NotificationDropdown = () => {
               Clear all
             </button>
           </div>
+
           
           <div className="max-h-64 overflow-y-auto">
             {notifications.length === 0 ? (
@@ -72,6 +74,23 @@ export const NotificationDropdown = () => {
               ))
             )}
           </div>
+            
+
+            <div className="p-2 border-t bg-gray-50 rounded-b-xl text-center">
+           <div className="flex items-center justify-center gap-2">
+              {/* Green blinking dot to show it's "Live" */}
+              <span className="relative flex h-2 w-2">
+                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span>
+                <span className="relative inline-flex rounded-full h-2 w-2 bg-green-500"></span>
+              </span>
+              <p className="text-[10px] text-gray-500 uppercase tracking-wider font-semibold font-sans">
+                {lastSyncTime && !isNaN(lastSyncTime)
+                  ? `Last update: ${lastSyncTime.toLocaleTimeString()}` 
+                  : "Connecting..."}
+              </p>
+           </div>
+        </div>
+
         </div>
       </div>
     </div>

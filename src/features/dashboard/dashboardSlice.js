@@ -25,7 +25,8 @@ const INITIAL_STATE = {
     loading:false,
         error:null,
         stats:null,
-        notifications:[]
+        notifications:[],
+        lastUpdated:null
 
 }
 
@@ -40,7 +41,8 @@ const dashboardSlice = createSlice({
                 if(state.stats){
                 Object.keys(state.stats.orders).forEach(range=>{
                     state.stats.orders[range]+=1
-                })
+                });
+                state.lastUpdated=new Date().toISOString();
             }
         },
         addNotification:(state,action)=>{
@@ -49,6 +51,14 @@ const dashboardSlice = createSlice({
 
         clearNotifications:(state)=>{
             state.notifications=[]
+        },
+
+        MarkAsRead:(state,action)=>{
+            const index = state.notifications.findIndex(n=>n.id===action.payload)
+            state.notifications[index].isRead=true
+        },
+        markAllAsRead:(state)=>{
+            state.notifications.forEach(n=>n.isRead=true)
         }
 
         
@@ -62,7 +72,9 @@ const dashboardSlice = createSlice({
         builder.addCase(getDashboardDetails.fulfilled,(state,action)=>{
             state.loading=false,
             state.error=null
-            state.stats = action.payload.data
+            state.stats = action.payload.data;
+            //updating timestamp
+            state.lastUpdated = new Date().toISOString()
         })
         builder.addCase(getDashboardDetails.rejected,(state,action)=>{
             state.loading=false,

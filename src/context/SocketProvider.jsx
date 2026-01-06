@@ -8,6 +8,7 @@ const SocketContext = createContext();
 export const SocketProvider = ({ children }) => {
   const dispatch = useDispatch();
   const socket = useRef(null);
+  const notificationSound = useRef(new Audio('/notification.mp3'))
 
   useEffect(() => {
     //  Initialize socket connection
@@ -17,6 +18,8 @@ export const SocketProvider = ({ children }) => {
 
     //  Define Listeners
     socket.current.on('new-order-notification', (data) => {
+        //notification sound
+        notificationSound.current.play().catch(()=>console.log('Audio blocked'))
       // Update global stats
       dispatch(updateOrderStats());
 
