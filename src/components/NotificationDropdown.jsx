@@ -1,6 +1,6 @@
 import { useSelector, useDispatch } from "react-redux";
-import { IoCopyOutline, IoNotificationsOutline } from "react-icons/io5";
-import { clearNotifications } from "../features/dashboard/dashboardSlice";
+import { IoCopyOutline, IoNotificationsOutline, IoVolumeHighOutline, IoVolumeMuteOutline } from "react-icons/io5";
+import { clearNotifications, toggleIsMuted } from "../features/dashboard/dashboardSlice";
 import { Button, Badge, Tooltip } from "@mui/material";
 
 import { styled } from "@mui/material/styles";
@@ -16,7 +16,7 @@ backgroundColor: "#ff5252",
 }));
 
 export const NotificationDropdown = () => {
-  const { notifications,lastUpdated } = useSelector(state => state.dashboard);
+  const { notifications,lastUpdated,isMuted } = useSelector(state => state.dashboard);
   const dispatch = useDispatch();
 
   const copyToClipboard = (id) => {
@@ -42,12 +42,26 @@ export const NotificationDropdown = () => {
         <div className="bg-white shadow-xl border border-gray-200 rounded-xl overflow-hidden">
           <div className="p-3 border-b border-gray-200 flex justify-between items-center">
             <h4 className="font-bold">Recent Updates</h4>
+            <div className="flex justify-center items-center gap-2">
+
+            <button 
+              onClick={() => dispatch(toggleIsMuted())}
+              className="p-1 hover:bg-gray-200 rounded-full transition-colors"
+              title={isMuted ? "Unmute" : "Mute"}
+              >
+              {isMuted ? (
+                <IoVolumeMuteOutline className="text-red-500" size={18} />
+              ) : (
+                <IoVolumeHighOutline className="text-gray-600" size={18} />
+              )}
+            </button>
             <button 
               onClick={() => dispatch(clearNotifications())}
               className="text-xs text-blue-600 hover:underline"
             >
               Clear all
             </button>
+                </div>
           </div>
 
           

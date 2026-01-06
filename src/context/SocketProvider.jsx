@@ -1,6 +1,6 @@
 import React, { createContext, useContext, useEffect, useRef } from 'react';
 import { io } from 'socket.io-client';
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { addNotification,updateOrderStats } from '../features/dashboard/dashboardSlice';
 import { showSuccess } from '../utils/toastUtils';
 const SocketContext = createContext();
@@ -9,7 +9,8 @@ export const SocketProvider = ({ children }) => {
   const dispatch = useDispatch();
   const socket = useRef(null);
   const notificationSound = useRef(new Audio('/notification.mp3'))
-
+const{isMuted}=useSelector(state=>state.dashboard)
+console.log(isMuted)
   useEffect(() => {
     //  Initialize socket connection
     socket.current = io('http://localhost:8000', {
@@ -19,7 +20,10 @@ export const SocketProvider = ({ children }) => {
     //  Define Listeners
     socket.current.on('new-order-notification', (data) => {
         //notification sound
-        notificationSound.current.play().catch(()=>console.log('Audio blocked'))
+        if(!isMuted){
+
+          notificationSound.current.play().catch(()=>console.log('Audio blocked'))
+        }
       // Update global stats
       dispatch(updateOrderStats());
 
@@ -46,7 +50,7 @@ export const SocketProvider = ({ children }) => {
         socket.current.disconnect();
       }
     };
-  }, [dispatch]);
+  }, [dispatch,isMuted]);
 
   return (
     <SocketContext.Provider value={socket.current}>

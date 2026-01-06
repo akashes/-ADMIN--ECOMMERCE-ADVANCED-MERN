@@ -26,7 +26,8 @@ const INITIAL_STATE = {
         error:null,
         stats:null,
         notifications:[],
-        lastUpdated:null
+        lastUpdated:null,
+        isMuted:false
 
 }
 
@@ -59,6 +60,9 @@ const dashboardSlice = createSlice({
         },
         markAllAsRead:(state)=>{
             state.notifications.forEach(n=>n.isRead=true)
+        },
+        toggleIsMuted:(state)=>{
+            state.isMuted=!state.isMuted
         }
 
         
@@ -85,5 +89,5 @@ const dashboardSlice = createSlice({
 
 
 })
-export const {updateOrderStats,addNotification,clearNotifications}=dashboardSlice.actions
+export const {updateOrderStats,addNotification,clearNotifications,MarkAsRead,markAllAsRead,toggleIsMuted}=dashboardSlice.actions
 export default dashboardSlice.reducer
