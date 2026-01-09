@@ -1,8 +1,6 @@
 import React, { useContext, useState } from 'react'
 
-import Rating from '@mui/material/Rating';
-import UploadBox from "../../components/UploadBox";
-import { LazyLoadImage } from 'react-lazy-load-image-component';
+
 import 'react-lazy-load-image-component/src/effects/blur.css';
 import { IoIosClose, IoMdCloudUpload } from "react-icons/io";
 import { Button } from '@mui/material';
@@ -91,16 +89,7 @@ const selectedSubCategory = subCategories.find((category) => category._id === su
         return
       }
     
-      // useEffect(()=>{
-      //   if(categoryImages){
-      //     console.log('upadting formfields images')
-      //     setFormFields(prev=>({
-      //       ...prev,
-      //       images:[...prev.images,...categoryImages]
-      //     }))
-      //   }
-    
-      // },[categoryImages])
+   
 
 
   }

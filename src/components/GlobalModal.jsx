@@ -3,7 +3,7 @@ import { Dialog, Slide, AppBar, Toolbar, IconButton, Typography } from "@mui/mat
 import { IoIosClose } from "react-icons/io";
 import { MyContext } from "../App"; // Adjust path to your App context
 
-// Import all your form components here
+
 import AddProduct from "../pages/Products/AddProduct";
 import AddHomeSlide from "../pages/HomeSliderBanners/AddHomeSlide";
 import AddCategory from "../pages/Category/AddCategory";
@@ -20,16 +20,14 @@ const Transition = React.forwardRef(function Transition(props, ref) {
 });
 
 const GlobalModal = () => {
-  // Listen to the Context
+
   const { isAddProductModalOpen, setIsAddProductModalOpen } = useContext(MyContext);
 
   const handleClose = () => {
     setIsAddProductModalOpen({ open: false, modal: '' });
   };
 
-  // 2. Performance Check: If closed, render NOTHING. 
-  // This keeps your app fast because these components don't exist in the DOM until needed.
-  if (!isAddProductModalOpen.open) return null;
+  if (!isAddProductModalOpen?.open) return null;
 
   return (
     <Dialog

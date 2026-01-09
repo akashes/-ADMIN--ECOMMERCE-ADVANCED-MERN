@@ -50,21 +50,7 @@ export const deleteBlog=createAsyncThunk('blog/deleteBlog',async(id,{rejectWithV
 
     }
 })
-// export const updateBlog=createAsyncThunk('blog/createBlog',async(formData,{rejectWithValue})=>{
-//     try {
-//          const result=await axios.get('/api/bannerV1')
-//         if(!result.data.success){
-            
-//             throw new Error(result.data.message || 'Failed to Create Blog ')
-//         }
-//         return result.data
 
-        
-//     } catch (error) {
-//       return rejectWithValue(error.response?.data?.message || error.message || 'Category image add failed')
-
-//     }
-// })
 export const getSingleBlog=createAsyncThunk('blog/getSingleBlog',async(id,{rejectWithValue})=>{
     try {
          const result=await axios.get(`/api/blog/${id}`)

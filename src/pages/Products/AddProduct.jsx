@@ -368,18 +368,6 @@ useEffect(()=>{
 
 },[])
 
-// useEffect(() => {
-//   return () => {
-//     console.log("clean up");
-//     console.log({ productSubmitted: productSubmittedRef.current });
-//     if (productImages?.length > 0 && !productSubmittedRef.current) {
-//       console.log('inside')
-//       productImages.forEach((image) => {
-//         dispatch(deleteProductImagesDuringCreation(image.public_id));
-//       });
-//     }
-//   };
-// }, [productImages]);
 
 
 

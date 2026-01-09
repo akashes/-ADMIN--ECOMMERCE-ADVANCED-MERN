@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, {  useState } from "react";
 
 import Rating from "@mui/material/Rating";
 import UploadBox from "../../components/UploadBox";
@@ -9,7 +9,6 @@ import { Button } from "@mui/material";
 import { addCategory, addCategoryImage, deleteCategoryImage, getCategories } from "../../features/category/categorySlice";
 import {  showError, showSuccess, showWarning } from "../../utils/toastUtils";
 import { useDispatch, useSelector } from "react-redux";
-import { addAddress } from "../../features/user/userSlice";
 import { useContext } from "react";
 import { MyContext } from "../../App";
 import { useNavigate } from "react-router-dom";
@@ -20,29 +19,13 @@ const AddCategory = () => {
   const {categoryImages } = useSelector(state=>state.category)
   const[loading,setLoading] = useState(false)
   const[isUploading,setIsUploading] = useState(false)
-  const[previews,setPreviews] = useState([])
   const dispatch = useDispatch()
   const [formFields, setFormFields] = useState({
     name: "",
     // images: [],
 
   });
-  // const handleImageChange = (e)=>{
-  //   console.log('inside handle image change')
-  //   const files = Array.from(e.target.files)
-  //   console.log(files)
-  //   const newPreviews = files.map((file)=>({
-  //     file,
-  //     preview: URL.createObjectURL(file)
-  //   }))
-  //   console.log(newPreviews)
-  //   setPreviews(prev=>[...prev,...newPreviews])
-  //   setFormFields(prev=>({
-  //     ...prev,
-  //     images:[...prev.images,...files]
-  //   }))
 
-  // }
      const handleImageChange=async(e)=>{
 
           const filesArray=Array.from(e.target.files)
@@ -139,16 +122,7 @@ const AddCategory = () => {
     return
   }
 
-  // useEffect(()=>{
-  //   if(categoryImages){
-  //     console.log('upadting formfields images')
-  //     setFormFields(prev=>({
-  //       ...prev,
-  //       images:[...prev.images,...categoryImages]
-  //     }))
-  //   }
 
-  // },[categoryImages])
 }
 console.log(formFields)
   return (

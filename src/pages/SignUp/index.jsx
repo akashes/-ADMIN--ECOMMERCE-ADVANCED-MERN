@@ -1,17 +1,16 @@
 import { Button } from '@mui/material'
-import React, { useState } from 'react'
-import { Link, NavLink, useLocation, useNavigate } from 'react-router-dom'
+import  { useState } from 'react'
+import { Link, NavLink, useNavigate } from 'react-router-dom'
 import { MdOutlineLogin } from "react-icons/md";
 import { FaRegUser } from "react-icons/fa6";
 import { FcGoogle } from "react-icons/fc";
 
-import FormControlLabel from '@mui/material/FormControlLabel';
-import Checkbox from '@mui/material/Checkbox';
+
 import { FaRegEye } from "react-icons/fa";
 import { FaEyeSlash } from "react-icons/fa";
 import { showError, showSuccess, showWarning } from '../../utils/toastUtils';
 import CircularProgress from '@mui/material/CircularProgress';
-import { useDispatch, useSelector } from 'react-redux';
+import { useDispatch } from 'react-redux';
 import { loginUser, registerUser } from '../../features/auth/authSlice';
 
 
@@ -29,8 +28,7 @@ const SignUp = () => {
     const navigate = useNavigate()
     const dispatch = useDispatch()
     
-    const location = useLocation()
-    const {loading}=useSelector(state=>state.auth)
+
 
     const[isLoading,setIsLoading]=useState(false)
 const[isPasswordShow,setIsPasswordShow]=useState(false);
@@ -59,7 +57,7 @@ const[isPasswordShow,setIsPasswordShow]=useState(false);
         return
     }
     setIsLoading(true)
-    const resultAction = await dispatch(registerUser({...formFields,role:['USER','MODERATOR']}))
+    const resultAction = await dispatch(registerUser(formFields))
     console.log(resultAction)
     if(registerUser.fulfilled.match(resultAction)){
         showSuccess(resultAction.payload ||'Registration successful')
@@ -115,7 +113,7 @@ const[isPasswordShow,setIsPasswordShow]=useState(false);
             password:null,
             avatar:user.providerData[0].photoURL,
             mobile:user.providerData[0].phoneNumber,
-            role:['USER','MODERATOR']
+            // role:['USER','MODERATOR']
             
           }
           console.log(fields)

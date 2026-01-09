@@ -195,13 +195,7 @@ const EditSubCatBox = (props) => {
     }
  
    </form>
-   {/* <DeleteWarningDialog
-       open={deleteModalOpen} handleClose={handleClose} 
-       setDeleteId={setDeleteCategoryId}
-        deleteFunction={handleDeleteCategory}
-        title={'Do you want to delete this category?'}
-        content={'Deleting this category also deletes all the products under this category as well its subcategories'}
-        /> */}
+
     
     </>
 

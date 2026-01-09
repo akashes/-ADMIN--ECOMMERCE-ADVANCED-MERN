@@ -5,9 +5,11 @@ import { useContext } from 'react';
 import { MyContext } from '../App'; // Import your context
 import GlobalModal from './GlobalModal';
 
+
 const AdminLayout = () => {
   const { isSidebarOpen, windowWidth, sidebarWidth } = useContext(MyContext);
 
+ 
   return (
     <section className="main">
       <Header />

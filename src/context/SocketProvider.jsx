@@ -13,7 +13,7 @@ const{isMuted}=useSelector(state=>state.dashboard)
 console.log(isMuted)
   useEffect(() => {
     //  Initialize socket connection
-    socket.current = io('http://localhost:8000', {
+    socket.current = io(import.meta.env.VITE_API_URL, {
       withCredentials: true,
     });
 

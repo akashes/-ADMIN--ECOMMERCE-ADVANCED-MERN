@@ -13,18 +13,17 @@ import "swiper/css/pagination";
 import "swiper/css/navigation";
 import "swiper/css/free-mode"
 import DashboardBoxesSkelton from "../Skeltons/DashboardBoxesSkelton";
-import { addNotification, getDashboardDetails, updateOrderStats } from "../../features/dashboard/dashboardSlice";
+import {  getDashboardDetails } from "../../features/dashboard/dashboardSlice";
 import { useDispatch, useSelector } from "react-redux";
 import './dashboardStyle.css'
-import { io } from "socket.io-client";
-import { showSuccess } from "../../utils/toastUtils";
+
 const ranges = ["today", "lastWeek", "lastMonth", "thisYear"];
 
 const DashboardBoxes = () => {
   console.log('DASHBOARD BOXES')
   const [selectedRange, setSelectedRange] = useState("lastMonth");
   const[pulseOrder,setPulseOrder]=useState(false)
-  const{stats,loading}=useSelector(state=>state.dashboard)
+  const{stats}=useSelector(state=>state.dashboard)
   const dispatch = useDispatch()
 
 
@@ -32,41 +31,14 @@ const DashboardBoxes = () => {
 useEffect(() => {
   dispatch(getDashboardDetails());
 
-  // const socket = io('http://localhost:8000', {
-  //   withCredentials: true
-  // });
 
-  // const handleNewOrder = (data) => {
-    
-  //   dispatch(updateOrderStats());
-
-  //   dispatch(addNotification({
-  //     id: data.orderId,
-  //     message: `New Order #${data.orderId.slice(-6)}`,
-  //     time: new Date().toLocaleTimeString(),
-  //     status: 'unread'
-  //   }));
-
-  //   setPulseOrder(true);
-  //   setTimeout(() => setPulseOrder(false), 1000);
-  // };
-
-  // //  listener
-  // socket.on('new-order-notification', handleNewOrder);
-
-  // // CLEANUP
-  // return () => {
-  //   console.log("Cleaning up socket...");
-  //   socket.off('new-order-notification', handleNewOrder); // Remove listener
-  //   socket.disconnect(); // Close connection
-  // };
 }, [dispatch]); 
 
 const notifications = useSelector(state=>state.dashboard.notifications)
 useEffect(()=>{
   if(notifications.length>0){
     setPulseOrder(true)
-    const timer = setTimeout(()=>setPulseOrder(false),2000)
+    const timer = setTimeout(()=>setPulseOrder(false),2500)
     return ()=>clearTimeout(timer)
   }
 },[notifications.length])
@@ -91,10 +63,10 @@ useEffect(()=>{
 {
   !stats? <DashboardBoxesSkelton/> : (
 
-    <div className="overflow-y-hidden dashboard-box">
+    <div className=" dashboard-box">
 
       <Swiper
-      className="!overflow-y-visible "
+      className="!overflow-y-visible !overflow-x-visible "
       
         spaceBetween={12}
   modules={[Pagination,FreeMode]}
@@ -121,7 +93,7 @@ useEffect(()=>{
         </SwiperSlide>
       <SwiperSlide>
     <div className={`hover:scale-101 box bg-gradient-to-r from-blue-500 to-blue-600 shadow-md p-5 min-h-[100px] rounded-2xl flex items-center gap-4 transition-all duration-500
-      ${pulseOrder ? "ring-4 ring-blue-300 scale-105" : ""}`}> 
+      ${pulseOrder ? "animate-pulse-ring scale-[1.03] z-10": "hover:scale-101"}`}> 
       
       <HiOutlineGift className={`text-[40px] text-white ${pulseOrder ? "animate-bounce" : ""}`} />
       
@@ -132,6 +104,11 @@ useEffect(()=>{
         </p>
       </div>
       <IoStatsChart className="text-[80px] text-white/20 absolute bottom-2 right-2" />
+      {pulseOrder && (
+      <span className="absolute -top-2 -right-2 bg-red-500 text-white text-[10px] font-bold px-2 py-1 rounded-full shadow-lg animate-bounce">
+        NEW
+      </span>
+    )}
     </div>
   </SwiperSlide>
         <SwiperSlide>

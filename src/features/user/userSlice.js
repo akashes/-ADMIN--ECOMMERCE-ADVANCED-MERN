@@ -47,20 +47,6 @@ export const getAddress = createAsyncThunk('user/getAddress',async(userId,{rejec
     }
 })
 
-// export const selectAddress = createAsyncThunk('user/selectAddress',async({addressId,selected},{rejectWithValue})=>{
-//     try {
-//         const result = await axios.put(`/api/address/select-address/${addressId}`,{selected})
-//         console.log(result)
-//         if(!result.data.success){
-//             throw new Error(result.data.message || 'Address select failed')
-//         }
-//         return result.data
-//     } catch (error) {
-//         return rejectWithValue(error.response?.data?.message || error.message || 'Address select failed')
-        
-//     }
-// })
-
 
 export const deleteUser= createAsyncThunk('product/deleteUser',async(userId,{rejectWithValue})=>{
     try {
@@ -197,21 +183,7 @@ const userSlice = createSlice({
             state.allUsersLoading = false
             state.allUsersError = action.payload
         })
-        // .addCase(selectAddress.pending,(state)=>{
-        //     state.loading = true
-        //     state.error = null
-        // })
-        // .addCase(selectAddress.fulfilled,(state,action)=>{
-        //     console.log(action.payload)
-        //     state.loading = false
-        //     state.error = null
-        //     console.log(action.payload)
-        //     // state.address = action.payload.address
-        // })
-        // .addCase(selectAddress.rejected,(state,action)=>{
-        //     state.loading = false
-        //     state.error = action.payload
-        // })
+     
           .addCase(deleteUser.pending,(state)=>{
                     // state.loading = true
                     state.error = null

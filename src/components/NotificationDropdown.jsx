@@ -26,7 +26,6 @@ export const NotificationDropdown = () => {
 
   const lastSyncTime = lastUpdated? new Date(lastUpdated):null
   return (
-    // Outer group
     <div className="relative group py-2"> 
       {/* Bell Icon */}
       <div className="cursor-pointer relative">
@@ -92,7 +91,7 @@ export const NotificationDropdown = () => {
 
             <div className="p-2 border-t bg-gray-50 rounded-b-xl text-center">
            <div className="flex items-center justify-center gap-2">
-              {/* Green blinking dot to show it's "Live" */}
+
               <span className="relative flex h-2 w-2">
                 <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span>
                 <span className="relative inline-flex rounded-full h-2 w-2 bg-green-500"></span>

@@ -5,3 +5,26 @@
 .dashboard-box .swiper::-webkit-scrollbar {
   display: none !important;
 }
+
+
+/* dashboardStyle.css */
+
+@keyframes pulse-ring {
+  0% {
+    box-shadow: 0 0 0 0 rgba(59, 130, 246, 0.7); /* Blue color with opacity */
+  }
+  70% {
+    box-shadow: 0 0 0 15px rgba(59, 130, 246, 0); /* Expand and fade */
+  }
+  100% {
+    box-shadow: 0 0 0 0 rgba(59, 130, 246, 0);
+  }
+}
+
+.animate-pulse-ring {
+  animation: pulse-ring 1.5s cubic-bezier(0.24, 0, 0.38, 1) infinite;
+}
+
+.box-transition {
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}

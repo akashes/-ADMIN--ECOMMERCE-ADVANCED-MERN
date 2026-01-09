@@ -120,7 +120,7 @@ const [loadingGoogle, setLoadingGoogle] = useState(false);
 
   } 
   if(userLogin.rejected.match(resultAction)){
-    showError(resultAction.payload.message ||'Login failed')
+    showError('Login failed')
   }
 
   }
@@ -227,9 +227,9 @@ const [loadingGoogle, setLoadingGoogle] = useState(false);
                </div>
             </div>
             <div className="form-group mb-4 w-full flex items-center justify-between">
-              <button type='button' className='text-gray-600 font-[700] text-[15px] hover:underline hover:text-gray-700'
+              {/* <button type='button' className='text-gray-600 font-[700] text-[15px] hover:underline hover:text-gray-700'
               onClick={navigateToVerify}
-              >Verify Email</button>
+              >Verify Email</button> */}
                   <p onClick={navigateToForgot} className='text-secondary font-[700] text-[15px] hover:underline hover:text-gray-700' >
                   Forgot Password
                   </p>

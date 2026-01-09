@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, {  useState } from "react";
 
 import Rating from "@mui/material/Rating";
 import UploadBox from "../../components/UploadBox";
@@ -7,7 +7,7 @@ import "react-lazy-load-image-component/src/effects/blur.css";
 import { IoIosClose, IoMdCloudUpload } from "react-icons/io";
 import { Button, CircularProgress } from "@mui/material";
 import {  showError, showSuccess, showWarning } from "../../utils/toastUtils";
-import { useDispatch, useSelector } from "react-redux";
+import { useDispatch } from "react-redux";
 import { useContext } from "react";
 import { MyContext } from "../../App";
 import { useNavigate } from "react-router-dom";

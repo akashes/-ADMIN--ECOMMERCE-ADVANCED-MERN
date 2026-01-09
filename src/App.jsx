@@ -24,10 +24,13 @@ import Profile from './pages/Profile'
 import ProductDetails from './pages/Products/ProductDetails.jsx'
 import BannerV1 from './pages/Banners/index.jsx'
 import BlogList from './pages/Blog/index.jsx'
-
+import ForgotPassword from './pages/ForgotPassword/index.jsx'
+import VerifyAccount from './pages/verifyAccount/index.jsx'
+import ResetPassword from './pages/ResetPassword/index.jsx'
 import './App.css'
 import './responsive.css'
 import OrderTracking from './components/OrderTracking/index.jsx'
+import ChangePassword from './pages/ChangePassword/index.jsx'
 
 import AdminLayout from './components/AdminLayout.jsx'
 export const MyContext = createContext({
@@ -48,10 +51,8 @@ function App() {
     modal:'',
     id:''
   })
-  console.log(isAddProductModalOpen)
 
-  console.log('sidebaropen',isSidebarOpen)
-  console.log('windowWidth',windowWidth)
+
   
   const values={
     isSidebarOpen,
@@ -65,353 +66,7 @@ function App() {
     sidebarWidth
   }
 
-// const router = createBrowserRouter([
-//   {
-//     path:'/',
-//    element: 
-//    <PrivateRoute>
 
-//    <>
-//    <section className="main">
-//     <Header/>
-//     <div className="contentMain flex">
-//       <div  
-//  //
-//       className={`sidebarWrapper overflow-hidden
-//         ${isSidebarOpen===true  ? windowWidth<992? `  w-[${sidebarWidth/1.5}%]`:`w-[${sidebarWidth}%]`:'w-0 opacity-0  '}
-//         transition-all
-//         `}
-//       >
-//         <Sidebar/>
-     
-
-//       </div>
-//       <div className={`contentRight py-4  px-5 
-//         //  ${isSidebarOpen===false?'w-[100%]':`w-[82%]`}
-//         ${isSidebarOpen===true && windowWidth<992 && 'opacity-0' }
-        
-//           `}
-//           style={{width:`w-[${isSidebarOpen?100-sidebarWidth:100}%]`}}
-//            >
-
-//         <Dashboard />
-//       </div>
-//     </div>
-    
-//    </section>
-//    </>
-//    </PrivateRoute>
-
-//   },
-//   {
-//     path:'/login',
-//    element: 
-//    <Login/>
-//   },
-//   {
-//     path:'/sign-up',
-//    element: 
-//    <SignUp/>
-//   },
-//     {
-//     path:'/products',
-//    element: 
-//    <>
-//    <section className="main">
-//     <Header/>
-//     <div className="contentMain flex">
-//       <div  
-
-//       className={`sidebarWrapper overflow-hidden
-//         ${isSidebarOpen===true?'w-[18%] ':'w-0 opacity-0  '}
-//         transition-all
-//         `}
-//       >
-//         <Sidebar/>
-//       </div>
-//       <div className={`contentRight py-4 px-2 md:px-5
-//           ${isSidebarOpen===false?'w-[100%]':'w-[82%]'} `}
-//            >
-//         <Products />
-//       </div>
-//     </div>
-    
-//    </section>
-//    </>
-//   },
-//     {
-//     path:'/homeSlider/list',
-//    element: 
-//    <>
-//    <section className="main">
-//     <Header/>
-//     <div className="contentMain flex">
-//       <div  
-
-//       className={`sidebarWrapper overflow-hidden
-//         ${isSidebarOpen===true?'w-[18%]':'w-[0px] opacity-0  '}
-//         transition-all
-//         `}
-//       >
-//         <Sidebar/>
-//       </div>
-//       <div className={`contentRight py-4 px-2  md:px-5  ${isSidebarOpen===false?'w-[100%]':'w-[82%]'} `} >
-//         <HomeSliderBanners />
-//       </div>
-//     </div>
-    
-//    </section>
-//    </>
-//   },
-//     {
-//     path:'/category/list',
-//    element: 
-//    <>
-//    <section className="main">
-//     <Header/>
-//     <div className="contentMain flex">
-//       <div  
-
-//       className={`sidebarWrapper overflow-hidden
-//         ${isSidebarOpen===true?'w-[18%]':'w-[0px] opacity-0  '}
-//         transition-all
-//         `}
-//       >
-//         <Sidebar/>
-//       </div>
-//       <div className={`contentRight py-4 px-5  ${isSidebarOpen===false?'w-[100%]':'w-[82%]'} `} >
-//         <CategoryList />
-//       </div>
-//     </div>
-    
-//    </section>
-//    </>
-//   },
-//     {
-//     path:'/subCategory/list',
-//    element: 
-//    <>
-//    <section className="main">
-//     <Header/>
-//     <div className="contentMain flex">
-//       <div  
-
-//       className={`sidebarWrapper overflow-hidden
-//         ${isSidebarOpen===true?'w-[18%]':'w-[0px] opacity-0  '}
-//         transition-all
-//         `}
-//       >
-//         <Sidebar/>
-//       </div>
-//       <div className={`contentRight py-4 px-5  ${isSidebarOpen===false?'w-[100%]':'w-[82%]'} `} >
-//         <SubCategoryList />
-//       </div>
-//     </div>
-    
-//    </section>
-//    </>
-//   },
-//     {
-//     path:'/users',
-//    element: 
-//    <>
-//    <section className="main">
-//     <Header/>
-//     <div className="contentMain flex">
-//       <div  
-
-//       className={`sidebarWrapper overflow-hidden
-//         ${isSidebarOpen===true?'w-[18%]':'w-[0px] opacity-0  '}
-//         transition-all
-//         `}
-//       >
-//         <Sidebar/>
-//       </div>
-//       <div className={`contentRight py-4 px-2 md:px-5  ${isSidebarOpen===false?'w-[100%]':'w-[82%]'} `} >
-//         <Users />
-//       </div>
-//     </div>
-    
-//    </section>
-//    </>
-//   },
-//     {
-//     path:'/orders',
-//    element: 
-//    <>
-//    <section className="main">
-//     <Header/>
-//     <div className="contentMain flex">
-//       <div  
-
-//       className={`sidebarWrapper overflow-hidden
-//         ${isSidebarOpen===true?'w-[18%]':'w-[0px] opacity-0  '}
-//         transition-all
-//         `}
-//       >
-//         <Sidebar/>
-//       </div>
-//       <div className={`contentRight py-4  px-2 md:px-5  ${isSidebarOpen===false?'w-[100%]':'w-[82%]'} `} >
-//         <Orders />
-//       </div>
-//     </div>
-    
-//    </section>
-//    </>
-//   },
-//     {
-//     path:'/order/:orderId',
-//    element: 
-//    <>
-//    <section className="main">
-//     <Header/>
-//     <div className="contentMain flex">
-//       <div  
-
-//       className={`sidebarWrapper overflow-hidden
-//         ${isSidebarOpen===true?'w-[18%]':'w-[0px] opacity-0  '}
-//         transition-all
-//         `}
-//       >
-//         <Sidebar/>
-//       </div>
-//       <div className={`contentRight py-4 px-5  ${isSidebarOpen===false?'w-[100%]':'w-[82%]'} `} >
-//         <OrderTracking />
-//       </div>
-//     </div>
-    
-//    </section>
-//    </>
-//   },
-//     {
-//     path:'/forgot-password',
-//    element: 
-//    <ForgotPassword/>
-//   },
-//     {
-//     path:'/verify',
-//    element: 
-//    <VerifyAccount resetPassword={false} />
-//   },
-//     {
-//     path:'/forgot-verify',
-//    element: 
-//    <VerifyAccount resetPassword={true} />
-//   },
-//       {
-//     path:'/change-password',
-//    element: 
-//    <ChangePassword/>
-//   },
-//   {
-//     path:"/reset-password",
-//     element:<ResetPassword/>
-//   },
-//    {
-//     path:'/profile',
-//    element: 
-//    <>
-//    <section className="main">
-//     <Header/>
-//     <div className="contentMain flex">
-//       <div  
-
-//         className={`sidebarWrapper
-//     transition-all duration-300
-//     ${windowWidth < 992 
-//         ? `fixed top-0 left-0 h-full z-110 bg-white 
-//            ${isSidebarOpen ? 'w-[80%] opacity-100' : 'w-0 opacity-0'}`
-//         : `${isSidebarOpen ? 'w-[18%]' : 'w-0 opacity-0'}`
-//     }
-//   `}
-//       >
-//         <Sidebar/>
-//       </div>
-//       <div className={`contentRight py-4 px-2  md:px-5  ${isSidebarOpen===false?`w-[100%]`:'w-[100%]'} `} >
-//         <Profile />
-//       </div>
-//     </div>
-    
-//    </section>
-//    </>
-//   },
-
-//    {
-//     path:'/product/:id',
-//    element: 
-//    <>
-//    <section className="main">
-//     <Header/>
-//     <div className="contentMain flex">
-//       <div  
-
-//       className={`sidebarWrapper overflow-hidden
-//         ${isSidebarOpen===true?'w-[18%]':'w-[0px] opacity-0  '}
-//         transition-all
-//         `}
-//       >
-//         <Sidebar/>
-//       </div>
-//       <div className={`contentRight py-4 px-5  ${isSidebarOpen===false?'w-[100%]':'w-[82%]'} `} >
-//         <ProductDetails />
-//       </div>
-//     </div>
-    
-//    </section>
-//    </>
-//   },
-//    {
-//     path:'/bannerV1/list',
-//    element: 
-//    <>
-//    <section className="main">
-//     <Header/>
-//     <div className="contentMain flex">
-//       <div  
-
-//       className={`sidebarWrapper overflow-hidden
-//         ${isSidebarOpen===true?'w-[18%]':'w-[0px] opacity-0  '}
-//         transition-all
-//         `}
-//       >
-//         <Sidebar/>
-//       </div>
-//       <div className={`contentRight py-4  px-1 md:px-5  ${isSidebarOpen===false?'w-[100%]':'w-[82%]'} `} >
-//         <BannerV1 />
-//       </div>
-//     </div>
-    
-//    </section>
-//    </>
-//   },
-//    {
-//     path:'/blog/list',
-//    element: 
-//    <>
-//    <section className="main">
-//     <Header/>
-//     <div className="contentMain flex">
-//       <div  
-
-//       className={`sidebarWrapper overflow-hidden
-//         ${isSidebarOpen===true?'w-[18%]':'w-[0px] opacity-0  '}
-//         transition-all
-//         `}
-//       >
-//         <Sidebar/>
-//       </div>
-//       <div className={`contentRight py-4 px-1  md:px-5  ${isSidebarOpen===false?'w-[100%]':'w-[82%]'} `} >
-//         <BlogList />
-//       </div>
-//     </div>
-    
-//    </section>
-//    </>
-//   },
-
-
-
-// ])  
 
 
 const router = createBrowserRouter([
@@ -437,11 +92,16 @@ const router = createBrowserRouter([
         { path: 'bannerV1/list', element: <BannerV1 /> },
         { path: 'blog/list', element: <BlogList /> },
         { path: 'profile', element: <Profile /> },
-
-        // ... add the rest of your admin routes here
+        
+        //  admin routes 
       ]
     },
     // Public Routes (No Sidebar/Header)
+    { path: 'forgot-password', element: <ForgotPassword/> },
+    { path: 'forgot-verify', element : <VerifyAccount resetPassword={true}/> },
+    { path: 'reset-password', element : <ResetPassword /> },
+    { path: 'verify', element : <VerifyAccount resetPassword={false} /> },
+    { path: 'change-password', element : <ChangePassword /> },
     {
       path: '/login',
       element: <Login />

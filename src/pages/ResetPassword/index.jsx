@@ -3,16 +3,13 @@ import React, { useState } from 'react'
 import { Link, NavLink, useNavigate } from 'react-router-dom'
 import { MdOutlineLogin } from "react-icons/md";
 import { FaRegUser } from "react-icons/fa6";
-import { FcGoogle } from "react-icons/fc";
 
-import FormControlLabel from '@mui/material/FormControlLabel';
-import Checkbox from '@mui/material/Checkbox';
 import { FaRegEye } from "react-icons/fa";
 import { FaEyeSlash } from "react-icons/fa";
 import CircularProgress from '@mui/material/CircularProgress';
 import { useDispatch, useSelector } from 'react-redux';
 import { showError, showSuccess, showWarning } from '../../utils/toastUtils';
-import {  loginUser, resetPassword, userLogin } from '../../features/auth/authSlice';
+import {   resetPassword } from '../../features/auth/authSlice';
 
 
 

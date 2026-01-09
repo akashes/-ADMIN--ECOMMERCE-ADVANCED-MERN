@@ -41,7 +41,7 @@ const rootReducer = combineReducers({
 const persistConfig = {
   key: 'root',
   storage,
-  // Whitelist: Only these slices will be saved to localStorage
+  // Whitelist slices will be saved to localStorage
   // We include 'dashboard' for the notifications and 'auth' for login session
   whitelist: ['dashboard', 'auth'] 
 };
@@ -54,7 +54,7 @@ export const store = configureStore({
   reducer: persistedReducer,
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware({
-      serializableCheck: false, // Required for Redux Persist to work without console errors
+      serializableCheck: false,
     }),
 });
 

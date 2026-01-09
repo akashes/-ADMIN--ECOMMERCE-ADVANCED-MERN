@@ -6,7 +6,6 @@ import Badge from '../../components/Badge'
 import Checkbox from '@mui/material/Checkbox';
 import { Link, useNavigate } from 'react-router-dom'
 import { FcCancel } from "react-icons/fc";
-import ProgressBar from '../../components/ProgressBar'
 import { AiFillEdit } from "react-icons/ai";
 import { FaEye } from "react-icons/fa";
 import { MdDelete } from "react-icons/md";
@@ -33,16 +32,14 @@ import { MyContext } from '../../App'
 import { useDispatch, useSelector } from 'react-redux'
 import { getCategories } from '../../features/category/categorySlice'
 import AlertBox from '../../components/AlertBox'
-import { CircularProgress, Rating } from '@mui/material';
+import {  Rating } from '@mui/material';
 import useDebounce from '../../hooks/useDebounce'
 import { deleteMultipleProducts, deleteProduct, getAllProducts, setProductAdded } from '../../features/product/productSlice'
 import SearchBox from '../../components/SearchBox'
 import { getOrders } from '../../features/order/orderSlice'
 import RevenueChart from '../../components/Charts/RevenueChart'
-import OrderChart from '../../components/Charts/OrderChart'
 import ProductsSkeleton from '../../components/Skeltons/ProductsSkelton'
 
-import {io} from 'socket.io-client'
 import { showSuccess } from '../../utils/toastUtils'
 
 
@@ -310,7 +307,6 @@ const thirdLevelCategories = selectedSubCategory?.children || [];
 
  
 
-    const [categoryFilterVal, setCategoryFilterVal] = React.useState('');
 
 
 
@@ -336,8 +332,6 @@ const thirdLevelCategories = selectedSubCategory?.children || [];
   
 
   }
-  console.log(showProducts)
-  const[isOpen,setIsOpen]=useState(false)
      useEffect(()=>{
   
           const fetchCategoriesFunction=async()=>{

@@ -1,39 +1,3 @@
-// import { Button, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle } from '@mui/material'
-// import React from 'react'
-
-// const DeleteWarningDialog = ({open,handleClose,setDeleteId,deleteFunction,title,content}) => {
-//   return (
-//    <Dialog
-//         open={open}
-//         onClose={handleClose}
-//         aria-labelledby="alert-dialog-title"
-//         aria-describedby="alert-dialog-description"
-//       >
-//         <DialogTitle id="alert-dialog-title">
-//           {title}
-//         </DialogTitle>
-//         <DialogContent>
-//           <DialogContentText id="alert-dialog-description">
-//             {content}
-
-//           </DialogContentText>
-//         </DialogContent>
-//         <DialogActions>
-//           <Button
-//           className='!bg-black !text-white btn-md'
-//           onClick={()=>{
-//             handleClose()
-//             setDeleteId(null)
-//           }}>Close</Button>
-//           <Button className='!bg-secondary !text-white !btn-sm' onClick={deleteFunction} autoFocus>
-//             Delete
-//           </Button>
-//         </DialogActions>
-//       </Dialog>
-//   )
-// }
-
-// export default DeleteWarningDialog
 
 
 

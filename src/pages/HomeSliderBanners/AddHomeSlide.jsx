@@ -8,7 +8,6 @@ import { useDispatch } from 'react-redux';
 import { LiaImages } from "react-icons/lia";
 import { useNavigate } from 'react-router-dom';
 
-// Internal Imports
 import UploadBox from "../../components/UploadBox";
 import { MyContext } from '../../App';
 import { addHomeSlide, getHomeSlides } from '../../features/homeSlide/homeSlide';

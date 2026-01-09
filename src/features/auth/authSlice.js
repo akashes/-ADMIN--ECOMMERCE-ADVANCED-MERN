@@ -157,7 +157,7 @@ export const logoutUser = createAsyncThunk(
     try {
       console.log('inside logout user')
       //call backend api 
-    const res =   await axios.post('/api/user/logout',{
+    const res =   await axios.post('/api/user/logout',{},{
         withCredentials:true
       })
       console.log(res)
@@ -407,7 +407,7 @@ const authSlice = createSlice({
       .addCase(uploadAvatar.fulfilled, (state, action) => {
         state.userLoading = false;
         state.userError = null;
-        state.user.avatar.url = action.payload.avatar;
+        state.user.avatar = action.payload.avatar;
       })
       .addCase(uploadAvatar.rejected, (state, action) => {
         state.userLoading = false;

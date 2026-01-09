@@ -25,23 +25,7 @@ const EditCategory = () => {
     // images: [],
 
   });
-  console.log(previews.length)
-  // const handleImageChange = (e)=>{
-  //   console.log('inside handle image change')
-  //   const files = Array.from(e.target.files)
-  //   console.log(files)
-  //   const newPreviews = files.map((file)=>({
-  //     file,
-  //     preview: URL.createObjectURL(file)
-  //   }))
-  //   console.log(newPreviews)
-  //   setPreviews(prev=>[...prev,...newPreviews])
-  //   setFormFields(prev=>({
-  //     ...prev,
-  //     images:[...prev.images,...files]
-  //   }))
 
-  // }
      const handleImageChange=async(e)=>{
 
           const filesArray=Array.from(e.target.files)

@@ -11,7 +11,7 @@ import { FaRegEye } from "react-icons/fa";
 import { FaEyeSlash } from "react-icons/fa";
 import { useDispatch, useSelector } from 'react-redux';
 import { forgotPassword } from '../../features/auth/authSlice';
-import { showSuccess } from '../../utils/toastUtils';
+import { showError, showSuccess } from '../../utils/toastUtils';
 
 const ForgotPassword = () => {
     const{loading}=useSelector(state=>state.auth)

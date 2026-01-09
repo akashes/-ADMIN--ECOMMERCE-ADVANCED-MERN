@@ -1,32 +1,21 @@
-import React, { useContext, useEffect, useRef, useState } from "react";
-import InputLabel from "@mui/material/InputLabel";
+import React, { useContext, useEffect, useState } from "react";
 import MenuItem from "@mui/material/MenuItem";
-import FormControl from "@mui/material/FormControl";
 import Select from "@mui/material/Select";
 
-import Rating from "@mui/material/Rating";
 import UploadBox from "../../components/UploadBox";
 import { LazyLoadImage } from "react-lazy-load-image-component";
 import "react-lazy-load-image-component/src/effects/blur.css";
 import { IoIosClose } from "react-icons/io";
 import { Button, CircularProgress } from "@mui/material";
-import { IoMdCloudUpload } from "react-icons/io";
 import { useDispatch, useSelector } from "react-redux";
-import {
-  addProduct,
-  addProductImages,
-  deleteProductImagesDuringCreation,
-  getAllProducts,
-  setProductAdded,
-} from "../../features/product/productSlice";
+
+
+import { addBannerV1, getBannersV1, getFilterProducts } from "../../features/bannerV1/bannerv1Slice";
 import { showError, showSuccess, showWarning } from "../../utils/toastUtils";
 import { getCategories } from "../../features/category/categorySlice";
 import { MyContext } from "../../App";
 import { useNavigate } from "react-router-dom";
-
 import { FcAdvertising } from "react-icons/fc";
-import { addBannerV1, getBannersV1, getFilterProducts } from "../../features/bannerV1/bannerv1Slice";
-
 const AddBannerV1 = () => {
   //test
   //testing

@@ -1,6 +1,5 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import axios from "axios";
-import reducer from "../category/categorySlice";
 
 export const addProduct = createAsyncThunk('product/addProduct',async(product,{rejectWithValue,getState})=>{
     try {

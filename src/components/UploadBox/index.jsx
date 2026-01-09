@@ -1,4 +1,4 @@
-import { CircularProgress, Tooltip } from '@mui/material';
+import {  Tooltip } from '@mui/material';
 import React from 'react';
 import { FaRegImages } from "react-icons/fa6";
 import './uploadbox.css'; 
