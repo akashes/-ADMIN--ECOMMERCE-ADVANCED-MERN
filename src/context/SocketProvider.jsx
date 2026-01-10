@@ -10,7 +10,6 @@ export const SocketProvider = ({ children }) => {
   const socket = useRef(null);
   const notificationSound = useRef(new Audio('/notification.mp3'))
 const{isMuted}=useSelector(state=>state.dashboard)
-console.log(isMuted)
   useEffect(() => {
     //  Initialize socket connection
     socket.current = io(import.meta.env.VITE_API_URL, {
@@ -31,6 +30,8 @@ console.log(isMuted)
       dispatch(addNotification({
         id: data.orderId,
         message: `New Order #${data.orderId.slice(-6)}`,
+        customer:data.customer,
+        total:data.total,
         time: new Date().toLocaleTimeString(),
         status: 'unread'
       }));

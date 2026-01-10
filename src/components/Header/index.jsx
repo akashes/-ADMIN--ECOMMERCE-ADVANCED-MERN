@@ -44,13 +44,13 @@ const Header = () => {
 
   const handleLogout = async () => {
     try {
+      navigate('/login');
       const result = await dispatch(logoutUser()).unwrap();
       if (result === 'success') {
         showSuccess('Logout successful');
-        navigate('/login');
       }
     } catch (error) {
-      showError('Failed to logout');
+      // showError('Failed to logout');
     }
   };
 

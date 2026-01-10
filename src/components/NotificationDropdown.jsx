@@ -1,32 +1,34 @@
-import { useSelector, useDispatch } from "react-redux";
-import { IoCopyOutline, IoNotificationsOutline, IoVolumeHighOutline, IoVolumeMuteOutline } from "react-icons/io5";
-import { clearNotifications, toggleIsMuted } from "../features/dashboard/dashboardSlice";
-import { Button, Badge, Tooltip } from "@mui/material";
+"use client"
 
-import { styled } from "@mui/material/styles";
-import { showSuccess } from "../utils/toastUtils";
+import { useSelector, useDispatch } from "react-redux"
+import { IoCopyOutline, IoVolumeHighOutline, IoVolumeMuteOutline } from "react-icons/io5"
+import { clearNotifications, toggleIsMuted } from "../features/dashboard/dashboardSlice"
+import { Button, Badge, Tooltip } from "@mui/material"
+
+import { styled } from "@mui/material/styles"
+import { showSuccess } from "../utils/toastUtils"
 const StyledBadge = styled(Badge)(({ theme }) => ({
-"& .MuiBadge-badge": {
-right: 5,
-top: 13,
-border: `2px solid ${(theme.vars ?? theme).palette.background.paper}`,
-padding: "0 4px",
-backgroundColor: "#ff5252",
-},
-}));
+  "& .MuiBadge-badge": {
+    right: 5,
+    top: 13,
+    border: `2px solid ${(theme.vars ?? theme).palette.background.paper}`,
+    padding: "0 4px",
+    backgroundColor: "#ff5252",
+  },
+}))
 
 export const NotificationDropdown = () => {
-  const { notifications,lastUpdated,isMuted } = useSelector(state => state.dashboard);
-  const dispatch = useDispatch();
+  const { notifications, lastUpdated, isMuted } = useSelector((state) => state.dashboard)
+  const dispatch = useDispatch()
 
   const copyToClipboard = (id) => {
-    navigator.clipboard.writeText(id);
-    showSuccess('Order ID copied to clipboard');
-  };
+    navigator.clipboard.writeText(id)
+    showSuccess("Order ID copied to clipboard")
+  }
 
-  const lastSyncTime = lastUpdated? new Date(lastUpdated):null
+  const lastSyncTime = lastUpdated ? new Date(lastUpdated) : null
   return (
-    <div className="relative group py-2"> 
+    <div className="relative group py-2">
       {/* Bell Icon */}
       <div className="cursor-pointer relative">
         <StyledBadge badgeContent={notifications?.length} color={"primary"}>
@@ -37,42 +39,46 @@ export const NotificationDropdown = () => {
       </div>
 
       <div className="absolute right-0 top-full w-72 pt-2 opacity-0 group-hover:opacity-100 transition-opacity invisible group-hover:visible z-50">
-        
         <div className="bg-white shadow-xl border border-gray-200 rounded-xl overflow-hidden">
           <div className="p-3 border-b border-gray-200 flex justify-between items-center">
             <h4 className="font-bold">Recent Updates</h4>
             <div className="flex justify-center items-center gap-2">
-
-            <button 
-              onClick={() => dispatch(toggleIsMuted())}
-              className="p-1 hover:bg-gray-200 rounded-full transition-colors"
-              title={isMuted ? "Unmute" : "Mute"}
+              <button
+                onClick={() => dispatch(toggleIsMuted())}
+                className="p-1 hover:bg-gray-200 rounded-full transition-colors"
+                title={isMuted ? "Unmute" : "Mute"}
               >
-              {isMuted ? (
-                <IoVolumeMuteOutline className="text-red-500" size={18} />
-              ) : (
-                <IoVolumeHighOutline className="text-gray-600" size={18} />
-              )}
-            </button>
-            <button 
-              onClick={() => dispatch(clearNotifications())}
-              className="text-xs text-blue-600 hover:underline"
-            >
-              Clear all
-            </button>
-                </div>
+                {isMuted ? (
+                  <IoVolumeMuteOutline className="text-red-500" size={18} />
+                ) : (
+                  <IoVolumeHighOutline className="text-gray-600" size={18} />
+                )}
+              </button>
+              <button onClick={() => dispatch(clearNotifications())} className="text-xs text-blue-600 hover:underline">
+                Clear all
+              </button>
+            </div>
           </div>
 
-          
           <div className="max-h-64 overflow-y-auto">
             {notifications.length === 0 ? (
               <p className="p-4 text-center text-sm text-gray-500">No new notifications</p>
             ) : (
               notifications.map((n) => (
-                <div key={n.id} className="group/notify p-3 border-b border-gray-200 hover:bg-gray-50 transition-colors flex justify-between items-start">
+                <div
+                  key={n.id}
+                  className="group/notify p-3 border-b border-gray-200 hover:bg-gray-50 transition-colors flex justify-between items-start"
+                >
                   <div className="flex-1 pr-2">
+                    {n.customer && <p className="text-xs text-gray-500 mb-1">{n.customer}</p>}
+
                     <p className="text-sm font-medium">{n.message}</p>
-                    <span className="text-[10px] text-gray-400">{n.time}</span>
+
+                    {n.total && (
+                      <p className="text-sm font-semibold text-green-600 mt-1">₹{n.total.toFixed(2)}</p>
+                    )}
+
+                    <span className="text-[10px] text-gray-400 mt-1">{n.time}</span>
                   </div>
 
                   <Tooltip title="Copy ID" arrow placement="top">
@@ -87,25 +93,22 @@ export const NotificationDropdown = () => {
               ))
             )}
           </div>
-            
 
-            <div className="p-2 border-t bg-gray-50 rounded-b-xl text-center">
-           <div className="flex items-center justify-center gap-2">
-
+          <div className="p-2 border-t bg-gray-50 rounded-b-xl text-center">
+            <div className="flex items-center justify-center gap-2">
               <span className="relative flex h-2 w-2">
                 <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span>
                 <span className="relative inline-flex rounded-full h-2 w-2 bg-green-500"></span>
               </span>
               <p className="text-[10px] text-gray-500 uppercase tracking-wider font-semibold font-sans">
                 {lastSyncTime && !isNaN(lastSyncTime)
-                  ? `Last update: ${lastSyncTime.toLocaleTimeString()}` 
+                  ? `Last update: ${lastSyncTime.toLocaleTimeString()}`
                   : "Connecting..."}
               </p>
-           </div>
-        </div>
-
+            </div>
+          </div>
         </div>
       </div>
     </div>
-  );
-};
+  )
+}
