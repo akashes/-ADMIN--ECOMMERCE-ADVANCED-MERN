@@ -11,7 +11,7 @@ import AddSubCategory from "../pages/Category/AddSubCategory";
 import AddAddress from "../pages/Address/addAddress";
 import EditCategory from "../pages/Category/EditCategory";
 import EditProduct from "../pages/Products/EditProduct";
-import AddBannerV1 from "../pages/Banners/addBannerV1";
+import AddBannerV1 from "../pages/Banners/AddBannerV1";
 import AddBlog from "../pages/Blog/AddBlog";
 import EditBlog from "../pages/Blog/EditBlog";
 
