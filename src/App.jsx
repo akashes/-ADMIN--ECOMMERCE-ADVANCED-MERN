@@ -26,7 +26,7 @@ import BannerV1 from './pages/Banners/index.jsx'
 import BlogList from './pages/Blog/index.jsx'
 import ForgotPassword from './pages/ForgotPassword/index.jsx'
 import ResetPassword from './pages/ResetPassword/index.jsx'
-import VerifyAccount from './pages/VerifyAccount/index.jsx'
+import verifyAccount from './pages/verifyAccount/index.jsx'
 import './App.css'
 import './responsive.css'
 import OrderTracking from './components/OrderTracking/index.jsx'
@@ -98,9 +98,9 @@ const router = createBrowserRouter([
     },
     // Public Routes (No Sidebar/Header)
     { path: 'forgot-password', element: <ForgotPassword/> },
-    { path: 'forgot-verify', element : <VerifyAccount resetPassword={true}/> },
+    { path: 'forgot-verify', element : <verifyAccount resetPassword={true}/> },
     { path: 'reset-password', element : <ResetPassword /> },
-    { path: 'verify', element : <VerifyAccount resetPassword={false} /> },
+    { path: 'verify', element : <verifyAccount resetPassword={false} /> },
     { path: 'change-password', element : <ChangePassword /> },
     {
       path: '/login',
