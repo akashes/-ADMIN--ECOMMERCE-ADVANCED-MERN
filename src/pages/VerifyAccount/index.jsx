@@ -10,7 +10,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { forgotPasswordOtp, verifyEmail } from '../../features/auth/authSlice';
 
 
-const verifyAccount = ({resetPassword}) => {
+const VerifyAccount = ({resetPassword}) => {
     const {loading}=useSelector(state=>state.auth)
     const location = useLocation()
     const navigate = useNavigate()
@@ -160,4 +160,4 @@ const verifyAccount = ({resetPassword}) => {
   )
 }
 
-export default verifyAccount
+export default VerifyAccount
