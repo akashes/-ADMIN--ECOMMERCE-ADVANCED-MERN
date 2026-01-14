@@ -1,7 +1,6 @@
 import  Button  from '@mui/material/Button'
 import React, { useContext, useEffect, useState } from 'react'
 
-import { IoIosAdd } from "react-icons/io";
 
 import Checkbox from '@mui/material/Checkbox';
 import { Link } from 'react-router-dom'
@@ -300,7 +299,7 @@ useEffect(()=>{
 },[])
 useEffect(() => {
   setPage(0);
-}, [ratingFilter,isFeaturedFilter]);
+}, [ratingFilter,isFeaturedFilter,formFields,debouncedSearchTerm]);
 
 const selectedRootCategory = categories.find((category) => category._id === formFields.category);
 const subCategories = selectedRootCategory?.children || [];

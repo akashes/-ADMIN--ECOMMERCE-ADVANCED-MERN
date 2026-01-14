@@ -11,6 +11,8 @@ import { PersistGate } from 'redux-persist/integration/react'
 axios.defaults.baseURL = import.meta.env.VITE_API_URL
 axios.defaults.withCredentials = true
 
+import './api/axiosConfig.js'
+
 createRoot(document.getElementById('root')).render(
     <Provider store={store}>
         <PersistGate loading={null} persistor={persistor}>

@@ -28,7 +28,8 @@ const getStatusChip = (status) => {
     shipped: { label: "Shipped", color: "primary" },
     "on-the-way": { label: "On the Way", color: "secondary" },
     delivered: { label: "Delivered", color: "success" },
-    cancelled: { label: "cancelled", color: "error" },
+    cancelled: { label: "Cancelled", color: "error" },
+    'cancel-requested':{label:'Cancel Requested',color:'green'}
   };
 
   const { label, color } = colorMap[status] || { label: status, color: "default" };
@@ -56,7 +57,6 @@ const Orders = () => {
   search: "",
   dateRange:""
 });
-console.log(filters)
 
         const[showProducts,setShowProducts]=useState(null)
       const isShowOrderedProduct=(index)=>{
@@ -141,10 +141,10 @@ async function validateOrderTransition(order,status){
     setSearchTerm(e.target.value);
   };
 
-      useEffect(()=>{
-        dispatch(getOrders())
+      // useEffect(()=>{
+      //   dispatch(getOrders())
 
-      },[])
+      // },[])
 
       useEffect(()=>{
         dispatch(getOrders({page,limit,...filters}))
@@ -393,7 +393,7 @@ const handleApproveRefund = async (id) => {
                     let isOrderStatusLoading = order._id == orderStatusLoading
                     console.log(order)
                     return(
-                      <>
+                      <React.Fragment key={order._id}>
                                       <tr className={`bg-white border-b border-b-[rgba(0,0,0,0.2)] ${isOrderStatusLoading && 'uploading-gradient-delete'} ${order.order_status==='cancelled' && 'opacity-60'}`}>
                   <td className="px-6 py-4 font-[500]">
                       <Button  className="  !w-[25px] !h-[25px] !min-w-[25px] md:!w-[35px] md:!h-[35px] md:!min-w-[35px] !rounded-full !bg-[#cfcdcd] !text-black"
@@ -682,7 +682,7 @@ const handleApproveRefund = async (id) => {
                   )
                 }
            
-                      </>
+                      </React.Fragment>
 
                     )
                   })

@@ -12,7 +12,7 @@ import { FaEyeSlash } from "react-icons/fa";
 import CircularProgress from '@mui/material/CircularProgress';
 import { useDispatch, useSelector } from 'react-redux';
 import { showError, showSuccess, showWarning } from '../../utils/toastUtils';
-import {  loginUser, userLogin } from '../../features/auth/authSlice';
+import {   setGoogleAuthCredentials, userLogin } from '../../features/auth/authSlice';
 
 import { getAuth, signInWithPopup, GoogleAuthProvider } from "firebase/auth";
 import { firebaseApp } from '../../utils/firebase';
@@ -58,7 +58,7 @@ const [loadingGoogle, setLoadingGoogle] = useState(false);
         console.log(fields)
            setLoadingGoogle(true)
         const res = await axios.post('/api/user/google-auth', fields)
-        console.log(res)
+        console.log(res.data.data)
         setLoadingGoogle(false)
         if(!res.data.success){
             showError(res.data.message || 'Registration failed')
@@ -70,9 +70,14 @@ const [loadingGoogle, setLoadingGoogle] = useState(false);
         //setting email to local storage
         localStorage.setItem('verifyEmail',fields.email)
                localStorage.setItem('admin_accessToken',res.data.data.accessToken)
+               localStorage.setItem('admin_user', JSON.stringify(res.data.data.user)) // Save user too if needed for auto-login logic
                 // localStorage.setItem('refreshToken',result.data.refreshToken)
                 // authContext.login(res.data.accessToken,res.data.user)
-                 await dispatch(loginUser({token:res.data.data.accessToken,user:res.data.data.user}))
+                //  await dispatch(loginUser({token:res.data.data.accessToken,user:res.data.data.user}))
+                dispatch(setGoogleAuthCredentials({
+                user: res.data.data.user,
+                token: res.data.data.accessToken
+            }));
     
         showSuccess(res.data.message || 'Login successful',3000)
         navigate('/')
@@ -113,10 +118,10 @@ const [loadingGoogle, setLoadingGoogle] = useState(false);
         
         showSuccess(resultAction.payload.message ||'Login successful')
         navigate('/')
-        await dispatch(loginUser({
-            token: resultAction.payload.accessToken,
-            user: resultAction.payload.user
-        }))
+        // await dispatch(loginUser({
+        //     token: resultAction.payload.accessToken,
+        //     user: resultAction.payload.user
+        // }))
 
   } 
   if(userLogin.rejected.match(resultAction)){

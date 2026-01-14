@@ -11,7 +11,7 @@ import { FaEyeSlash } from "react-icons/fa";
 import { showError, showSuccess, showWarning } from '../../utils/toastUtils';
 import CircularProgress from '@mui/material/CircularProgress';
 import { useDispatch } from 'react-redux';
-import { loginUser, registerUser } from '../../features/auth/authSlice';
+import {  registerUser } from '../../features/auth/authSlice';
 
 
 import { getAuth, signInWithPopup, GoogleAuthProvider } from "firebase/auth";
@@ -133,7 +133,7 @@ const[isPasswordShow,setIsPasswordShow]=useState(false);
                  localStorage.setItem('admin_accessToken',res.data.data.accessToken)
                   // localStorage.setItem('refreshToken',result.data.refreshToken)
                   // authContext.login(res.data.accessToken,res.data.user)
-                   await dispatch(loginUser({token:res.data.data.accessToken,user:res.data.data.user}))
+                //    await dispatch(loginUser({token:res.data.data.accessToken,user:res.data.data.user}))
       
           showSuccess(res.data.message || 'Login successful',3000)
           navigate('/')

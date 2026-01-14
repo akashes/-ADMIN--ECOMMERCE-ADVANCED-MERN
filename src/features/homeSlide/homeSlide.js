@@ -1,10 +1,9 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
-import axiosInstance from "../../api/axiosInstance";
-
+import axios from "axios";
 
 export const addHomeSlide = createAsyncThunk('homeSlide/addHomeSlide',async(formData,{rejectWithValue})=>{
     try {
-        const result = await axiosInstance.post('/api/homeSlides/create',formData)
+        const result = await axios.post('/api/homeSlides/create',formData)
         if(!result.data.success){
             
             throw new Error(result.data.message || 'Failed to add Home Slide')
@@ -18,7 +17,7 @@ export const addHomeSlide = createAsyncThunk('homeSlide/addHomeSlide',async(form
 
 export const getHomeSlides=createAsyncThunk('homeSlide/getHomeSlides',async(_,{rejectWithValue})=>{
     try {
-        const result=await axiosInstance.get('/api/homeSlides')
+        const result=await axios.get('/api/homeSlides')
         if(!result.data.success){
             
             throw new Error(result.data.message || 'Failed to fetch Home-slides')
@@ -36,7 +35,7 @@ export const getHomeSlides=createAsyncThunk('homeSlide/getHomeSlides',async(_,{r
 export const deleteHomeSlide=createAsyncThunk('homeSlide/deleteHomeSlide',async(id,{rejectWithValue})=>{
 
     try {
-        const result=await axiosInstance.delete(`/api/homeSlides?id=${id}`)
+        const result=await axios.delete(`/api/homeSlides?id=${id}`)
         if(!result.data.success){
             
             throw new Error(result.data.message || 'Failed to delete Home Slide')
