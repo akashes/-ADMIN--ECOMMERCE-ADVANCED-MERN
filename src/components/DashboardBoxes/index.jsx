@@ -61,9 +61,9 @@ const DashboardBoxes = () => {
       {!stats ? (
         <oxesSkelton />
       ) : (
-        <div className=" dashboard-box">
+        <div className=" dashboard-box w-full overflow-hidden">
           <Swiper
-            className="!overflow-y-visible  "
+            className="!overflow-y-visible w-full  p-4 "
             spaceBetween={12}
             modules={[Pagination, FreeMode]}
             freeMode={true}
