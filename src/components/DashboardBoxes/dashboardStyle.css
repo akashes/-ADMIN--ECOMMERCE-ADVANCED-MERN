@@ -1,9 +1,14 @@
 .dashboard-box .swiper {
   overflow-y: hidden !important;
+
 }
 
 .dashboard-box .swiper::-webkit-scrollbar {
   display: none !important;
+}
+.swiper-wrapper{
+  overflow-x: scroll;
+  scrollbar-width: none;
 }
 
 

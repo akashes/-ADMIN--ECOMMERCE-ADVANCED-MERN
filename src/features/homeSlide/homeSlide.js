@@ -55,22 +55,23 @@ const homeSlideSlice = createSlice({
     name:"homeSlide",
     initialState:{
         homeSlides:[],
-        currentHomeSlide:null
+        currentHomeSlide:null,
+        loading:false
     },
     reducers:{
      
     },
    extraReducers:(builder)=>{
               builder.addCase(addHomeSlide.pending,(state)=>{
-              state.loading = true
+            //   state.loading = true
               state.error = null
           }),
           builder.addCase(addHomeSlide.fulfilled,(state,action)=>{
-              state.loading = true
+            //   state.loading = true
               state.error = null
           }),
           builder.addCase(addHomeSlide.rejected,(state)=>{
-              state.loading = false
+            //   state.loading = false
               state.error = null
           })
           builder.addCase(getHomeSlides.pending,(state)=>{
@@ -87,16 +88,16 @@ const homeSlideSlice = createSlice({
               state.error = null
           })
           builder.addCase(deleteHomeSlide.pending,(state)=>{
-              state.loading = true
+            //   state.loading = true
               state.error = null
           }),
           builder.addCase(deleteHomeSlide.fulfilled,(state,action)=>{
-              state.loading = true
+            //   state.loading = true
               state.error = null
               state.homeSlides = state.homeSlides.filter((slide)=>slide._id!==action.payload.id)
           }),
           builder.addCase(deleteHomeSlide.rejected,(state)=>{
-              state.loading = true
+            //   state.loading = true
               state.error = null
           })
     }

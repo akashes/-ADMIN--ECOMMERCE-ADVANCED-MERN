@@ -28,6 +28,7 @@ import { MyContext } from '../../App';
 import { deleteHomeSlide, getHomeSlides } from '../../features/homeSlide/homeSlide';
 import { showError, showSuccess } from '../../utils/toastUtils';
 import './homeSlide.css'
+import { HomeSlidesSkeleton } from '../../components/Skeltons/HomeSlidesSkelton';
 
 const columns=[
   {id:'Image',label:'IMAGE'},
@@ -39,7 +40,7 @@ const HomeSliderBanners = () => {
     const dispatch = useDispatch()
 
     //Redux State
-    const {homeSlides}=useSelector(state=>state.homeSlide)
+    const {homeSlides,loading}=useSelector(state=>state.homeSlide)
 
     //UI States
     const [previewOpen, setPreviewOpen] = useState(false);
@@ -124,8 +125,9 @@ const HomeSliderBanners = () => {
 
 
           <TableBody>
-            {
-              homeSlides?.length>0 && homeSlides.map((slide)=>(
+           {
+            homeSlides?.length>0 ? (
+              homeSlides.map((slide)=>(
                 <TableRow key={slide._id} className={`${deleteId ===slide._id && 'uploading-gradient-delete'}`} >
         
               <TableCell 
@@ -172,7 +174,12 @@ const HomeSliderBanners = () => {
         
             </TableRow>
               ))
-            }
+            ):(
+              <>
+              <HomeSlidesSkeleton/>
+              </>
+            )
+           }
    
 
           

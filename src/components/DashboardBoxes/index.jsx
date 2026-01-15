@@ -105,7 +105,7 @@ useEffect(()=>{
       </div>
       <IoStatsChart className="text-[80px] text-white/20 absolute bottom-2 right-2" />
       {pulseOrder && (
-      <span className="absolute -top-2 -right-2 bg-red-500 text-white text-[10px] font-bold px-2 py-1 rounded-full shadow-lg animate-bounce">
+      <span className="absolute top-2 -right-2 bg-red-500 text-white text-[10px] font-bold px-2 py-1 rounded-full shadow-lg animate-bounce">
         NEW
       </span>
     )}
