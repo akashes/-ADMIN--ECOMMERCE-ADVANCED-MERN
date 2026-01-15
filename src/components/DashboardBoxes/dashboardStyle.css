@@ -6,7 +6,10 @@
 .dashboard-box .swiper::-webkit-scrollbar {
   display: none !important;
 }
-
+.swiper-wrapper{
+  overflow-x: scroll;
+  scrollbar-width: none;
+}
 
 
 /* dashboardStyle.css */

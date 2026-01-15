@@ -63,7 +63,7 @@ const DashboardBoxes = () => {
       ) : (
         <div className=" dashboard-box">
           <Swiper
-            className="!overflow-y-visible !overflow-x-visible "
+            className="!overflow-y-visible  "
             spaceBetween={12}
             modules={[Pagination, FreeMode]}
             freeMode={true}
