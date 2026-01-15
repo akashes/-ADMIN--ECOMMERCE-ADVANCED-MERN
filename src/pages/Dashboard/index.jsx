@@ -463,10 +463,7 @@ leading-snug sm:leading-normal font-bold  mb-3 '>Welcome, {context.windowWidth>9
     <img src="https://res.cloudinary.com/dllelmzim/image/upload/v1753076866/shop-illustration_lpdjyl.webp" alt="" className=' w-[220px]  md:w-[250px] max-w-full' />
 
    </div>
-   <div className="flex-1 min-w-0" >
-
    <DashboardBoxes/>
-   </div>
 
  
 
