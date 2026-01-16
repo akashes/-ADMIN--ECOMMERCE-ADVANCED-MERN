@@ -28,7 +28,6 @@ const isMutedRef = useRef(isMuted)
 
     //  Define Listeners
     socket.current.on('new-order-notification', (data) => {
-      alert('hai')
         //notification sound
         if(!isMutedRef.current){
 
