@@ -10,16 +10,27 @@ export const SocketProvider = ({ children }) => {
   const socket = useRef(null);
   const notificationSound = useRef(new Audio('/notification.mp3'))
 const{isMuted}=useSelector(state=>state.dashboard)
+const isMutedRef = useRef(isMuted)
+
   useEffect(() => {
+    console.log('inside socket provider')
     //  Initialize socket connection
     socket.current = io(import.meta.env.VITE_API_URL, {
       withCredentials: true,
     });
 
+    //join room
+    socket.current.on('connect', () => {
+        console.log("Socket Connected: Joining Admin Room...");
+        socket.current.emit('join-admin-room');
+        console.log('joined admin room')
+    });
+
     //  Define Listeners
     socket.current.on('new-order-notification', (data) => {
+      alert('hai')
         //notification sound
-        if(!isMuted){
+        if(!isMutedRef.current){
 
           notificationSound.current.play().catch(()=>console.log('Audio blocked'))
         }
@@ -51,7 +62,7 @@ const{isMuted}=useSelector(state=>state.dashboard)
         socket.current.disconnect();
       }
     };
-  }, [dispatch,isMuted]);
+  }, [dispatch]);
 
   return (
     <SocketContext.Provider value={socket.current}>
